@@ -6,12 +6,12 @@ const fs   = require("fs");
 const yaml = require("js-yaml");
 
 /**
- * Required by system to perform file carcass initialization
+ * Required by system to perform file initialization
  * @inner
  * @memberof module:system
- * @param {string} rootDir 
- * @param {string} relativeInitDir 
- * @param {string} initFilename
+ * @param {string} rootDir Absolute root directory
+ * @param {string} relativeInitDir Relative path to root
+ * @param {string} initFilename Filename
  * @throws {external:Error} Standard error with message
  */
 class SystemLoader{
@@ -247,4 +247,3 @@ var loadYaml = function(filename){
 }
 
 exports.SystemLoader = SystemLoader;
-exports.loadYaml = loadYaml;
