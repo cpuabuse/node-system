@@ -1,9 +1,9 @@
 {
   "name": "cpuabuse-system",
-	"version": "0.0.1",
-	"main": "index.js",
+  "version": "0.0.1",
+  "main": "index.js",
   "scripts": {
-    "test": "RESULT=$(node test.js) && exit $RESULT"
+    "test": "node test/test.js && exit $?"
   },
   "repository": {
     "type": "git",
@@ -11,5 +11,5 @@
   },
   "dependencies": {
     "js-yaml": "^3.12.0"
-	}
+  }
 }

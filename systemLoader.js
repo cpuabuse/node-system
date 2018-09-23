@@ -247,3 +247,4 @@ var loadYaml = function(filename){
 }
 
 exports.SystemLoader = SystemLoader;
+exports.loadYaml = loadYaml;
