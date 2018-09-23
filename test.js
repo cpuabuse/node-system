@@ -1,7 +1,9 @@
-export function test(){
+test();
+
+function test(){
     // If all good
-    return 0;
+    //return 0;
 
     // If all bad
-    return 1;
+    console.log(1);
 }
