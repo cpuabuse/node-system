@@ -267,6 +267,7 @@ async function initSettings(
 /**
  * Parses YAML file, and returns and object; Adds extension if absent
  * @inner
+ * @memberof module:system~SystemLoader
  * @param {string} directory Absolute directory path
  * @param {string} filename Filename, with or without extension
  * @returns {external:Promise} Javascript object
