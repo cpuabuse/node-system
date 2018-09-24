@@ -1,4 +1,9 @@
 planets:
-- Earth
-- Mars
-- Jupiter
+- mercury
+- venus
+- earth
+- mars
+- jupiter
+- saturn
+- uranus
+- neptune
