@@ -10,6 +10,7 @@
     "url": "git+https://github.com/cpuabuse/node-system.git"
   },
   "dependencies": {
+    "eslint": "^5.6.0",
     "js-yaml": "^3.12.0"
   }
 }
