@@ -25,6 +25,8 @@ instance | `#` | `@instance`
 * [system](#module_system)
     * [~SystemLoader](#module_system..SystemLoader)
         * [new SystemLoader(rootDir, relativeInitDir, initFilename)](#new_module_system..SystemLoader_new)
+        * _instance_
+            * [.load](#module_system..SystemLoader+load) : [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
         * _static_
             * [.getFile(folder, file)](#module_system..SystemLoader.getFile) ⇒ <code>external.Promise</code>
             * [.toRelative(absoluteDir, absoluteFile)](#module_system..SystemLoader.toRelative) ⇒ <code>external.Promise</code>
@@ -47,6 +49,8 @@ Required by system to perform file initialization
 
 * [~SystemLoader](#module_system..SystemLoader)
     * [new SystemLoader(rootDir, relativeInitDir, initFilename)](#new_module_system..SystemLoader_new)
+    * _instance_
+        * [.load](#module_system..SystemLoader+load) : [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
     * _static_
         * [.getFile(folder, file)](#module_system..SystemLoader.getFile) ⇒ <code>external.Promise</code>
         * [.toRelative(absoluteDir, absoluteFile)](#module_system..SystemLoader.toRelative) ⇒ <code>external.Promise</code>
@@ -74,6 +78,12 @@ Required by system to perform file initialization
 | relativeInitDir | <code>string</code> | Relative path to root |
 | initFilename | <code>string</code> | Filename |
 
+<a name="module_system..SystemLoader+load"></a>
+
+#### systemLoader.load : [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+Promise containing result of loading
+
+**Kind**: instance property of [<code>SystemLoader</code>](#module_system..SystemLoader)  
 <a name="module_system..SystemLoader.getFile"></a>
 
 #### SystemLoader.getFile(folder, file) ⇒ <code>external.Promise</code>

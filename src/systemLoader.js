@@ -18,9 +18,14 @@ const yaml = require("js-yaml");
  * @throws {external:Error} Standard error with message
  */
 class SystemLoader{
-	constructor(rootDir, arg_relativeInitDir, arg_initFilename, callback){
+	constructor(rootDir, arg_relativeInitDir, arg_initFilename){
 		// Initialization recursion
-		initRecursion(rootDir, arg_relativeInitDir, arg_initFilename, this).then(() => callback());
+		/** 
+		 * Promise containing result of loading
+		 * @instance
+		 * @type {external:Promise}
+		*/
+		this.load = initRecursion(rootDir, arg_relativeInitDir, arg_initFilename, this);
 	}
 
 	/**

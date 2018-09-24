@@ -8,4 +8,5 @@ const SystemLoader = require("../src/systemLoader.js");
 
 // Check SystemLoader functions
 console.log("Checking SystemLoader with dummy...")
-var sl = new SystemLoader.SystemLoader("./", "test/", "stars", () => console.log("Complete"));
+var sl = new SystemLoader.SystemLoader("./", "test/", "stars");
+sl.load.then(console.log("Complete"));
