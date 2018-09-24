@@ -1,6 +1,6 @@
 // systemLoader.js
 /** 
- * 
+ * Contains methods necessary to initialize the system and work with file system.
 */
 "use strict";
 
@@ -18,18 +18,16 @@ const yaml = require("js-yaml");
  * @throws {external:Error} Standard error with message
  */
 class SystemLoader{
-	constructor(rootDir, arg_relativeInitDir, arg_initFilename){
+	constructor(rootDir, arg_relativeInitDir, arg_initFilename, callback){
 		// Initialization recursion
-		initRecursion(rootDir, arg_relativeInitDir, arg_initFilename, this);
+		initRecursion(rootDir, arg_relativeInitDir, arg_initFilename, this).then(() => callback());
 	}
 
-	
 	/**
 	 * Gets file contents
 	 * @param {string} folder Absolute file location
 	 * @param {string} file Full file name
 	 * @returns {external.Promise} File contents
-	 * @memberof SystemLoader
 	 */
 	static getFile(folder, file){
 		return new Promise(function(resolve, reject){
@@ -43,14 +41,20 @@ class SystemLoader{
 		});
 	}
 	
+	/**
+	 * Converts absolute path to relative path
+	 * @param {string} absoluteDir Absolute file location
+	 * @param {string|string[]} absoluteFile File name|names
+	 * @returns {external.Promise} Relative path|paths
+	 */
 	static toRelative(absoluteDir, absoluteFile){
-		return new Promise(function(resolve, reject){
+		return new Promise(function(resolve){
 			if (Array.isArray(absoluteFile)){
 				var files = new Array(); // Prepare the return array
 
 				// Populate return array
 				absoluteFile.forEach(function(file){
-					files.push(path.relative(absoluteDir, absoluteFile));
+					files.push(path.relative(absoluteDir, file));
 				})
 
 				// Resolve with the array
@@ -64,12 +68,12 @@ class SystemLoader{
 
 	/** 
 	 * Convert a file/folder or array of files/folders to absolute(system absolute) path.
-	 * @param {string} relativeDir
-	 * @param {string|string[]} file
-	 * @returns {external.Promise}
+	 * @param {string} relativeDir Relative file location
+	 * @param {string|string[]} file File name|names
+	 * @returns {external.Promise} Absolute path|paths
 	 */
 	static toAbsolute(relativeDir, file){
-		return new Promise(function(resolve, reject){
+		return new Promise(function(resolve){
 			if (Array.isArray(file)){
 				var files = new Array(); // Prepare the return array
 
@@ -87,12 +91,18 @@ class SystemLoader{
 		});
 	}
 
-	/** Returns `true` if a file, `false` if not */
+	/**
+	 * Checks if is a file
+	 * @param {string} rootDir Absolute root directory
+	 * @param {string} relativeDir Relative directory to root
+	 * @param {string} filename Full filename
+	 * @returns {boolean} Returns `true` if a file, `false` if not
+	 */
 	static isFile(rootDir, relativeDir, filename){
-		return new Promise(function(resolve, reject){
+		return new Promise(function(resolve){
 			fs.stat(path.join(rootDir, relativeDir, filename), function(err, stats){
 				if (err){
-					reject(err);
+					resolve(false);
 				} else {
 					resolve(!stats.isDirectory());
 				}
@@ -100,12 +110,17 @@ class SystemLoader{
 		});
 	} 
 	
-	/** Returns `true` if a directory, `false` if not */
+	/**
+	 * Checks if is a directory
+	 * @param {string} rootDir Absolute root directory
+	 * @param {string} relativeDir Relative directory to root
+	 * @returns {boolean} Returns `true` if a directory, `false` if not
+	 */
 	static isDir(rootDir, relativeDir){
-		return new Promise(function(resolve, reject){
+		return new Promise(function(resolve){
 			fs.stat(path.join(rootDir, relativeDir), function(err, stats){
 				if (err){
-					reject(err);
+					resolve(false);
 				} else {
 					resolve(stats.isDirectory());
 				}
@@ -115,13 +130,13 @@ class SystemLoader{
 	
 	/** 
 	 * Returns an array of strings, representing the contents of a folder
-	 * @param {sting} root
-	 * @param {string} folder
-	 * @returns {external:Promise}
+	 * @param {sting} rootDir Root directory
+	 * @param {string} relativeDir Relative directory
+	 * @returns {external:Promise} Array with contents; Rejects with errors from https://nodejs.org/api/fs.html#fs_fs_readdir_path_options_callback
 	 */
-	static list(root, folder){
+	static list(rootDir, relativeDir){
 		return new Promise(function(resolve, reject){
-			fs.readdir(path.join(root, folder),function(err, files){
+			fs.readdir(path.join(rootDir, relativeDir), function(err, files){
 				if (err){
 					reject(err);
 				} else {
@@ -131,6 +146,11 @@ class SystemLoader{
 		});
 	}
 
+	/**
+	 * Converts YAML string to a JS object
+	 * @param {string} string YAML string
+	 * @returns {object} Javascript object
+	 */
 	static yamlToObject(string){
 		return yaml.load(string);
 	}
@@ -139,10 +159,11 @@ class SystemLoader{
 /**
  * @inner
  * @memberof module:system~SystemLoader
- * @param {string} rootDir 
- * @param {object} sourceObject 
- * @param {string} sourceKey 
- * @param {object} targetObject
+ * @param {string} rootDir Root directory
+ * @param {object} relativePath Relative path
+ * @param {string} initFilename Filename for settings 
+ * @param {object} targetObject Object to be filled
+ * @returns {external:Promise}
  * @example <caption>Default filename - null</caption> @lang yaml
  * # Variable settings to be populated with data from "./settings.yml"
  * [settings:]
@@ -150,7 +171,7 @@ class SystemLoader{
  * # Variable settings to be populated with data from "./settings.yml"
  * [settings: ""] 
  * @example <caption>Specified filename</caption> @lang yaml
- * # Variable settings to be populated with data from ".\xxx.yml"
+ * # Variable settings to be populated with data from "./xxx.yml"
  * [settings: "xxx"]
  * @example <caption>Default extension</caption> @lang yaml
  * # The "extension"(recursion) with default variables will be assumed, so that variable "settings" will be recursively populated with files located in "settings/settings.yml"
@@ -167,7 +188,7 @@ class SystemLoader{
  *   name:
  *   path: # Note: path may be either absolute(default) or relative(relative to the folder from which the file containing instructions is read), the system will not read files outside of system_root_dir tree.
  */
-var initRecursion = function(rootDir, relativePath, initFilename, targetObject){
+async function initRecursion(rootDir, relativePath, initFilename, targetObject){
 	// Initialize the initialization file
 	let initPath = path.resolve(rootDir, relativePath);
 	let init = initSettings(initPath, initFilename);
@@ -206,8 +227,8 @@ var initRecursion = function(rootDir, relativePath, initFilename, targetObject){
 			if (init[key] == ""){ // Filename is same as the key
 				break;
 			} else {
-			// Specific filename
-			targetObject[key] = initSettings(path.resolve(rootDir, relativePath), init[key]);
+				// Specific filename
+				targetObject[key] = await initSettings(path.resolve(rootDir, relativePath), init[key]);
 			}
 			break;
 
@@ -216,25 +237,26 @@ var initRecursion = function(rootDir, relativePath, initFilename, targetObject){
 		}
 
 		// By default we are looking for the settings files to reside within the initialization folder, but this can be changed later
-		targetObject[key] = initSettings(path.resolve(rootDir, relativePath), key);
+		targetObject[key] = await initSettings(path.resolve(rootDir, relativePath), key);
 	}
 }
 
 /**
- * Init and populate globalspace with settings - specific global object member per file
+ * Init and populate globalspace with settings - specific global object member per file.
+ * Semantically this function has broader purpose than loadYaml.
  * @inner
  * @memberof module:system~SystemLoader
- * @param {string} initPath 
- * @param {string} filename 
- * @returns {object}
+ * @param {string} initPath Path to the settings file
+ * @param {string} filename Filename
+ * @returns {object} Javascript object with settings
  */
-var initSettings = function(
+async function initSettings(
 	initPath,
 	filename // Filename, without extention; If null, then varname will be used instead
 ){
     try {
         // Set the global object from an argument of varname to data from YAML file with path constructed from varname; or filename, if filename provided
-        return loadYaml(path.join(initPath, filename));
+        return await loadYaml(initPath, filename);
     } catch (err) {
         console.error("Critical file not loaded - " + filename);
         // Error thrown for now. Because the caller handling of the systemErrorLevel variable does not exist yet.
@@ -242,8 +264,14 @@ var initSettings = function(
     }
 }
 
-// Parses YAML file, and returns and object; Adds extension if absent
-var loadYaml = function(filename){
+/**
+ * Parses YAML file, and returns and object; Adds extension if absent
+ * @inner
+ * @param {string} directory Absolute directory path
+ * @param {string} filename Filename, with or without extension
+ * @returns {external:Promise} Javascript object
+ */
+async function loadYaml(directory, filename){
 	var fileExtension = ".yml"; // Making a variale for interpreted language like this would not even save any memory, but it feels right
 
 	// Add file extension if absent
@@ -253,7 +281,7 @@ var loadYaml = function(filename){
 
 	// Try to read the file contents and retuen them; If we fail, we log filename to error stream, and rethrow the error
 	try {
-		var contents = fs.readFileSync(filename, "utf8");
+		var contents = await SystemLoader.getFile(directory, filename);
 		return yaml.load(contents);
 	} catch (err) {
 		// Prints path of problem filename
