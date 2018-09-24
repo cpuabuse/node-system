@@ -1,4 +1,7 @@
 // systemLoader.js
+/** 
+ * 
+*/
 "use strict";
 
 const path = require("path");
@@ -20,11 +23,24 @@ class SystemLoader{
 		initRecursion(rootDir, arg_relativeInitDir, arg_initFilename, this);
 	}
 
+	
 	/**
 	 * Gets file contents
+	 * @param {string} folder Absolute file location
+	 * @param {string} file Full file name
+	 * @returns {external.Promise} File contents
+	 * @memberof SystemLoader
 	 */
 	static getFile(folder, file){
-		return fs.readFileSync(path.join(folder, file), "utf8");
+		return new Promise(function(resolve, reject){
+			return fs.readFile(path.join(folder, file), "utf8", function(err, data){
+				if (err){
+					reject(err);
+				} else {
+					resolve(data);
+				}
+			});			
+		});
 	}
 	
 	static toRelative(absoluteDir, absoluteFile){
@@ -50,7 +66,7 @@ class SystemLoader{
 	 * Convert a file/folder or array of files/folders to absolute(system absolute) path.
 	 * @param {string} relativeDir
 	 * @param {string|string[]} file
-	 * @return {external.Promise}
+	 * @returns {external.Promise}
 	 */
 	static toAbsolute(relativeDir, file){
 		return new Promise(function(resolve, reject){
