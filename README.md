@@ -3,55 +3,6 @@
 
 # System
 
-## Modules
-
-<dl>
-<dt><a href="#module_system">system</a></dt>
-<dd><p>System is intended more than anything, for centralized managment.</p>
-<p><strong>Files &amp; Data</strong></p>
-<ul>
-<li>Default file extension is added, if missing</li>
-<li>For empty value in key/value pair, value equal to key is assumed</li>
-<li>In absent key/value child pairs, default values for missing keys are assumed</li>
-</ul>
-<p><strong>JSDoc - Member Declaration</strong></p>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Selector</th>
-<th>Declaration</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>static</td>
-<td><code>.</code></td>
-<td>Default</td>
-</tr>
-<tr>
-<td>inner</td>
-<td><code>~</code></td>
-<td><code>@inner</code><br><code>@memberof module:myModule~myMember</code></td>
-</tr>
-<tr>
-<td>instance</td>
-<td><code>#</code></td>
-<td><code>@instance</code></td>
-</tr>
-</tbody>
-</table>
-</dd>
-</dl>
-
-## Functions
-
-<dl>
-<dt><a href="#loadYaml">loadYaml(directory, filename)</a> ⇒ <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code></dt>
-<dd><p>Parses YAML file, and returns and object; Adds extension if absent</p>
-</dd>
-</dl>
-
 <a name="module_system"></a>
 
 ## system
@@ -85,6 +36,7 @@ instance | `#` | `@instance`
         * _inner_
             * [~initRecursion(rootDir, relativePath, initFilename, targetObject)](#module_system..SystemLoader..initRecursion) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
             * [~initSettings(initPath, filename)](#module_system..SystemLoader..initSettings) ⇒ <code>object</code>
+            * [~loadYaml(directory, filename)](#module_system..SystemLoader..loadYaml) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 
 <a name="module_system..SystemLoader"></a>
 
@@ -106,6 +58,7 @@ Required by system to perform file initialization
     * _inner_
         * [~initRecursion(rootDir, relativePath, initFilename, targetObject)](#module_system..SystemLoader..initRecursion) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
         * [~initSettings(initPath, filename)](#module_system..SystemLoader..initSettings) ⇒ <code>object</code>
+        * [~loadYaml(directory, filename)](#module_system..SystemLoader..loadYaml) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 
 <a name="new_module_system..SystemLoader_new"></a>
 
@@ -271,12 +224,12 @@ Semantically this function has broader purpose than loadYaml.
 | initPath | <code>string</code> | Path to the settings file |
 | filename | <code>string</code> | Filename |
 
-<a name="loadYaml"></a>
+<a name="module_system..SystemLoader..loadYaml"></a>
 
-## loadYaml(directory, filename) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+#### SystemLoader~loadYaml(directory, filename) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 Parses YAML file, and returns and object; Adds extension if absent
 
-**Kind**: global function  
+**Kind**: inner method of [<code>SystemLoader</code>](#module_system..SystemLoader)  
 **Returns**: [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) - Javascript object  
 
 | Param | Type | Description |
