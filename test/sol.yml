@@ -1,9 +1,8 @@
-planets:
-- mercury
-- venus
-- earth
-- mars
-- jupiter
-- saturn
-- uranus
-- neptune
+planet0: Mercury
+planet1: Venus
+planet2: Earth
+planet3: Mars
+planet4: Jupiter
+planet5: Saturn
+planet6: Uranus
+planet7: Neptune

@@ -1,1 +1,5 @@
 sol:
+alphacentauri:
+  file: alphacentauri.yml
+  path: relative
+  folder: close/veryclose

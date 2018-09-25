@@ -1,5 +1,5 @@
 // systemLoader.js
-/** 
+/**
  * Contains methods necessary to initialize the system and work with file system.
 */
 "use strict";
@@ -20,12 +20,13 @@ const yaml = require("js-yaml");
 class SystemLoader{
 	constructor(rootDir, arg_relativeInitDir, arg_initFilename){
 		// Initialization recursion
-		/** 
+		/**
 		 * Promise containing result of loading
 		 * @instance
 		 * @type {external:Promise}
 		*/
-		this.load = initRecursion(rootDir, arg_relativeInitDir, arg_initFilename, this);
+		this.data = {};
+		this.load = initRecursion(rootDir, arg_relativeInitDir, arg_initFilename, this.data);
 	}
 
 	/**
@@ -42,10 +43,10 @@ class SystemLoader{
 				} else {
 					resolve(data);
 				}
-			});			
+			});
 		});
 	}
-	
+
 	/**
 	 * Converts absolute path to relative path
 	 * @param {string} absoluteDir Absolute file location
@@ -71,7 +72,7 @@ class SystemLoader{
 		});
 	}
 
-	/** 
+	/**
 	 * Convert a file/folder or array of files/folders to absolute(system absolute) path.
 	 * @param {string} relativeDir Relative file location
 	 * @param {string|string[]} file File name|names
@@ -113,8 +114,8 @@ class SystemLoader{
 				}
 			});
 		});
-	} 
-	
+	}
+
 	/**
 	 * Checks if is a directory
 	 * @param {string} rootDir Absolute root directory
@@ -132,8 +133,8 @@ class SystemLoader{
 			});
 		});
 	}
-	
-	/** 
+
+	/**
 	 * Returns an array of strings, representing the contents of a folder
 	 * @param {sting} rootDir Root directory
 	 * @param {string} relativeDir Relative directory
@@ -147,7 +148,7 @@ class SystemLoader{
 				} else {
 					resolve(files);
 				}
-			});			
+			});
 		});
 	}
 
@@ -166,7 +167,7 @@ class SystemLoader{
  * @memberof module:system~SystemLoader
  * @param {string} rootDir Root directory
  * @param {object} relativePath Relative path
- * @param {string} initFilename Filename for settings 
+ * @param {string} initFilename Filename for settings
  * @param {object} targetObject Object to be filled
  * @returns {external:Promise}
  * @example <caption>Default filename - null</caption> @lang yaml
@@ -174,7 +175,7 @@ class SystemLoader{
  * [settings:]
  * @example <caption>Default filename - empty string</caption> @lang yaml
  * # Variable settings to be populated with data from "./settings.yml"
- * [settings: ""] 
+ * [settings: ""]
  * @example <caption>Specified filename</caption> @lang yaml
  * # Variable settings to be populated with data from "./xxx.yml"
  * [settings: "xxx"]
@@ -196,16 +197,16 @@ class SystemLoader{
 async function initRecursion(rootDir, relativePath, initFilename, targetObject){
 	// Initialize the initialization file
 	let initPath = path.resolve(rootDir, relativePath);
-	let init = initSettings(initPath, initFilename);
-
+	let init = await initSettings(initPath, initFilename);
 	// Initialize files
 	iterate_properties:
 	for (var key in init) {
 		switch (typeof init[key]){
 			case "object":
 			if(init[key] === null){ // Filename is same as the key
-				break; 
-			} else { // "Extension"	
+				break;
+			} else { // "Extension"
+				// Check if property is set or assume default
 				let checkDefaultDirective = function (property) {
 					if (init[key].hasOwnProperty(property)){
 						if ((typeof init[key][property]) === "string"){
@@ -215,30 +216,43 @@ async function initRecursion(rootDir, relativePath, initFilename, targetObject){
 						}
 					}
 					return key;
-				}	
+				}
+				// Check if property is set or assume default for path type
+				let checkDefaultPathDirective = function (property) {
+					if (init[key].hasOwnProperty(property)){
+						if ((typeof init[key][property]) === "string"){
+							if (init[key][property] == "relative") {
+								return false;
+							}
+						}
+					}
+					return true;
+				}
 
-				let folder = checkDefaultDirective("folder");
-				let file = checkDefaultDirective("file");	
-				let path = "absolute";
-	
+				// Set the "extension" values
+				let folder					= checkDefaultDirective("folder");
+				let file						= checkDefaultDirective("file");
+				let pathIsAbsolute	= checkDefaultPathDirective("path");
+
 				targetObject[key] = {};
-				initRecursion(rootDir, folder, file, targetObject[key]);	
-				
+				await initRecursion(rootDir, pathIsAbsolute ? folder : path.join(relativePath, folder), file, targetObject[key]);
+
 				// Break into for loop
 				continue iterate_properties;
 			}
-			
-			case "String": // Standard filename
+
+			case "string": // Standard filename
 			if (init[key] == ""){ // Filename is same as the key
 				break;
 			} else {
 				// Specific filename
-				targetObject[key] = await initSettings(path.resolve(rootDir, relativePath), init[key]);
+				targetObject[key] = init[key];
 			}
-			break;
+			// Break into for loop
+			continue iterate_properties;
 
 			default:
-			throw("critical_system_error", "Invalid intialization entry type - " + sourceKey);
+			throw("critical_system_error", "Invalid intialization entry type - " + key);
 		}
 
 		// By default we are looking for the settings files to reside within the initialization folder, but this can be changed later

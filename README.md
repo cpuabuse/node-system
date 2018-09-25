@@ -195,7 +195,7 @@ Converts YAML string to a JS object
 **Example** *(Default filename - empty string)*  
 ```yaml
 # Variable settings to be populated with data from "./settings.yml"
-[settings: ""] 
+[settings: ""]
 ```
 **Example** *(Specified filename)*  
 ```yaml
