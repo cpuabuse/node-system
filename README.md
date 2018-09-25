@@ -26,7 +26,7 @@ instance | `#` | `@instance`
     * [~SystemLoader](#module_system..SystemLoader)
         * [new SystemLoader(rootDir, relativeInitDir, initFilename)](#new_module_system..SystemLoader_new)
         * _instance_
-            * [.load](#module_system..SystemLoader+load) : [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+            * [.data](#module_system..SystemLoader+data) : [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
         * _static_
             * [.getFile(folder, file)](#module_system..SystemLoader.getFile) ⇒ <code>external.Promise</code>
             * [.toRelative(absoluteDir, absoluteFile)](#module_system..SystemLoader.toRelative) ⇒ <code>external.Promise</code>
@@ -39,6 +39,8 @@ instance | `#` | `@instance`
             * [~initRecursion(rootDir, relativePath, initFilename, targetObject)](#module_system..SystemLoader..initRecursion) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
             * [~initSettings(initPath, filename)](#module_system..SystemLoader..initSettings) ⇒ <code>object</code>
             * [~loadYaml(directory, filename)](#module_system..SystemLoader..loadYaml) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+    * [~SystemError](#module_system..SystemError) ⇐ [<code>Error</code>](https://nodejs.org/api/errors.html#errors_class_error)
+        * [new SystemError(systemContext, code, message)](#new_module_system..SystemError_new)
 
 <a name="module_system..SystemLoader"></a>
 
@@ -50,7 +52,7 @@ Required by system to perform file initialization
 * [~SystemLoader](#module_system..SystemLoader)
     * [new SystemLoader(rootDir, relativeInitDir, initFilename)](#new_module_system..SystemLoader_new)
     * _instance_
-        * [.load](#module_system..SystemLoader+load) : [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+        * [.data](#module_system..SystemLoader+data) : [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
     * _static_
         * [.getFile(folder, file)](#module_system..SystemLoader.getFile) ⇒ <code>external.Promise</code>
         * [.toRelative(absoluteDir, absoluteFile)](#module_system..SystemLoader.toRelative) ⇒ <code>external.Promise</code>
@@ -78,9 +80,9 @@ Required by system to perform file initialization
 | relativeInitDir | <code>string</code> | Relative path to root |
 | initFilename | <code>string</code> | Filename |
 
-<a name="module_system..SystemLoader+load"></a>
+<a name="module_system..SystemLoader+data"></a>
 
-#### systemLoader.load : [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+#### systemLoader.data : [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 Promise containing result of loading
 
 **Kind**: instance property of [<code>SystemLoader</code>](#module_system..SystemLoader)  
@@ -246,4 +248,26 @@ Parses YAML file, and returns and object; Adds extension if absent
 | --- | --- | --- |
 | directory | <code>string</code> | Absolute directory path |
 | filename | <code>string</code> | Filename, with or without extension |
+
+<a name="module_system..SystemError"></a>
+
+### system~SystemError ⇐ [<code>Error</code>](https://nodejs.org/api/errors.html#errors_class_error)
+Extended system error class.
+Creates an instance of SystemError.
+
+**Kind**: inner class of [<code>system</code>](#module_system)  
+**Extends**: [<code>Error</code>](https://nodejs.org/api/errors.html#errors_class_error)  
+<a name="new_module_system..SystemError_new"></a>
+
+#### new SystemError(systemContext, code, message)
+**Throws**:
+
+- [<code>Error</code>](https://nodejs.org/api/errors.html#errors_class_error) Throwing error if the code already defined
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| systemContext | <code>module:system.System</code> | System context |
+| code | <code>string</code> | Error code |
+| message | <code>string</code> | Error message |
 
