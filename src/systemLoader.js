@@ -19,13 +19,18 @@ const yaml = require("js-yaml");
  */
 class SystemLoader{
 	constructor(rootDir, arg_relativeInitDir, arg_initFilename){
-		// Initialization recursion
+		/**
+		 * Contains the loaded data
+		 * @instance
+		 * @type {external:Object}
+		*/
+		this.data = {};
 		/**
 		 * Promise containing result of loading
 		 * @instance
 		 * @type {external:Promise}
 		*/
-		this.data = {};
+		// Initialization recursion
 		this.load = initRecursion(rootDir, arg_relativeInitDir, arg_initFilename, this.data);
 	}
 
@@ -171,27 +176,25 @@ class SystemLoader{
  * @param {object} targetObject Object to be filled
  * @returns {external:Promise}
  * @example <caption>Default filename - null</caption> @lang yaml
- * # Variable settings to be populated with data from "./settings.yml"
+ * # Variable settings to be populated with data from "system_root_dir/settings.yml"
  * [settings:]
  * @example <caption>Default filename - empty string</caption> @lang yaml
- * # Variable settings to be populated with data from "./settings.yml"
+ * # Variable to be assigned an empty string
  * [settings: ""]
  * @example <caption>Specified filename</caption> @lang yaml
- * # Variable settings to be populated with data from "./xxx.yml"
+ * # Variable settings to be populated with data from "system_root_dir/xxx.yml"
  * [settings: "xxx"]
  * @example <caption>Default extension</caption> @lang yaml
- * # The "extension"(recursion) with default variables will be assumed, so that variable "settings" will be recursively populated with files located in "settings/settings.yml"
+ * # The "extension"(recursion) with default variables will be assumed, so that variable "settings" will be recursively populated with files in "system_root_dir/settings.yml"
  * settings:
  *   folder:
  *   file:
- *   name:
  *   path: # Note: path may be either absolute(default) or relative(relative to the folder from which the file containing instructions is read), the system will not read files outside of system_root_dir tree.
  * @example <caption>Specified extension</caption> @lang yaml
  * # The  "extension"(recursion) with only specified variables will be performed, in this example "settings" variable will be populated with the files described in the "system_root_dir/hello/settings.yml"
  * settings:
  *   folder: "hello"
  *   file:
- *   name:
  *   path: # Note: path may be either absolute(default) or relative(relative to the folder from which the file containing instructions is read), the system will not read files outside of system_root_dir tree.
  */
 async function initRecursion(rootDir, relativePath, initFilename, targetObject){
@@ -202,61 +205,60 @@ async function initRecursion(rootDir, relativePath, initFilename, targetObject){
 	iterate_properties:
 	for (var key in init) {
 		switch (typeof init[key]){
-			case "object":
-			if(init[key] === null){ // Filename is same as the key
-				break;
-			} else { // "Extension"
-				// Check if property is set or assume default
-				let checkDefaultDirective = function (property) {
-					if (init[key].hasOwnProperty(property)){
-						if ((typeof init[key][property]) === "string"){
-							if (init[key][property] != "") {
-								return init[key][property];
-							}
-						}
-					}
-					return key;
-				}
-				// Check if property is set or assume default for path type
-				let checkDefaultPathDirective = function (property) {
-					if (init[key].hasOwnProperty(property)){
-						if ((typeof init[key][property]) === "string"){
-							if (init[key][property] == "relative") {
-								return false;
-							}
-						}
-					}
-					return true;
-				}
+			case "string": {
+				// Assing the target key the string value
+				targetObject[key] = init[key];
 
-				// Set the "extension" values
-				let folder					= checkDefaultDirective("folder");
-				let file						= checkDefaultDirective("file");
-				let pathIsAbsolute	= checkDefaultPathDirective("path");
+				// Break into for loop
+				continue iterate_properties;
+			} // ...case "string"
+
+			// "Extension"
+			case "object": {
+				let folder, file, pathIsAbsolute;
+				if(init[key] === null){ // Filename is same as the key
+					folder = relativePath;
+					file = key;
+					pathIsAbsolute = true;
+				} else { // "Extension"
+					// Check if property is set or assume default
+					let checkDefaultDirective = function (property) {
+						if (init[key].hasOwnProperty(property)){
+							if ((typeof init[key][property]) === "string"){
+								if (init[key][property] != "") {
+									return init[key][property];
+								}
+							}
+						}
+						return key;
+					}
+					// Check if property is set or assume default for path type
+					let checkDefaultPathDirective = function (property) {
+						if (init[key].hasOwnProperty(property)){
+							if ((typeof init[key][property]) === "string"){
+								if (init[key][property] == "relative") {
+									return false;
+								}
+							}
+						}
+						return true;
+					}
+
+					// Set the "extension" values
+					folder					= checkDefaultDirective("folder");
+					file						= checkDefaultDirective("file");
+					pathIsAbsolute	= checkDefaultPathDirective("path");
+				}
 
 				targetObject[key] = {};
 				await initRecursion(rootDir, pathIsAbsolute ? folder : path.join(relativePath, folder), file, targetObject[key]);
 
-				// Break into for loop
-				continue iterate_properties;
-			}
-
-			case "string": // Standard filename
-			if (init[key] == ""){ // Filename is same as the key
-				break;
-			} else {
-				// Specific filename
-				targetObject[key] = init[key];
-			}
-			// Break into for loop
+			} // ...case "object"
 			continue iterate_properties;
 
 			default:
 			throw("critical_system_error", "Invalid intialization entry type - " + key);
 		}
-
-		// By default we are looking for the settings files to reside within the initialization folder, but this can be changed later
-		targetObject[key] = await initSettings(path.resolve(rootDir, relativePath), key);
 	}
 }
 
