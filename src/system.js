@@ -5,8 +5,8 @@
  */
 "use strict";
 const events = require("events");
-const loader = require("./system.loader.js"); // Auxiliary system lib
-const systemError = require("./system.error.js");
+const loader = require("./systemLoader.js"); // Auxiliary system lib
+const systemError = require("./systemError.js");
 
 /**
  * Provides wide range of functionality for file loading and event exchange.
@@ -27,27 +27,26 @@ const systemError = require("./system.error.js");
 class System extends loader.SystemLoader{
 	constructor(id, rootDir, relativeInitDir, initFilename, behaviors){
 		// First things first, call a loader, if loader has failed, there are no tools to report gracefully, so the errors from there will just go above
-		super(rootDir, relativeInitDir, initFilename);
+		super(rootDir, relativeInitDir, initFilename, (promise) => {
+			promise.then(() => {
+				/**
+				 * Events to be populated by the loader.
+				 * System by itself does not do anything about the events themselves, it only confirms that the events were initialized. Ofcourse, if the events are fired, and failure to fire event is set to throw, or undocumented events encountered, it would make troubles(System and standard throws).
+				 * @abstract
+				 * @member events
+				 * @instance
+				 * @memberof module:system.System
+				 */
+				if(!this.hasOwnProperty("events")){ // Make sure basic system carcass was initialized
+					throw new Error("loader_failed");
+				}
 
-		// Asynchronous initialization
-		this.load.then(() => {
-			/**
-			 * Events to be populated by the loader.
-			 * System by itself does not do anything about the events themselves, it only confirms that the events were initialized. Ofcourse, if the events are fired, and failure to fire event is set to throw, or undocumented events encountered, it would make troubles(System and standard throws).
-			 * @abstract
-			 * @member events
-			 * @instance
-			 * @memberof module:system.System
-			 */
-			if(!this.hasOwnProperty("events")){ // Make sure basic system carcass was initialized
-				throw new Error("loader_failed");
-			}
-
-			// Initialize the behaviors; If behaviors not provided as argument, it is OK; Immediate, since if behaviors would fire and they would access the instance, then it needs to be done, after the construction completed
-			if(behaviors){
-				this.addBehaviors(behaviors);
-			}
-			this.fire("system_load");
+				// Initialize the behaviors; If behaviors not provided as argument, it is OK; Immediate, since if behaviors would fire and they would access the instance, then it needs to be done, after the construction completed
+				if(behaviors){
+					this.addBehaviors(behaviors);
+				}
+				this.fire("system_load");
+			});
 		});
 
 		// System constants

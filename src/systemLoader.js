@@ -200,12 +200,12 @@ class SystemLoader{
  */
 async function initRecursion(rootDir, relativePath, initFilename, targetObject){
 	// Initialize the initialization file
-	let initPath = path.resolve(rootDir, relativePath);
-	let init = await initSettings(rootDir, initPath, initFilename);
+	let init = await initSettings(rootDir, relativePath, initFilename);
 	// Initialize files
 	iterate_properties:
 	for (var key in init) {
 		switch (typeof init[key]){
+			case "number":
 			case "string": {
 				// Assing the target key the string value
 				targetObject[key] = init[key];
@@ -231,7 +231,7 @@ async function initRecursion(rootDir, relativePath, initFilename, targetObject){
 								}
 							}
 						}
-						return key;
+						return relativePath;
 					}
 					// Check if property is set or assume default for path type
 					let checkDefaultPathDirective = function (property) {
@@ -250,7 +250,6 @@ async function initRecursion(rootDir, relativePath, initFilename, targetObject){
 					file						= checkDefaultDirective("file");
 					pathIsAbsolute	= checkDefaultPathDirective("path");
 				}
-
 				targetObject[key] = {};
 				await initRecursion(rootDir, pathIsAbsolute ? folder : path.join(relativePath, folder), file, targetObject[key]);
 

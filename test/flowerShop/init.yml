@@ -1,0 +1,5 @@
+events:
+data:
+  file: flowers
+  path: relative
+  folder: data
