@@ -36,13 +36,14 @@ class SystemLoader{
 
 	/**
 	 * Gets file contents
-	 * @param {string} folder Absolute file location
+	 * @param {string} rootDir Root directory
+	 * @param {string} relativeDir Directory relative to root
 	 * @param {string} file Full file name
 	 * @returns {external.Promise} File contents
 	 */
-	static getFile(folder, file){
+	static getFile(rootDir, relativeDir, file){
 		return new Promise(function(resolve, reject){
-			return fs.readFile(path.join(folder, file), "utf8", function(err, data){
+			return fs.readFile(path.join(rootDir, relativeDir, file), "utf8", function(err, data){
 				if (err){
 					reject(err);
 				} else {
@@ -200,7 +201,7 @@ class SystemLoader{
 async function initRecursion(rootDir, relativePath, initFilename, targetObject){
 	// Initialize the initialization file
 	let initPath = path.resolve(rootDir, relativePath);
-	let init = await initSettings(initPath, initFilename);
+	let init = await initSettings(rootDir, initPath, initFilename);
 	// Initialize files
 	iterate_properties:
 	for (var key in init) {
@@ -267,17 +268,19 @@ async function initRecursion(rootDir, relativePath, initFilename, targetObject){
  * Semantically this function has broader purpose than loadYaml.
  * @inner
  * @memberof module:system~SystemLoader
- * @param {string} initPath Path to the settings file
+ * @param {string} rootDir Root directory
+ * @param {string} initPath Relative directory to root
  * @param {string} filename Filename
  * @returns {object} Javascript object with settings
  */
 async function initSettings(
-	initPath,
+	rootDir,
+	relativeDir,
 	filename // Filename, without extention; If null, then varname will be used instead
 ){
     try {
         // Set the global object from an argument of varname to data from YAML file with path constructed from varname; or filename, if filename provided
-        return await loadYaml(initPath, filename);
+        return await loadYaml(rootDir, relativeDir, filename);
     } catch (err) {
         console.error("Critical file not loaded - " + filename);
         // Error thrown for now. Because the caller handling of the systemErrorLevel variable does not exist yet.
@@ -289,11 +292,12 @@ async function initSettings(
  * Parses YAML file, and returns and object; Adds extension if absent
  * @inner
  * @memberof module:system~SystemLoader
- * @param {string} directory Absolute directory path
+ * @param {string} rootDir Absolute directory path
+ * @param {string} relativeDir Relative directory to root
  * @param {string} filename Filename, with or without extension
  * @returns {external:Promise} Javascript object
  */
-async function loadYaml(directory, filename){
+async function loadYaml(rootDir, relativeDir, filename){
 	var fileExtension = ".yml"; // Making a variale for interpreted language like this would not even save any memory, but it feels right
 
 	// Add file extension if absent
@@ -303,7 +307,7 @@ async function loadYaml(directory, filename){
 
 	// Try to read the file contents and retuen them; If we fail, we log filename to error stream, and rethrow the error
 	try {
-		var contents = await SystemLoader.getFile(directory, filename);
+		var contents = await SystemLoader.getFile(rootDir, relativeDir, filename);
 		return yaml.load(contents);
 	} catch (err) {
 		// Prints path of problem filename
