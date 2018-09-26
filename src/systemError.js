@@ -7,12 +7,12 @@
 /**
  * Extended system error class.
  * Creates an instance of SystemError.
+ * @inner
+ * @memberof module:system
+ * @extends external:error
  * @param {module:system.System} systemContext System context
  * @param {string} code Error code
  * @param {string} message Error message
- * @inner
- * @memberof module:system
- * @extends external:Error
  * @throws {external:Error} Throwing error if the code already defined
  */
 class SystemError extends Error{

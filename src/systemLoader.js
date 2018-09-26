@@ -212,7 +212,7 @@ async function initRecursion(rootDir, relativePath, initFilename, targetObject){
 
 				// Break into for loop
 				continue iterate_properties;
-			} // ...case "string"
+			} // <== case "string"
 
 			// "Extension"
 			case "object": {
@@ -254,7 +254,7 @@ async function initRecursion(rootDir, relativePath, initFilename, targetObject){
 				targetObject[key] = {};
 				await initRecursion(rootDir, pathIsAbsolute ? folder : path.join(relativePath, folder), file, targetObject[key]);
 
-			} // ...case "object"
+			} // <== case "object"
 			continue iterate_properties;
 
 			default:

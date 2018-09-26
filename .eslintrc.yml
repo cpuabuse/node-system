@@ -9,7 +9,6 @@ rules:
   array-bracket-newline: error
   array-bracket-spacing: error
   array-callback-return: error
-  array-element-newline: error
   arrow-body-style: error
   arrow-parens: error
   arrow-spacing: error
@@ -50,12 +49,11 @@ rules:
   guard-for-in: 'off'
   handle-callback-err: error
   id-blacklist: error
-  id-length: error
   id-match: error
   implicit-arrow-linebreak: error
   indent: 'off'
   indent-legacy: 'off'
-  init-declarations: error
+  init-declarations: 'off'
   jsx-quotes: error
   key-spacing: error
   keyword-spacing: 'off'
@@ -92,10 +90,7 @@ rules:
   no-caller: error
   no-catch-shadow: error
   no-confusing-arrow: error
-  no-console:
-    - error
-    - allow:
-      - error
+  no-console: 'off'
   no-continue: 'off'
   no-div-regex: error
   no-duplicate-imports: error
@@ -121,7 +116,11 @@ rules:
   no-lone-blocks: error
   no-lonely-if: error
   no-loop-func: 'off'
-  no-magic-numbers: error
+  no-magic-numbers: 
+    - error
+    - ignore:
+      - 0
+      - 1
   no-misleading-character-class: error
   no-mixed-operators: error
   no-mixed-requires: error
@@ -130,7 +129,6 @@ rules:
   no-multi-str: error
   no-multiple-empty-lines: error
   no-native-reassign: error
-  no-negated-condition: error
   no-negated-in-lhs: error
   no-nested-ternary: error
   no-new: error
@@ -141,7 +139,6 @@ rules:
   no-octal-escape: error
   no-param-reassign: 'off'
   no-path-concat: error
-  no-plusplus: error
   no-process-env: error
   no-process-exit: error
   no-proto: error
@@ -152,7 +149,6 @@ rules:
   no-restricted-properties: error
   no-restricted-syntax: error
   no-return-assign: error
-  no-return-await: error
   no-script-url: error
   no-self-compare: error
   no-sequences: error
@@ -180,9 +176,6 @@ rules:
   no-useless-return: error
   no-var: 'off'
   no-void: error
-  no-warning-comments:
-    - error
-    - location: start
   no-whitespace-before-property: error
   no-with: error
   nonblock-statement-body-position: error
@@ -204,16 +197,13 @@ rules:
   prefer-numeric-literals: error
   prefer-object-spread: error
   prefer-promise-reject-errors: error
-  prefer-reflect: error
   prefer-rest-params: error
   prefer-spread: error
   prefer-template: 'off'
-  quote-props: error
   quotes:
     - error
     - double
   radix: error
-  require-atomic-updates: error
   require-await: error
   require-jsdoc: error
   require-unicode-regexp: error
@@ -224,8 +214,6 @@ rules:
     - error
     - last
   sort-imports: error
-  sort-keys: error
-  sort-vars: error
   space-before-blocks: 'off'
   space-before-function-paren: 'off'
   space-in-parens:
