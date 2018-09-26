@@ -67,7 +67,6 @@ rules:
     - error
     - always
   max-classes-per-file: error
-  max-depth: error
   max-len: 'off'
   max-lines: 'off'
   max-lines-per-function: 'off'
@@ -113,7 +112,6 @@ rules:
   no-invalid-this: error
   no-iterator: error
   no-label-var: error
-  no-lone-blocks: error
   no-lonely-if: error
   no-loop-func: 'off'
   no-magic-numbers: 

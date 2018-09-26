@@ -15,23 +15,13 @@ const yaml = require("js-yaml");
  * @param {string} rootDir Absolute root directory
  * @param {string} relativeInitDir Relative path to root
  * @param {string} initFilename Filename
+ * @param {function} callback Callback to call with Promise of completion
  * @throws {external:Error} Standard error with message
  */
 class SystemLoader{
-	constructor(rootDir, arg_relativeInitDir, arg_initFilename){
-		/**
-		 * Contains the loaded data
-		 * @instance
-		 * @type {external:Object}
-		*/
-		this.data = {};
-		/**
-		 * Promise containing result of loading
-		 * @instance
-		 * @type {external:Promise}
-		*/
+	constructor(rootDir, arg_relativeInitDir, arg_initFilename, callback){
 		// Initialization recursion
-		this.load = initRecursion(rootDir, arg_relativeInitDir, arg_initFilename, this.data);
+		callback(initRecursion(rootDir, arg_relativeInitDir, arg_initFilename, this, true));
 	}
 
 	/**
@@ -198,67 +188,80 @@ class SystemLoader{
  *   file:
  *   path: # Note: path may be either absolute(default) or relative(relative to the folder from which the file containing instructions is read), the system will not read files outside of system_root_dir tree.
  */
-async function initRecursion(rootDir, relativePath, initFilename, targetObject){
+async function initRecursion(
+	rootDir,
+	relativePath,
+	initFilename,
+	targetObject,
+	extend
+){
 	// Initialize the initialization file
 	let init = await initSettings(rootDir, relativePath, initFilename);
+	// Return if no extending
+	if(!extend) {
+		Object.assign(targetObject, init);
+		return;
+	}
+
 	// Initialize files
-	iterate_properties:
 	for (var key in init) {
+		let folder = relativePath,
+			file = key,
+			pathIsAbsolute = true,
+			extend = false;
 		switch (typeof init[key]){
-			case "number":
 			case "string": {
-				// Assing the target key the string value
-				targetObject[key] = init[key];
+				if (init[key] != ""){
+					file = init[key];
+				}
+				break;
+			}
 
-				// Break into for loop
-				continue iterate_properties;
-			} // <== case "string"
-
-			// "Extension"
 			case "object": {
-				let folder, file, pathIsAbsolute;
-				if(init[key] === null){ // Filename is same as the key
-					folder = relativePath;
-					file = key;
-					pathIsAbsolute = true;
-				} else { // "Extension"
+				if(init[key] !== null){ // Custom properties
 					// Check if property is set or assume default
 					let checkDefaultDirective = function (property) {
 						if (init[key].hasOwnProperty(property)){
 							if ((typeof init[key][property]) === "string"){
 								if (init[key][property] != "") {
-									return init[key][property];
+									return true;
 								}
 							}
 						}
-						return relativePath;
-					}
-					// Check if property is set or assume default for path type
-					let checkDefaultPathDirective = function (property) {
-						if (init[key].hasOwnProperty(property)){
-							if ((typeof init[key][property]) === "string"){
-								if (init[key][property] == "relative") {
-									return false;
-								}
-							}
-						}
-						return true;
+						return false;
 					}
 
 					// Set the "extension" values
-					folder					= checkDefaultDirective("folder");
-					file						= checkDefaultDirective("file");
-					pathIsAbsolute	= checkDefaultPathDirective("path");
+					if (checkDefaultDirective("folder")){
+						({folder} = init[key]);
+					}
+					if (checkDefaultDirective("file")){
+						({file} = init[key]);
+					}
+					if (checkDefaultDirective("path")){
+						if(init[key].path == "relative") {
+							pathIsAbsolute = false;
+						}
+					}
+					if (checkDefaultDirective("extend")){
+						if(init[key].extend == "extend") {
+							extend = true;
+						}
+					}
 				}
-				targetObject[key] = {};
-				await initRecursion(rootDir, pathIsAbsolute ? folder : path.join(relativePath, folder), file, targetObject[key]);
-
+				break;
 			} // <== case "object"
-			continue iterate_properties;
 
 			default:
 			throw("critical_system_error", "Invalid intialization entry type - " + key);
 		}
+		await initRecursion(
+			rootDir,
+			pathIsAbsolute ? folder : path.join(relativePath, folder),
+			file,
+			targetObject[key] = {},
+			extend
+		);
 	}
 }
 

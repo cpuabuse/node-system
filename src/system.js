@@ -27,8 +27,8 @@ const systemError = require("./systemError.js");
 class System extends loader.SystemLoader{
 	constructor(id, rootDir, relativeInitDir, initFilename, behaviors){
 		// First things first, call a loader, if loader has failed, there are no tools to report gracefully, so the errors from there will just go above
-		super(rootDir, relativeInitDir, initFilename, (promise) => {
-			promise.then(() => {
+		super(rootDir, relativeInitDir, initFilename, (load) => {
+			load.then(() => {
 				/**
 				 * Events to be populated by the loader.
 				 * System by itself does not do anything about the events themselves, it only confirms that the events were initialized. Ofcourse, if the events are fired, and failure to fire event is set to throw, or undocumented events encountered, it would make troubles(System and standard throws).
