@@ -165,6 +165,7 @@ class SystemLoader{
  * @param {object} relativePath Relative path
  * @param {string} initFilename Filename for settings
  * @param {object} targetObject Object to be filled
+ * @param {boolean} extend Extend the children objects or not
  * @returns {external:Promise}
  * @example <caption>Default filename - null</caption> @lang yaml
  * # Variable settings to be populated with data from "system_root_dir/settings.yml"
