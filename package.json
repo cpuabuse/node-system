@@ -1,7 +1,7 @@
 {
   "name": "cpuabuse-system",
-  "version": "0.0.2",
-  "main": "index.js",
+  "version": "0.0.3",
+  "main": "src/system.js",
   "scripts": {
     "test": "node test/test.js && exit $?"
   },
