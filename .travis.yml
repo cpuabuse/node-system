@@ -3,6 +3,6 @@ node_js:
   - "10"
 after_script:
   - |
-    # Upload coverage to coveralls
-    npm install --save-dev coveralls
-    coveralls < ./coverage/lcov.info
+    # Install and run Istanbul into Coveralls
+    npm install -g istanbul coveralls
+    istanbul cover ./src/system.js && cat ./coverage/lcov.info | coveralls
