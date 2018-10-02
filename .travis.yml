@@ -4,5 +4,5 @@ node_js:
 after_script:
   - |
     # Install and run Istanbul into Coveralls
-    npm install -g istanbul@1.1.0-alpha.1 coveralls
-    istanbul cover ./src/system.js && cat ./coverage/lcov.info | coveralls
+    npm install -g jest coveralls
+    jest --coverage --coverageReporters=text-lcov | coveralls
