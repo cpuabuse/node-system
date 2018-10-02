@@ -27,7 +27,7 @@ const systemError = require("./systemError.js");
 class System extends loader.SystemLoader{
 	constructor(id, rootDir, relativeInitDir, initFilename, behaviors){
 		// First things first, call a loader, if loader has failed, there are no tools to report gracefully, so the errors from there will just go above
-		super(rootDir, relativeInitDir, initFilename, (load) => {
+		super(rootDir, relativeInitDir, initFilename, load => {
 			load.then(() => {
 				/**
 				 * Events to be populated by the loader.
@@ -79,7 +79,7 @@ class System extends loader.SystemLoader{
 				/** Check if argument is a file (relative to system root directory) */
 				isFile: async (folder, file) => await loader.SytemLoader.isFile(this.system.rootDir, folder, file),
 				/** Check if argument is a folder (relative to system root directory) */
-				isDir: async (dir) => await loader.SystemLoader.isDir(this.system.rootDir, dir)
+				isDir: async dir => await loader.SystemLoader.isDir(this.system.rootDir, dir)
 			},
 			toRelative: async (dir, file) => await loader.SystemLoader.toRelative(dir, file),
 			/** Converts relative path to absolute path */
@@ -110,7 +110,7 @@ class System extends loader.SystemLoader{
 					}
 
 					// Work on results
-					await Promise.all(filterMatches).then((values) => {
+					await Promise.all(filterMatches).then(values => {
 						// Populate return object preserving the order
 						for (let i = 0; i < length; i++){
 							if(values[i]){
@@ -146,7 +146,7 @@ class System extends loader.SystemLoader{
 				let postAttachment = [];
 
 				// Loop - attachment
-				behaviors.forEach((element) => {
+				behaviors.forEach(element => {
 					if(typeof element === "object"){
 						let properties = Object.getOwnPropertyNames(element);
 						if(properties.length == 1){
@@ -167,7 +167,7 @@ class System extends loader.SystemLoader{
 				});
 
 				// Loop - post-attachment event fire
-				postAttachment.forEach((element) => {
+				postAttachment.forEach(element => {
 					if(element === null){
 						this.fire("behavior_attach_fail", "Request garbage");
 					} else if (element[0]){
