@@ -154,7 +154,7 @@ class System extends loader.SystemLoader{
 							let value = element[key];
 							if(typeof key === "string"){
 								if (key.length > 0 && typeof value === "function"){
-									this.system.behavior.addListener(key, value);
+									this.system.behavior.addListener(key, () => value(this));
 									postAttachment.push([true, key]);
 									return;
 								}
