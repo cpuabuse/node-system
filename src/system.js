@@ -37,7 +37,7 @@ class System extends loader.SystemLoader{
 				 * @instance
 				 * @memberof module:system.System
 				 */
-				if(!this.hasOwnProperty("events")){ // Make sure basic system carcass was initialized
+				if(!(this.hasOwnProperty("events") && this.hasOwnProperty("behaviors"))){ // Make sure basic system carcass was initialized
 					throw new Error("loader_failed");
 				}
 
@@ -294,7 +294,7 @@ class System extends loader.SystemLoader{
 		}
 	}
 
-	// FIXME: Do event type right
+	// FIXME: Do event type right; Add check that behavior exists
 	/**
 	 * Emit an event as a behavior.
 	 * @instance
