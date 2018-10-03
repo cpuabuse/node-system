@@ -41,7 +41,7 @@ class System extends loader.SystemLoader{
 					throw new Error("loader_failed");
 				}
 
-				// Initialize the behaviors; If behaviors not provided as argument, it is OK; Immediate, since if behaviors would fire and they would access the instance, then it needs to be done, after the construction completed
+				// Initialize the behaviors; If behaviors not provided as argument, it is OK; Not immediate, since the load.then() code will execute after the instance finish initializing.
 				if(behaviors){
 					this.addBehaviors(behaviors);
 				}
@@ -302,7 +302,7 @@ class System extends loader.SystemLoader{
 	 */
 	behave(event){
 		if (typeof this.behaviors[event] !== "undefined"){
-			this.log("Bahavior - " + this.behaviors[event].text);
+			this.log("Behavior - " + this.behaviors[event].text);
 		} else { // Complain about undocumented behaviors
 			this.log("Behavior - Undocumented behavior - " + event)
 		}
