@@ -13,18 +13,21 @@ const maxTestWait = 10000;
 */
 function test(){
 	new Promise(function (resolve){
-		console.log("Test - SystemLoader < Planets...")
-		let planets = new SystemLoader.SystemLoader("./test", "stars", "stars", load => {
+		console.log("Test - SystemLoader < Stars...")
+		let stars = new SystemLoader.SystemLoader("./test", "stars", "stars", load => {
 			load.then(() => {
-				console.log(planets);
+				if (stars.sol.planet2 != "Earth"){
+					throw "Earth is not 3rd planet. Error in System Loader."
+				}
+				console.log(stars);
 				console.log("\n");
 				resolve();
 			});
 		});
 	}).then(function (){
 		return new Promise(function(resolve){
-			console.log("Test - System - Latin Classes...")
-			var latinClasses = new System.System(
+			console.log("Test - System - Flower Shop...")
+			var flowerShop = new System.System(
 				"flower_shop",
 				"./test",
 				"flowerShop",
@@ -32,7 +35,7 @@ function test(){
 				[
 					{
 						"system_load": () => {
-							console.log(latinClasses);
+							console.log(flowerShop);
 							resolve();
 						}
 					}
