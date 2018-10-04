@@ -7,6 +7,7 @@
 const events = require("events");
 const loader = require("./systemLoader.js"); // Auxiliary system lib
 const systemError = require("./systemError.js");
+const error_errorExists = "error_exists";
 
 /**
  * Provides wide range of functionality for file loading and event exchange.
@@ -41,6 +42,11 @@ class System extends loader.SystemLoader{
 					throw new Error("loader_failed");
 				}
 
+				// Initialize the events
+				for (var error in this.errors){
+					this.addError(error, this.errors[error].error);
+				}
+
 				// Initialize the behaviors; If behaviors not provided as argument, it is OK; Not immediate, since the load.then() code will execute after the instance finish initializing.
 				if(behaviors){
 					this.addBehaviors(behaviors);
@@ -70,6 +76,11 @@ class System extends loader.SystemLoader{
 		 * @private
 		 */
 		this.system.behavior = new events.EventEmitter();
+
+		/**
+		 * Contains throwables
+		*/
+		this.system.error = {};
 
 		// System methods
 		/** File system methods */
@@ -127,6 +138,21 @@ class System extends loader.SystemLoader{
 			}
 		};
 	} // <== constructor
+
+	/**
+	 * Adds an error to the System dynamically
+	 * @instance
+	 * @param {string} code Error code
+	 * @param {string} message Error description
+	*/
+	addError(code, message){
+		if(this.system.error.hasOwnProperty(code)){
+			// Fire an error event that error already exists
+			this.fire(error_errorExists);
+		} else {
+			this.system.error[code] = new systemError.SystemError(this, code, message);
+		}
+	}
 
 	/**
 	 * Adds behaviors to the system, and fires post-addtion events.
