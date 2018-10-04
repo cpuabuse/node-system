@@ -5,6 +5,3 @@ data:
   folder: data
 behaviors:
 errors:
-  file:
-  path: relative
-  folder: data

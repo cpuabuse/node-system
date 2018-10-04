@@ -209,8 +209,11 @@ class System extends loader.SystemLoader{
 	 * @throws {external:Error} Will throw `error_hell`. The inability to process error - if {@link module:system.System~event_fail} event fails.
 	 */
 	fire(name, message){
-		let event;
+		let event_absent = "event_absent";
+		let event_fail = "event_fail";
 		try{
+			let event;
+
 			// Verify event exists
 			if(!this.events.hasOwnProperty(name)){
 				// throw new system error
@@ -241,11 +244,21 @@ class System extends loader.SystemLoader{
 			}
 			// Callback
 		} catch (error) {
-			let event_fail = "event_fail";
+			let noFail = true;
 			if(name == event_fail){
-				throw ("error_hell");
+				noFail = false;
+			}
+			if(name == event_absent){
+				if(systemError.SystemError.isSystemError(error)){
+					if(error.code == event_absent){
+						noFail = false;
+					}
+				}
+			}
+			if(noFail){
+				this.fire(event_fail);
 			} else {
-				this.fire("event_fail");
+				throw ("error_hell");
 			}
 		}
 	} // <== fire

@@ -33,6 +33,21 @@ class SystemError extends Error{
 			throw new Error("System error undefined.");
 		}
 	}
+
+	/**
+	 * Check if an object is indeed a functional SystemError
+	 * @param {module:system.SystemError} error Error to check
+	 */
+	static isSystemError(error){
+		if((error instanceof SystemError)){
+			if(error.hasOwnProperty("code")){
+				if (error.code != ""){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 }
 
 exports.SystemError = SystemError;
