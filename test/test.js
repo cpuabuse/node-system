@@ -7,6 +7,7 @@
 const system = require("../src/system.js");
 const systemError = require("../src/systemError.js");
 const systemLoader = require("../src/systemLoader.js");
+const systemAtomic = require("../src/systemAtomic.js");
 const maxTestWait = 1000;
 
 // DEBUG: Devonly - promise throw
@@ -33,6 +34,7 @@ function test(){
 	new Promise(function(resolve, reject){
 		console.log("System test: SystemLoader < Stars...")
 		let timeout = timeoutReject(reject);
+		
 		stars = new systemLoader.SystemLoader("./test", "stars", "stars", load => {
 			load.then(() => {
 				if (stars.sol.planet2 != "Earth"){
@@ -67,7 +69,7 @@ function test(){
 		});
 	}).then(function(){
 		return new Promise(function(resolve, reject){
-			console.log("System test: - System - Flower shop errors...")
+			console.log("System test: System - Flower shop errors...")
 			let timeout = timeoutReject(reject);
 
 			let flowerShopErrorCode = "all_flowers_gone";
@@ -97,6 +99,30 @@ function test(){
 				console.log(error.message + " == " + carShopErrorCode);
 			}
 
+			console.log("");
+			clearTimeout(timeout);
+			resolve();
+		});
+	}).then(function(){
+		return new Promise(function(resolve, reject){
+			console.log("System test: AtomicLock - Testing virtual atomic operations")
+			let timeout = timeoutReject(reject);
+
+			// Assing variables
+			var atomicLock = new systemAtomic.AtomicLock();
+
+			// Test for initial state
+			if (atomicLock.locked != false) {
+				throw new Error("AtomicLock failed to initialize.");
+			}
+
+			// Test for lock
+			atomicLock.lock();
+			if (atomicLock.locked != true) {
+				throw new Error("AtomicLock failed to lock.");
+			}
+
+			console.log("AtomicLock has initialized and performed a lock.");
 			console.log("");
 			clearTimeout(timeout);
 			resolve();
