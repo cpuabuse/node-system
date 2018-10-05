@@ -19,7 +19,7 @@ const waitTime = 400;
  */
 class AtomicLock {
 	constructor(){
-			this.locked = false;
+		this.locked = false;
 	}
 
 	/**
