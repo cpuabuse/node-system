@@ -44,7 +44,19 @@ class System extends loader.SystemLoader{
 
 				// Initialize the events
 				for (var error in this.errors){
-					this.addError(error, this.errors[error].error);
+					// Will skip garbled errors
+					if (typeof error === "object"){
+						// Set default error message for absent message
+						let message = "Error message not set.";
+						if (error.hasOwnProperty(message)){
+							if (typeof error.message === "string"){
+								if (error.message != "") {
+									({message} = error);
+								}
+							}
+						}
+						this.addError(error, message);
+					}
 				}
 
 				// Initialize the behaviors; If behaviors not provided as argument, it is OK; Not immediate, since the load.then() code will execute after the instance finish initializing.
@@ -150,7 +162,7 @@ class System extends loader.SystemLoader{
 			// Fire an error event that error already exists
 			this.fire(error_errorExists);
 		} else {
-			this.system.error[code] = new systemError.SystemError(this, code, message);
+			this.system.error[code] = new systemError.SystemError(code, message);
 		}
 	}
 

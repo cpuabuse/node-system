@@ -34,7 +34,7 @@ function test(){
 	new Promise(function(resolve, reject){
 		console.log("System test: SystemLoader < Stars...")
 		let timeout = timeoutReject(reject);
-		
+
 		stars = new systemLoader.SystemLoader("./test", "stars", "stars", load => {
 			load.then(() => {
 				if (stars.sol.planet2 != "Earth"){
