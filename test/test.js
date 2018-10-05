@@ -73,15 +73,10 @@ function test(){
 			let timeout = timeoutReject(reject);
 
 			let flowerShopErrorCode = "all_flowers_gone";
-			let carShopErrorCode = "all_cars_gone";
-			let systemErrorFailResponse = "System error undefined.";
-			let throwTestError = function (errorCode){
-				throw new systemError.SystemError(flowerShop, errorCode, "Testing SystemError");
-			}
 
 			// Test for expected error behavior
 			try {
-				throwTestError(flowerShopErrorCode);
+				throw flowerShop.system.error.all_flowers_gone;
 			} catch(error) {
 				if(error.code != flowerShopErrorCode){
 					throw new Error("SystemError does not retain error code || System does not contain " + flowerShopErrorCode + " error.");
@@ -89,15 +84,11 @@ function test(){
 				console.log(error.code + " == " + flowerShopErrorCode);
 			}
 
-			// Test for unexpected error behavior
-			try {
-				throwTestError(carShopErrorCode);
-			} catch(error) {
-				if(error.message != systemErrorFailResponse){
-					throw new Error("SystemError has not failed with carShopErrorCode: " + carShopErrorCode + ", but should have.");
-				}
-				console.log(error.message + " == " + carShopErrorCode);
+			// Test for incorrect error
+			if(systemError.SystemError.isSystemError(flowerShop.system.error.carShopErrorCode)){
+				throw new Error("Unknown error is viewed as system error");
 			}
+			console.log("carShopErrorCode is not an error");
 
 			console.log("");
 			clearTimeout(timeout);

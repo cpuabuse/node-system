@@ -45,7 +45,7 @@ class System extends loader.SystemLoader{
 				// Initialize the events
 				for (var error in this.errors){
 					// Will skip garbled errors
-					if (typeof error === "object"){
+					if (typeof this.errors[error] === "object"){
 						// Set default error message for absent message
 						let message = "Error message not set.";
 						if (error.hasOwnProperty(message)){
