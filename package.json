@@ -1,6 +1,7 @@
 {
   "name": "cpuabuse-system",
-  "version": "0.0.4",
+  "version": "0.1.0",
+  "description": "System module",
   "main": "src/system.js",
   "scripts": {
     "test": "node test/test.js && exit $?"
@@ -10,7 +11,9 @@
     "url": "git+https://github.com/cpuabuse/node-system.git"
   },
   "dependencies": {
-    "eslint": "^5.6.0",
     "js-yaml": "^3.12.0"
+  },
+  "devDependencies": {
+    "eslint": "^5.6.1"
   }
 }
