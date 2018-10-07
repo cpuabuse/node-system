@@ -67,8 +67,15 @@ System is intended more than anything, for centralized managment.
             * [~initSettings(rootDir, initPath, filename)](#module_system..SystemLoader..initSettings) ⇒ <code>object</code>
             * [~loadYaml(rootDir, relativeDir, filename)](#module_system..SystemLoader..loadYaml) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
     * [~SystemError](#module_system..SystemError) ⇐ <code>external:error</code>
-        * [new SystemError(systemContext, code, message)](#new_module_system..SystemError_new)
+        * [new SystemError(code, message)](#new_module_system..SystemError_new)
         * [.isSystemError(error)](#module_system..SystemError.isSystemError)
+    * [~SystemBehavior](#module_system..SystemBehavior) ⇐ [<code>EventEmitter</code>](https://nodejs.org/api/events.html#events_class_eventemitter)
+        * [new SystemBehavior()](#new_module_system..SystemBehavior_new)
+        * [.atomicLock](#module_system..SystemBehavior+atomicLock) ℗
+        * [.behaviorId](#module_system..SystemBehavior+behaviorId) ℗
+        * [.behaviorIndex](#module_system..SystemBehavior+behaviorIndex) ℗
+        * [.nextBehaviorCounter](#module_system..SystemBehavior+nextBehaviorCounter) ℗
+        * [.addBehavior(name, callback)](#module_system..SystemBehavior+addBehavior) ⇒ <code>number</code>
     * [~AtomicLock](#module_system..AtomicLock)
         * _instance_
             * [.lock()](#module_system..AtomicLock+lock)
@@ -137,8 +144,15 @@ Provides wide range of functionality for file loading and event exchange.
 | rootDir | <code>string</code> | The root directory for the System instance |
 | relativeInitDir | <code>string</code> | The relative directory to root of the location of the initialization file |
 | initFilename | <code>string</code> | Initialization file filename |
-| [behaviors] | [<code>behavior</code>](#module_system.System..behavior) | [Optional] Behaviors to add |
+| [behaviors] | <code>module:system.System~behavior</code> | [Optional] Behaviors to add |
 
+**Example** *(Behaviors outline)*  
+```js
+amazing_behavior: () => {
+  // Process system instance on "amazing_behavior"
+  amazingProcessor(this);
+}
+```
 
 * * *
 
@@ -339,7 +353,7 @@ Logically the two stage separation should be done with promises, but due to huge
 
 | Param | Type |
 | --- | --- |
-| behaviors | [<code>Array.&lt;behavior&gt;</code>](#module_system.System..behavior) | 
+| behaviors | <code>Array.&lt;module:system.System~behavior&gt;</code> | 
 
 
 * * *
@@ -697,7 +711,7 @@ Creates an instance of SystemError.
 **Extends**: <code>external:error</code>  
 
 * [~SystemError](#module_system..SystemError) ⇐ <code>external:error</code>
-    * [new SystemError(systemContext, code, message)](#new_module_system..SystemError_new)
+    * [new SystemError(code, message)](#new_module_system..SystemError_new)
     * [.isSystemError(error)](#module_system..SystemError.isSystemError)
 
 
@@ -705,7 +719,7 @@ Creates an instance of SystemError.
 
 <a name="new_module_system..SystemError_new"></a>
 
-### new SystemError(systemContext, code, message)
+### new SystemError(code, message)
 **Throws**:
 
 - [<code>Error</code>](https://nodejs.org/api/errors.html#errors_class_error) Throwing error if the code already defined
@@ -713,7 +727,6 @@ Creates an instance of SystemError.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| systemContext | <code>module:system.System</code> | System context |
 | code | <code>string</code> | Error code |
 | message | <code>string</code> | Error message |
 
@@ -730,6 +743,89 @@ Check if an object is indeed a functional SystemError
 | Param | Type | Description |
 | --- | --- | --- |
 | error | <code>module:system.SystemError</code> | Error to check |
+
+
+* * *
+
+<a name="module_system..SystemBehavior"></a>
+
+## system~SystemBehavior ⇐ [<code>EventEmitter</code>](https://nodejs.org/api/events.html#events_class_eventemitter)
+System behavior class
+
+**Kind**: inner class of [<code>system</code>](#module_system)  
+**Extends**: [<code>EventEmitter</code>](https://nodejs.org/api/events.html#events_class_eventemitter)  
+
+* [~SystemBehavior](#module_system..SystemBehavior) ⇐ [<code>EventEmitter</code>](https://nodejs.org/api/events.html#events_class_eventemitter)
+    * [new SystemBehavior()](#new_module_system..SystemBehavior_new)
+    * [.atomicLock](#module_system..SystemBehavior+atomicLock) ℗
+    * [.behaviorId](#module_system..SystemBehavior+behaviorId) ℗
+    * [.behaviorIndex](#module_system..SystemBehavior+behaviorIndex) ℗
+    * [.nextBehaviorCounter](#module_system..SystemBehavior+nextBehaviorCounter) ℗
+    * [.addBehavior(name, callback)](#module_system..SystemBehavior+addBehavior) ⇒ <code>number</code>
+
+
+* * *
+
+<a name="new_module_system..SystemBehavior_new"></a>
+
+### new SystemBehavior()
+Initializes system behavior
+
+
+* * *
+
+<a name="module_system..SystemBehavior+atomicLock"></a>
+
+### systemBehavior.atomicLock ℗
+Atomic lock to perform counter increments
+
+**Kind**: instance property of [<code>SystemBehavior</code>](#module_system..SystemBehavior)  
+**Access**: private  
+
+* * *
+
+<a name="module_system..SystemBehavior+behaviorId"></a>
+
+### systemBehavior.behaviorId ℗
+ID to use as actual event identifier
+
+**Kind**: instance property of [<code>SystemBehavior</code>](#module_system..SystemBehavior)  
+**Access**: private  
+
+* * *
+
+<a name="module_system..SystemBehavior+behaviorIndex"></a>
+
+### systemBehavior.behaviorIndex ℗
+Index to link id's back to behavior names
+
+**Kind**: instance property of [<code>SystemBehavior</code>](#module_system..SystemBehavior)  
+**Access**: private  
+
+* * *
+
+<a name="module_system..SystemBehavior+nextBehaviorCounter"></a>
+
+### systemBehavior.nextBehaviorCounter ℗
+Counter to use to generate IDs
+
+**Kind**: instance property of [<code>SystemBehavior</code>](#module_system..SystemBehavior)  
+**Access**: private  
+
+* * *
+
+<a name="module_system..SystemBehavior+addBehavior"></a>
+
+### systemBehavior.addBehavior(name, callback) ⇒ <code>number</code>
+Adds a behavior to the behavior class instance.
+
+**Kind**: instance method of [<code>SystemBehavior</code>](#module_system..SystemBehavior)  
+**Returns**: <code>number</code> - ID of the behavior; -1 if creation failed  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>string</code> | Name of the bahavior |
+| callback | <code>function</code> | Behavior callback function |
 
 
 * * *

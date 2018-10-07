@@ -7,6 +7,7 @@
 const events = require("events");
 const loader = require("./systemLoader.js"); // Auxiliary system lib
 const systemError = require("./systemError.js");
+const systemBehavior = require("./systemBehavior.js");
 const error_errorExists = "error_exists";
 
 /**
@@ -24,6 +25,11 @@ const error_errorExists = "error_exists";
  *
  * **Note**: typeof SystemError will return false
  * @fires system_load Load complete.
+ * @example <caption>Behaviors outline</caption>
+ * amazing_behavior: () => {
+ *   // Process system instance on "amazing_behavior"
+ *   amazingProcessor(this);
+ * }
  */
 class System extends loader.SystemLoader{
 	constructor(id, rootDir, relativeInitDir, initFilename, behaviors){
@@ -87,7 +93,7 @@ class System extends loader.SystemLoader{
 		 * Event emitter for the behaviors. Generally should use the public system instance methods instead.
 		 * @private
 		 */
-		this.system.behavior = new events.EventEmitter();
+		this.system.behavior = new systemBehavior.SystemBehavior();
 
 		/**
 		 * Contains throwables
@@ -192,7 +198,7 @@ class System extends loader.SystemLoader{
 							let value = element[key];
 							if(typeof key === "string"){
 								if (key.length > 0 && typeof value === "function"){
-									this.system.behavior.addListener(key, () => value(this));
+									this.system.behavior.addBehavior(key, () => value(this));
 									postAttachment.push([true, key]);
 									return;
 								}
@@ -357,7 +363,7 @@ class System extends loader.SystemLoader{
 		} else { // Complain about undocumented behaviors
 			this.log("Behavior - Undocumented behavior - " + event)
 		}
-		this.system.behavior.emit(event);
+		this.system.behavior.behave(event);
 	}
 
 	on(event,callback){

@@ -120,6 +120,7 @@ rules:
     - ignore:
       - 0
       - 1
+      - -1
   no-misleading-character-class: error
   no-mixed-operators: error
   no-mixed-requires: error
