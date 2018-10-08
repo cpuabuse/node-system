@@ -73,7 +73,6 @@ class SystemBehavior extends events.EventEmitter{
 	 */
 	behave(name){
 		if(typeof name === "string"){
-			console.log(this.behaviorId);
 			this.behaviorId[name].forEach(event => {
 				this.emit(event);
 			});

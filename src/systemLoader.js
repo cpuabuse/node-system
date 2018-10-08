@@ -45,50 +45,50 @@ class SystemLoader{
 
 	/**
 	 * Converts absolute path to relative path
-	 * @param {string} absoluteDir Absolute file location
-	 * @param {string|string[]} absoluteFile File name|names
+	 * @param {string} rootDir Absolute folder
+	 * @param {string|string[]} target File/folder name|names
 	 * @returns {external.Promise} Relative path|paths
 	 */
-	static toRelative(absoluteDir, absoluteFile){
+	static toRelative(rootDir, target){
 		return new Promise(function(resolve){
-			if (Array.isArray(absoluteFile)){
-				var files = new Array(); // Prepare the return array
+			if (Array.isArray(target)){
+				var targets = new Array(); // Prepare the return array
 
 				// Populate return array
-				absoluteFile.forEach(function(file){
-					files.push(path.relative(absoluteDir, file));
+				target.forEach(function(_target){
+					targets.push(path.relative(rootDir, _target));
 				})
 
 				// Resolve with the array
-				resolve(files);
+				resolve(targets);
 			} else {
 				// Resolve with a string
-				resolve(path.relative(absoluteDir, absoluteFile));
+				resolve(path.relative(rootDir, target));
 			}
 		});
 	}
 
 	/**
 	 * Convert a file/folder or array of files/folders to absolute(system absolute) path.
-	 * @param {string} relativeDir Relative file location
-	 * @param {string|string[]} file File name|names
+	 * @param {string} rootDir Root folder
+	 * @param {string|string[]} target File/folder name|names
 	 * @returns {external.Promise} Absolute path|paths
 	 */
-	static toAbsolute(relativeDir, file){
+	static join(rootDir, target){
 		return new Promise(function(resolve){
-			if (Array.isArray(file)){
-				var files = new Array(); // Prepare the return array
+			if (Array.isArray(target)){
+				var targets = new Array(); // Prepare the return array
 
 				// Populate return array
-				file.forEach(function(file){
-					files.push(path.join(relativeDir, file));
+				target.forEach(function(target){
+					targets.push(path.join(rootDir, target));
 				})
 
 				// Resolve with the array
-				resolve(files);
+				resolve(targets);
 			} else {
 				// Resolve with a string
-				resolve(path.join(relativeDir, file));
+				resolve(path.join(rootDir, target));
 			}
 		});
 	}

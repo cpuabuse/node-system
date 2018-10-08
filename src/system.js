@@ -4,7 +4,6 @@
  * @module system
  */
 "use strict";
-const events = require("events");
 const loader = require("./systemLoader.js"); // Auxiliary system lib
 const systemError = require("./systemError.js");
 const systemBehavior = require("./systemBehavior.js");
@@ -110,9 +109,10 @@ class System extends loader.SystemLoader{
 				/** Check if argument is a folder (relative to system root directory) */
 				isDir: async dir => await loader.SystemLoader.isDir(this.system.rootDir, dir)
 			},
-			toRelative: async (dir, file) => await loader.SystemLoader.toRelative(dir, file),
+			/** Converts absolute path to relative path */
+			toRelative: (rootDir, target) => loader.SystemLoader.toRelative(rootDir, target),
 			/** Converts relative path to absolute path */
-			toAbsolute: async (dir, file) => await loader.SystemLoader.toAbsolute(dir, file),
+			join: (rootDir, target) => loader.SystemLoader.join(rootDir, target),
 			/** Get file contents relative to system\ root directory */
 			getFile: async (dir, file) => await loader.SystemLoader.getFile(this.system.rootDir, dir, file),
 			/** List the contents of the folder, relative to system root directory.
@@ -125,7 +125,7 @@ class System extends loader.SystemLoader{
 			list: async(dir, filter) => {
 				let filteredItems; // Return array
 				let items = await loader.SystemLoader.list(this.system.rootDir, dir); // Wait for folder contets
-				items = await this.system.file.toAbsolute(dir, items);
+				items = await this.system.file.join(dir, items);
 
 				// Was the filter even specified?
 				if(filter !== null){

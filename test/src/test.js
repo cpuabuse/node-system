@@ -4,11 +4,12 @@
  * If error is thrown, node will exit with code 1, otherwise 0.
 */
 "use strict";
-const system = require("../src/system.js");
-const systemError = require("../src/systemError.js");
-const systemLoader = require("../src/systemLoader.js");
-const systemAtomic = require("../src/systemAtomic.js");
+const system = require("../../src/system.js");
+const systemError = require("../../src/systemError.js");
+const systemLoader = require("../../src/systemLoader.js");
+const systemAtomic = require("../../src/systemAtomic.js");
 const maxTestWait = 1000;
+const starsFolderItemsAmount = 3;
 
 // DEBUG: Devonly - promise throw
 process.on("unhandledRejection", up => {
@@ -46,6 +47,25 @@ function test(){
 				resolve();
 			});
 		});
+	}).then(function(){
+		return new Promise(function(resolve, reject){
+			// Begin test
+			console.log("System test: SystemLoader - File functions...");
+			let timeout = timeoutReject(reject);
+
+			// Test
+			systemLoader.SystemLoader.list("./test", "stars").then(function(result){
+				if(result.length != starsFolderItemsAmount){
+					throw new Error("Amount of items in stars folder is != " + starsFolderItemsAmount);
+				}
+				console.log("Amount of items in stars folder is = " + starsFolderItemsAmount);
+
+				// End test
+				console.log("");
+				clearTimeout(timeout);
+				resolve();
+			})
+		})
 	}).then(function(){
 		return new Promise(function(resolve, reject){
 			console.log("System test: System - Flower shop...")

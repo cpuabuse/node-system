@@ -20,7 +20,8 @@ instance | `#` | `@instance`
 
 <a name="module_system"></a>
 
-# system
+## system
+
 System is intended more than anything, for centralized managment.
 
 
@@ -76,6 +77,7 @@ System is intended more than anything, for centralized managment.
         * [.behaviorIndex](#module_system..SystemBehavior+behaviorIndex) ℗
         * [.nextBehaviorCounter](#module_system..SystemBehavior+nextBehaviorCounter) ℗
         * [.addBehavior(name, callback)](#module_system..SystemBehavior+addBehavior) ⇒ <code>number</code>
+        * [.behave(name)](#module_system..SystemBehavior+behave)
     * [~AtomicLock](#module_system..AtomicLock)
         * _instance_
             * [.lock()](#module_system..AtomicLock+lock)
@@ -83,12 +85,10 @@ System is intended more than anything, for centralized managment.
         * _inner_
             * [~waitTime](#module_system..AtomicLock..waitTime) ℗
 
-
-* * *
-
 <a name="module_system..System"></a>
 
 ## system~System ⇐ [<code>SystemLoader</code>](#module_system..SystemLoader)
+
 Provides wide range of functionality for file loading and event exchange.
 
 **Kind**: inner class of [<code>system</code>](#module_system)  
@@ -123,12 +123,10 @@ Provides wide range of functionality for file loading and event exchange.
         * [.error(text)](#module_system..System.error)
         * [.log(text)](#module_system..System.log)
 
-
-* * *
-
 <a name="new_module_system..System_new"></a>
 
-### new System(id, rootDir, relativeInitDir, initFilename, [behaviors])
+## new System(id, rootDir, relativeInitDir, initFilename, [behaviors])
+
 **Throws**:
 
 - [<code>Error</code>](https://nodejs.org/api/errors.html#errors_class_error) Throws standard error if failed to perform basic initializations, or system failure that cannot be reported otherwise has occured.
@@ -153,12 +151,10 @@ amazing_behavior: () => {
   amazingProcessor(this);
 }
 ```
-
-* * *
-
 <a name="module_system..System+system"></a>
 
-### system.system
+## system.system
+
 Contains system info.
 
 **Kind**: instance property of [<code>System</code>](#module_system..System)  
@@ -179,67 +175,53 @@ Contains system info.
         * [.getFile()](#module_system..System+system.file.getFile)
         * [.list(folder, [filter])](#module_system..System+system.file.list) ⇒ <code>Array.&lt;string&gt;</code>
 
-
-* * *
-
 <a name="module_system..System+system.id"></a>
 
-#### system.id
+## system.id
+
 Instance identifier.
 
 **Kind**: static property of [<code>system</code>](#module_system..System+system)  
-
-* * *
-
 <a name="module_system..System+system.rootDir"></a>
 
-#### system.rootDir
+## system.rootDir
+
 Root directory; In general, expecting an absolute path.
 
 **Kind**: static property of [<code>system</code>](#module_system..System+system)  
-
-* * *
-
 <a name="module_system..System+system.relativeInitDir"></a>
 
-#### system.relativeInitDir
+## system.relativeInitDir
+
 Relative directory for the settings file.
 
 **Kind**: static property of [<code>system</code>](#module_system..System+system)  
-
-* * *
-
 <a name="module_system..System+system.initFilename"></a>
 
-#### system.initFilename
+## system.initFilename
+
 Initial filename.
 
 **Kind**: static property of [<code>system</code>](#module_system..System+system)  
-
-* * *
-
 <a name="module_system..System+system.behavior"></a>
 
-#### system.behavior ℗
+## system.behavior ℗
+
 Event emitter for the behaviors. Generally should use the public system instance methods instead.
 
 **Kind**: static property of [<code>system</code>](#module_system..System+system)  
 **Access**: private  
-
-* * *
-
 <a name="module_system..System+system.error"></a>
 
-#### system.error
+## system.error
+
 Contains throwables
 
 **Kind**: static property of [<code>system</code>](#module_system..System+system)  
-
-* * *
-
 <a name="module_system..System+system.file"></a>
 
-#### system.file
+## system.file
+
 File system methods
 
 **Kind**: static property of [<code>system</code>](#module_system..System+system)  
@@ -252,12 +234,10 @@ File system methods
     * [.getFile()](#module_system..System+system.file.getFile)
     * [.list(folder, [filter])](#module_system..System+system.file.list) ⇒ <code>Array.&lt;string&gt;</code>
 
-
-* * *
-
 <a name="module_system..System+system.file.filter"></a>
 
-##### file.filter
+## file.filter
+
 File level filters
 
 **Kind**: static property of [<code>file</code>](#module_system..System+system.file)  
@@ -266,48 +246,38 @@ File level filters
     * [.isFile()](#module_system..System+system.file.filter.isFile)
     * [.isDir()](#module_system..System+system.file.filter.isDir)
 
-
-* * *
-
 <a name="module_system..System+system.file.filter.isFile"></a>
 
-###### filter.isFile()
+## filter.isFile()
+
 Check if argument is a file (relative to system root directory)
 
 **Kind**: static method of [<code>filter</code>](#module_system..System+system.file.filter)  
-
-* * *
-
 <a name="module_system..System+system.file.filter.isDir"></a>
 
-###### filter.isDir()
+## filter.isDir()
+
 Check if argument is a folder (relative to system root directory)
 
 **Kind**: static method of [<code>filter</code>](#module_system..System+system.file.filter)  
-
-* * *
-
 <a name="module_system..System+system.file.toAbsolute"></a>
 
-##### file.toAbsolute()
+## file.toAbsolute()
+
 Converts relative path to absolute path
 
 **Kind**: static method of [<code>file</code>](#module_system..System+system.file)  
-
-* * *
-
 <a name="module_system..System+system.file.getFile"></a>
 
-##### file.getFile()
+## file.getFile()
+
 Get file contents relative to system\ root directory
 
 **Kind**: static method of [<code>file</code>](#module_system..System+system.file)  
-
-* * *
-
 <a name="module_system..System+system.file.list"></a>
 
-##### file.list(folder, [filter]) ⇒ <code>Array.&lt;string&gt;</code>
+## file.list(folder, [filter]) ⇒ <code>Array.&lt;string&gt;</code>
+
 List the contents of the folder, relative to system root directory.
 
 **Kind**: static method of [<code>file</code>](#module_system..System+system.file)  
@@ -322,12 +292,10 @@ List the contents of the folder, relative to system root directory.
 ```js
 systemInstance.system.file.list("css", systemInstance.system.file.isDir);
 ```
-
-* * *
-
 <a name="module_system..System+addError"></a>
 
-### system.addError(code, message)
+## system.addError(code, message)
+
 Adds an error to the System dynamically
 
 **Kind**: instance method of [<code>System</code>](#module_system..System)  
@@ -337,12 +305,10 @@ Adds an error to the System dynamically
 | code | <code>string</code> | Error code |
 | message | <code>string</code> | Error description |
 
-
-* * *
-
 <a name="module_system..System+addBehaviors"></a>
 
-### system.addBehaviors(behaviors)
+## system.addBehaviors(behaviors)
+
 Adds behaviors to the system, and fires post-addtion events.
 Firstly, this function attempts to add the behaviors.
 When the behavior addition has been processed, the function will attempt to fire post-addition events, depending on success/failure of behavior additions.
@@ -355,12 +321,10 @@ Logically the two stage separation should be done with promises, but due to huge
 | --- | --- |
 | behaviors | <code>Array.&lt;module:system.System~behavior&gt;</code> | 
 
-
-* * *
-
 <a name="module_system..System+log"></a>
 
-### system.log(text)
+## system.log(text)
+
 Log message from the System context
 
 **Kind**: instance method of [<code>System</code>](#module_system..System)  
@@ -370,12 +334,10 @@ Log message from the System context
 | --- | --- | --- |
 | text | <code>string</code> | Message |
 
-
-* * *
-
 <a name="module_system..System+fire"></a>
 
-### system.fire(name, [message])
+## system.fire(name, [message])
+
 Fires a system event
 
 **Kind**: instance method of [<code>System</code>](#module_system..System)  
@@ -389,12 +351,10 @@ Fires a system event
 | name | <code>string</code> | Event name, as specified in [events](#module_system.System+events). |
 | [message] | <code>string</code> | [Optional] Message is not strictly required, but preferred. If not specified, will assume value of the name |
 
-
-* * *
-
 <a name="module_system..System+processNewSystemError"></a>
 
-### system.processNewSystemError(code, message)
+## system.processNewSystemError(code, message)
+
 Create and process an error
 
 **Kind**: instance method of [<code>System</code>](#module_system..System)  
@@ -404,12 +364,10 @@ Create and process an error
 | code | <code>string</code> | 
 | message | <code>string</code> | 
 
-
-* * *
-
 <a name="module_system..System+processError"></a>
 
-### system.processError(error)
+## system.processError(error)
+
 Process a system error - log, behavior or further throw
 
 **Kind**: instance method of [<code>System</code>](#module_system..System)  
@@ -418,12 +376,10 @@ Process a system error - log, behavior or further throw
 | --- | --- | --- |
 | error | [<code>SystemError</code>](#module_system..SystemError) \| <code>string</code> | SystemError error or error text |
 
-
-* * *
-
 <a name="module_system..System+behave"></a>
 
-### system.behave(event)
+## system.behave(event)
+
 Emit an event as a behavior.
 
 **Kind**: instance method of [<code>System</code>](#module_system..System)  
@@ -432,12 +388,10 @@ Emit an event as a behavior.
 | --- | --- |
 | event | <code>event</code> | 
 
-
-* * *
-
 <a name="module_system..System.error"></a>
 
-### System.error(text)
+## System.error(text)
+
 Access stderr
 
 **Kind**: static method of [<code>System</code>](#module_system..System)  
@@ -446,12 +400,10 @@ Access stderr
 | --- | --- |
 | text | <code>string</code> | 
 
-
-* * *
-
 <a name="module_system..System.log"></a>
 
-### System.log(text)
+## System.log(text)
+
 Access stdout
 
 **Kind**: static method of [<code>System</code>](#module_system..System)  
@@ -460,12 +412,10 @@ Access stdout
 | --- | --- |
 | text | <code>string</code> | 
 
-
-* * *
-
 <a name="module_system..SystemLoader"></a>
 
 ## system~SystemLoader
+
 Required by system to perform file initialization
 
 **Kind**: inner class of [<code>system</code>](#module_system)  
@@ -485,12 +435,10 @@ Required by system to perform file initialization
         * [~initSettings(rootDir, initPath, filename)](#module_system..SystemLoader..initSettings) ⇒ <code>object</code>
         * [~loadYaml(rootDir, relativeDir, filename)](#module_system..SystemLoader..loadYaml) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 
-
-* * *
-
 <a name="new_module_system..SystemLoader_new"></a>
 
-### new SystemLoader(rootDir, relativeInitDir, initFilename, callback)
+## new SystemLoader(rootDir, relativeInitDir, initFilename, callback)
+
 **Throws**:
 
 - [<code>Error</code>](https://nodejs.org/api/errors.html#errors_class_error) Standard error with message
@@ -503,12 +451,10 @@ Required by system to perform file initialization
 | initFilename | <code>string</code> | Filename |
 | callback | <code>function</code> | Callback to call with Promise of completion |
 
-
-* * *
-
 <a name="module_system..SystemLoader.getFile"></a>
 
-### SystemLoader.getFile(rootDir, relativeDir, file) ⇒ <code>external.Promise</code>
+## SystemLoader.getFile(rootDir, relativeDir, file) ⇒ <code>external.Promise</code>
+
 Gets file contents
 
 **Kind**: static method of [<code>SystemLoader</code>](#module_system..SystemLoader)  
@@ -520,12 +466,10 @@ Gets file contents
 | relativeDir | <code>string</code> | Directory relative to root |
 | file | <code>string</code> | Full file name |
 
-
-* * *
-
 <a name="module_system..SystemLoader.toRelative"></a>
 
-### SystemLoader.toRelative(absoluteDir, absoluteFile) ⇒ <code>external.Promise</code>
+## SystemLoader.toRelative(absoluteDir, absoluteFile) ⇒ <code>external.Promise</code>
+
 Converts absolute path to relative path
 
 **Kind**: static method of [<code>SystemLoader</code>](#module_system..SystemLoader)  
@@ -536,12 +480,10 @@ Converts absolute path to relative path
 | absoluteDir | <code>string</code> | Absolute file location |
 | absoluteFile | <code>string</code> \| <code>Array.&lt;string&gt;</code> | File name|names |
 
-
-* * *
-
 <a name="module_system..SystemLoader.toAbsolute"></a>
 
-### SystemLoader.toAbsolute(relativeDir, file) ⇒ <code>external.Promise</code>
+## SystemLoader.toAbsolute(relativeDir, file) ⇒ <code>external.Promise</code>
+
 Convert a file/folder or array of files/folders to absolute(system absolute) path.
 
 **Kind**: static method of [<code>SystemLoader</code>](#module_system..SystemLoader)  
@@ -552,12 +494,10 @@ Convert a file/folder or array of files/folders to absolute(system absolute) pat
 | relativeDir | <code>string</code> | Relative file location |
 | file | <code>string</code> \| <code>Array.&lt;string&gt;</code> | File name|names |
 
-
-* * *
-
 <a name="module_system..SystemLoader.isFile"></a>
 
-### SystemLoader.isFile(rootDir, relativeDir, filename) ⇒ <code>boolean</code>
+## SystemLoader.isFile(rootDir, relativeDir, filename) ⇒ <code>boolean</code>
+
 Checks if is a file
 
 **Kind**: static method of [<code>SystemLoader</code>](#module_system..SystemLoader)  
@@ -569,12 +509,10 @@ Checks if is a file
 | relativeDir | <code>string</code> | Relative directory to root |
 | filename | <code>string</code> | Full filename |
 
-
-* * *
-
 <a name="module_system..SystemLoader.isDir"></a>
 
-### SystemLoader.isDir(rootDir, relativeDir) ⇒ <code>boolean</code>
+## SystemLoader.isDir(rootDir, relativeDir) ⇒ <code>boolean</code>
+
 Checks if is a directory
 
 **Kind**: static method of [<code>SystemLoader</code>](#module_system..SystemLoader)  
@@ -585,12 +523,10 @@ Checks if is a directory
 | rootDir | <code>string</code> | Absolute root directory |
 | relativeDir | <code>string</code> | Relative directory to root |
 
-
-* * *
-
 <a name="module_system..SystemLoader.list"></a>
 
-### SystemLoader.list(rootDir, relativeDir) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+## SystemLoader.list(rootDir, relativeDir) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+
 Returns an array of strings, representing the contents of a folder
 
 **Kind**: static method of [<code>SystemLoader</code>](#module_system..SystemLoader)  
@@ -601,12 +537,10 @@ Returns an array of strings, representing the contents of a folder
 | rootDir | <code>sting</code> | Root directory |
 | relativeDir | <code>string</code> | Relative directory |
 
-
-* * *
-
 <a name="module_system..SystemLoader.yamlToObject"></a>
 
-### SystemLoader.yamlToObject(string) ⇒ <code>object</code>
+## SystemLoader.yamlToObject(string) ⇒ <code>object</code>
+
 Converts YAML string to a JS object
 
 **Kind**: static method of [<code>SystemLoader</code>](#module_system..SystemLoader)  
@@ -616,12 +550,10 @@ Converts YAML string to a JS object
 | --- | --- | --- |
 | string | <code>string</code> | YAML string |
 
-
-* * *
-
 <a name="module_system..SystemLoader..initRecursion"></a>
 
-### SystemLoader~initRecursion(rootDir, relativePath, initFilename, targetObject, extend) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+## SystemLoader~initRecursion(rootDir, relativePath, initFilename, targetObject, extend) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+
 **Kind**: inner method of [<code>SystemLoader</code>](#module_system..SystemLoader)  
 
 | Param | Type | Description |
@@ -663,12 +595,10 @@ settings:
   file:
   path: # Note: path may be either absolute(default) or relative(relative to the folder from which the file containing instructions is read), the system will not read files outside of system_root_dir tree.
 ```
-
-* * *
-
 <a name="module_system..SystemLoader..initSettings"></a>
 
-### SystemLoader~initSettings(rootDir, initPath, filename) ⇒ <code>object</code>
+## SystemLoader~initSettings(rootDir, initPath, filename) ⇒ <code>object</code>
+
 Init and populate globalspace with settings - specific global object member per file.
 Semantically this function has broader purpose than loadYaml.
 
@@ -681,12 +611,10 @@ Semantically this function has broader purpose than loadYaml.
 | initPath | <code>string</code> | Relative directory to root |
 | filename | <code>string</code> | Filename |
 
-
-* * *
-
 <a name="module_system..SystemLoader..loadYaml"></a>
 
-### SystemLoader~loadYaml(rootDir, relativeDir, filename) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+## SystemLoader~loadYaml(rootDir, relativeDir, filename) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+
 Parses YAML file, and returns and object; Adds extension if absent
 
 **Kind**: inner method of [<code>SystemLoader</code>](#module_system..SystemLoader)  
@@ -698,12 +626,10 @@ Parses YAML file, and returns and object; Adds extension if absent
 | relativeDir | <code>string</code> | Relative directory to root |
 | filename | <code>string</code> | Filename, with or without extension |
 
-
-* * *
-
 <a name="module_system..SystemError"></a>
 
 ## system~SystemError ⇐ <code>external:error</code>
+
 Extended system error class.
 Creates an instance of SystemError.
 
@@ -714,12 +640,10 @@ Creates an instance of SystemError.
     * [new SystemError(code, message)](#new_module_system..SystemError_new)
     * [.isSystemError(error)](#module_system..SystemError.isSystemError)
 
-
-* * *
-
 <a name="new_module_system..SystemError_new"></a>
 
-### new SystemError(code, message)
+## new SystemError(code, message)
+
 **Throws**:
 
 - [<code>Error</code>](https://nodejs.org/api/errors.html#errors_class_error) Throwing error if the code already defined
@@ -730,12 +654,10 @@ Creates an instance of SystemError.
 | code | <code>string</code> | Error code |
 | message | <code>string</code> | Error message |
 
-
-* * *
-
 <a name="module_system..SystemError.isSystemError"></a>
 
-### SystemError.isSystemError(error)
+## SystemError.isSystemError(error)
+
 Check if an object is indeed a functional SystemError
 
 **Kind**: static method of [<code>SystemError</code>](#module_system..SystemError)  
@@ -744,12 +666,10 @@ Check if an object is indeed a functional SystemError
 | --- | --- | --- |
 | error | <code>module:system.SystemError</code> | Error to check |
 
-
-* * *
-
 <a name="module_system..SystemBehavior"></a>
 
 ## system~SystemBehavior ⇐ [<code>EventEmitter</code>](https://nodejs.org/api/events.html#events_class_eventemitter)
+
 System behavior class
 
 **Kind**: inner class of [<code>system</code>](#module_system)  
@@ -762,62 +682,52 @@ System behavior class
     * [.behaviorIndex](#module_system..SystemBehavior+behaviorIndex) ℗
     * [.nextBehaviorCounter](#module_system..SystemBehavior+nextBehaviorCounter) ℗
     * [.addBehavior(name, callback)](#module_system..SystemBehavior+addBehavior) ⇒ <code>number</code>
-
-
-* * *
+    * [.behave(name)](#module_system..SystemBehavior+behave)
 
 <a name="new_module_system..SystemBehavior_new"></a>
 
-### new SystemBehavior()
+## new SystemBehavior()
+
 Initializes system behavior
-
-
-* * *
 
 <a name="module_system..SystemBehavior+atomicLock"></a>
 
-### systemBehavior.atomicLock ℗
+## systemBehavior.atomicLock ℗
+
 Atomic lock to perform counter increments
 
 **Kind**: instance property of [<code>SystemBehavior</code>](#module_system..SystemBehavior)  
 **Access**: private  
-
-* * *
-
 <a name="module_system..SystemBehavior+behaviorId"></a>
 
-### systemBehavior.behaviorId ℗
+## systemBehavior.behaviorId ℗
+
 ID to use as actual event identifier
 
 **Kind**: instance property of [<code>SystemBehavior</code>](#module_system..SystemBehavior)  
 **Access**: private  
-
-* * *
-
 <a name="module_system..SystemBehavior+behaviorIndex"></a>
 
-### systemBehavior.behaviorIndex ℗
+## systemBehavior.behaviorIndex ℗
+
 Index to link id's back to behavior names
 
 **Kind**: instance property of [<code>SystemBehavior</code>](#module_system..SystemBehavior)  
 **Access**: private  
-
-* * *
-
 <a name="module_system..SystemBehavior+nextBehaviorCounter"></a>
 
-### systemBehavior.nextBehaviorCounter ℗
+## systemBehavior.nextBehaviorCounter ℗
+
 Counter to use to generate IDs
 
 **Kind**: instance property of [<code>SystemBehavior</code>](#module_system..SystemBehavior)  
 **Access**: private  
-
-* * *
-
 <a name="module_system..SystemBehavior+addBehavior"></a>
 
-### systemBehavior.addBehavior(name, callback) ⇒ <code>number</code>
+## systemBehavior.addBehavior(name, callback) ⇒ <code>number</code>
+
 Adds a behavior to the behavior class instance.
+Does not check for inconsistencies within ID and index arrays, as if it is internally managed by this class, inconsistencies should not happen.
 
 **Kind**: instance method of [<code>SystemBehavior</code>](#module_system..SystemBehavior)  
 **Returns**: <code>number</code> - ID of the behavior; -1 if creation failed  
@@ -827,12 +737,22 @@ Adds a behavior to the behavior class instance.
 | name | <code>string</code> | Name of the bahavior |
 | callback | <code>function</code> | Behavior callback function |
 
+<a name="module_system..SystemBehavior+behave"></a>
 
-* * *
+## systemBehavior.behave(name)
+
+Triggers behaviors registered for name
+
+**Kind**: instance method of [<code>SystemBehavior</code>](#module_system..SystemBehavior)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>string</code> | Behavior name |
 
 <a name="module_system..AtomicLock"></a>
 
 ## system~AtomicLock
+
 Creates an instance of AtomicLock.
 
 **Kind**: inner class of [<code>system</code>](#module_system)  
@@ -844,34 +764,25 @@ Creates an instance of AtomicLock.
     * _inner_
         * [~waitTime](#module_system..AtomicLock..waitTime) ℗
 
-
-* * *
-
 <a name="module_system..AtomicLock+lock"></a>
 
-### atomicLock.lock()
+## atomicLock.lock()
+
 Lock an atomic lock
 
 **Kind**: instance method of [<code>AtomicLock</code>](#module_system..AtomicLock)  
-
-* * *
-
 <a name="module_system..AtomicLock+release"></a>
 
-### atomicLock.release()
+## atomicLock.release()
+
 Release atomic lock
 
 **Kind**: instance method of [<code>AtomicLock</code>](#module_system..AtomicLock)  
-
-* * *
-
 <a name="module_system..AtomicLock..waitTime"></a>
 
-### AtomicLock~waitTime ℗
+## AtomicLock~waitTime ℗
+
 Specifies the time to wait between lock checks
 
 **Kind**: inner constant of [<code>AtomicLock</code>](#module_system..AtomicLock)  
 **Access**: private  
-
-* * *
-
