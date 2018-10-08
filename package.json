@@ -4,7 +4,7 @@
   "description": "System module",
   "main": "src/system.js",
   "scripts": {
-    "test": "node test/test.js && exit $?"
+    "test": "node test/src/test.js && exit $?"
   },
   "repository": {
     "type": "git",
