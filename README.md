@@ -29,18 +29,14 @@ System is intended more than anything, for centralized managment.
     * [~System](#module_system..System) ⇐ [<code>SystemLoader</code>](#module_system..SystemLoader)
         * [new System(id, rootDir, relativeInitDir, initFilename, [behaviors])](#new_module_system..System_new)
         * _instance_
-            * [.system](#module_system..System+system)
-                * [.id](#module_system..System+system.id)
-                * [.rootDir](#module_system..System+system.rootDir)
-                * [.relativeInitDir](#module_system..System+system.relativeInitDir)
-                * [.initFilename](#module_system..System+system.initFilename)
-                * [.behavior](#module_system..System+system.behavior) ℗
-                * [.error](#module_system..System+system.error)
+            * *[.events](#module_system..System+events)*
+            * [.system](#module_system..System+system) : <code>systemOptions</code>
                 * [.file](#module_system..System+system.file)
                     * [.filter](#module_system..System+system.file.filter)
                         * [.isFile()](#module_system..System+system.file.filter.isFile)
                         * [.isDir()](#module_system..System+system.file.filter.isDir)
-                    * [.toAbsolute()](#module_system..System+system.file.toAbsolute)
+                    * [.toRelative()](#module_system..System+system.file.toRelative)
+                    * [.join()](#module_system..System+system.file.join)
                     * [.getFile()](#module_system..System+system.file.getFile)
                     * [.list(folder, [filter])](#module_system..System+system.file.list) ⇒ <code>Array.&lt;string&gt;</code>
             * [.addError(code, message)](#module_system..System+addError)
@@ -57,8 +53,8 @@ System is intended more than anything, for centralized managment.
         * [new SystemLoader(rootDir, relativeInitDir, initFilename, callback)](#new_module_system..SystemLoader_new)
         * _static_
             * [.getFile(rootDir, relativeDir, file)](#module_system..SystemLoader.getFile) ⇒ <code>external.Promise</code>
-            * [.toRelative(absoluteDir, absoluteFile)](#module_system..SystemLoader.toRelative) ⇒ <code>external.Promise</code>
-            * [.toAbsolute(relativeDir, file)](#module_system..SystemLoader.toAbsolute) ⇒ <code>external.Promise</code>
+            * [.toRelative(rootDir, target)](#module_system..SystemLoader.toRelative) ⇒ <code>external.Promise</code>
+            * [.join(rootDir, target)](#module_system..SystemLoader.join) ⇒ <code>external.Promise</code>
             * [.isFile(rootDir, relativeDir, filename)](#module_system..SystemLoader.isFile) ⇒ <code>boolean</code>
             * [.isDir(rootDir, relativeDir)](#module_system..SystemLoader.isDir) ⇒ <code>boolean</code>
             * [.list(rootDir, relativeDir)](#module_system..SystemLoader.list) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
@@ -84,6 +80,7 @@ System is intended more than anything, for centralized managment.
             * [.release()](#module_system..AtomicLock+release)
         * _inner_
             * [~waitTime](#module_system..AtomicLock..waitTime) ℗
+    * [~systemOptions](#module_system..systemOptions) : <code>Object</code>
 
 <a name="module_system..System"></a>
 
@@ -98,18 +95,14 @@ Provides wide range of functionality for file loading and event exchange.
 * [~System](#module_system..System) ⇐ [<code>SystemLoader</code>](#module_system..SystemLoader)
     * [new System(id, rootDir, relativeInitDir, initFilename, [behaviors])](#new_module_system..System_new)
     * _instance_
-        * [.system](#module_system..System+system)
-            * [.id](#module_system..System+system.id)
-            * [.rootDir](#module_system..System+system.rootDir)
-            * [.relativeInitDir](#module_system..System+system.relativeInitDir)
-            * [.initFilename](#module_system..System+system.initFilename)
-            * [.behavior](#module_system..System+system.behavior) ℗
-            * [.error](#module_system..System+system.error)
+        * *[.events](#module_system..System+events)*
+        * [.system](#module_system..System+system) : <code>systemOptions</code>
             * [.file](#module_system..System+system.file)
                 * [.filter](#module_system..System+system.file.filter)
                     * [.isFile()](#module_system..System+system.file.filter.isFile)
                     * [.isDir()](#module_system..System+system.file.filter.isDir)
-                * [.toAbsolute()](#module_system..System+system.file.toAbsolute)
+                * [.toRelative()](#module_system..System+system.file.toRelative)
+                * [.join()](#module_system..System+system.file.join)
                 * [.getFile()](#module_system..System+system.file.getFile)
                 * [.list(folder, [filter])](#module_system..System+system.file.list) ⇒ <code>Array.&lt;string&gt;</code>
         * [.addError(code, message)](#module_system..System+addError)
@@ -151,73 +144,40 @@ amazing_behavior: () => {
   amazingProcessor(this);
 }
 ```
+<a name="module_system..System+events"></a>
+
+## *system.events*
+
+Events to be populated by the loader.
+System by itself does not do anything about the events themselves, it only confirms that the events were initialized. Ofcourse, if the events are fired, and failure to fire event is set to throw, or undocumented events encountered, it would make troubles(System and standard throws).
+
+**Kind**: instance abstract property of [<code>System</code>](#module_system..System)  
 <a name="module_system..System+system"></a>
 
-## system.system
+## system.system : <code>systemOptions</code>
 
 Contains system info.
 
 **Kind**: instance property of [<code>System</code>](#module_system..System)  
 **Read only**: true  
+**Properties**
 
-* [.system](#module_system..System+system)
-    * [.id](#module_system..System+system.id)
-    * [.rootDir](#module_system..System+system.rootDir)
-    * [.relativeInitDir](#module_system..System+system.relativeInitDir)
-    * [.initFilename](#module_system..System+system.initFilename)
-    * [.behavior](#module_system..System+system.behavior) ℗
-    * [.error](#module_system..System+system.error)
+| Name | Type | Description |
+| --- | --- | --- |
+| behavior | [<code>SystemBehavior</code>](#module_system..SystemBehavior) | Event emitter for the behaviors. Generally should use the public system instance methods instead. |
+| error | <code>object</code> | Contains throwables |
+
+
+* [.system](#module_system..System+system) : <code>systemOptions</code>
     * [.file](#module_system..System+system.file)
         * [.filter](#module_system..System+system.file.filter)
             * [.isFile()](#module_system..System+system.file.filter.isFile)
             * [.isDir()](#module_system..System+system.file.filter.isDir)
-        * [.toAbsolute()](#module_system..System+system.file.toAbsolute)
+        * [.toRelative()](#module_system..System+system.file.toRelative)
+        * [.join()](#module_system..System+system.file.join)
         * [.getFile()](#module_system..System+system.file.getFile)
         * [.list(folder, [filter])](#module_system..System+system.file.list) ⇒ <code>Array.&lt;string&gt;</code>
 
-<a name="module_system..System+system.id"></a>
-
-## system.id
-
-Instance identifier.
-
-**Kind**: static property of [<code>system</code>](#module_system..System+system)  
-<a name="module_system..System+system.rootDir"></a>
-
-## system.rootDir
-
-Root directory; In general, expecting an absolute path.
-
-**Kind**: static property of [<code>system</code>](#module_system..System+system)  
-<a name="module_system..System+system.relativeInitDir"></a>
-
-## system.relativeInitDir
-
-Relative directory for the settings file.
-
-**Kind**: static property of [<code>system</code>](#module_system..System+system)  
-<a name="module_system..System+system.initFilename"></a>
-
-## system.initFilename
-
-Initial filename.
-
-**Kind**: static property of [<code>system</code>](#module_system..System+system)  
-<a name="module_system..System+system.behavior"></a>
-
-## system.behavior ℗
-
-Event emitter for the behaviors. Generally should use the public system instance methods instead.
-
-**Kind**: static property of [<code>system</code>](#module_system..System+system)  
-**Access**: private  
-<a name="module_system..System+system.error"></a>
-
-## system.error
-
-Contains throwables
-
-**Kind**: static property of [<code>system</code>](#module_system..System+system)  
 <a name="module_system..System+system.file"></a>
 
 ## system.file
@@ -230,7 +190,8 @@ File system methods
     * [.filter](#module_system..System+system.file.filter)
         * [.isFile()](#module_system..System+system.file.filter.isFile)
         * [.isDir()](#module_system..System+system.file.filter.isDir)
-    * [.toAbsolute()](#module_system..System+system.file.toAbsolute)
+    * [.toRelative()](#module_system..System+system.file.toRelative)
+    * [.join()](#module_system..System+system.file.join)
     * [.getFile()](#module_system..System+system.file.getFile)
     * [.list(folder, [filter])](#module_system..System+system.file.list) ⇒ <code>Array.&lt;string&gt;</code>
 
@@ -260,9 +221,16 @@ Check if argument is a file (relative to system root directory)
 Check if argument is a folder (relative to system root directory)
 
 **Kind**: static method of [<code>filter</code>](#module_system..System+system.file.filter)  
-<a name="module_system..System+system.file.toAbsolute"></a>
+<a name="module_system..System+system.file.toRelative"></a>
 
-## file.toAbsolute()
+## file.toRelative()
+
+Converts absolute path to relative path
+
+**Kind**: static method of [<code>file</code>](#module_system..System+system.file)  
+<a name="module_system..System+system.file.join"></a>
+
+## file.join()
 
 Converts relative path to absolute path
 
@@ -348,7 +316,7 @@ Fires a system event
 
 | Param | Type | Description |
 | --- | --- | --- |
-| name | <code>string</code> | Event name, as specified in [events](#module_system.System+events). |
+| name | <code>string</code> | Event name, as specified in [module:system.System#events](module:system.System#events). |
 | [message] | <code>string</code> | [Optional] Message is not strictly required, but preferred. If not specified, will assume value of the name |
 
 <a name="module_system..System+processNewSystemError"></a>
@@ -424,8 +392,8 @@ Required by system to perform file initialization
     * [new SystemLoader(rootDir, relativeInitDir, initFilename, callback)](#new_module_system..SystemLoader_new)
     * _static_
         * [.getFile(rootDir, relativeDir, file)](#module_system..SystemLoader.getFile) ⇒ <code>external.Promise</code>
-        * [.toRelative(absoluteDir, absoluteFile)](#module_system..SystemLoader.toRelative) ⇒ <code>external.Promise</code>
-        * [.toAbsolute(relativeDir, file)](#module_system..SystemLoader.toAbsolute) ⇒ <code>external.Promise</code>
+        * [.toRelative(rootDir, target)](#module_system..SystemLoader.toRelative) ⇒ <code>external.Promise</code>
+        * [.join(rootDir, target)](#module_system..SystemLoader.join) ⇒ <code>external.Promise</code>
         * [.isFile(rootDir, relativeDir, filename)](#module_system..SystemLoader.isFile) ⇒ <code>boolean</code>
         * [.isDir(rootDir, relativeDir)](#module_system..SystemLoader.isDir) ⇒ <code>boolean</code>
         * [.list(rootDir, relativeDir)](#module_system..SystemLoader.list) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
@@ -468,7 +436,7 @@ Gets file contents
 
 <a name="module_system..SystemLoader.toRelative"></a>
 
-## SystemLoader.toRelative(absoluteDir, absoluteFile) ⇒ <code>external.Promise</code>
+## SystemLoader.toRelative(rootDir, target) ⇒ <code>external.Promise</code>
 
 Converts absolute path to relative path
 
@@ -477,12 +445,12 @@ Converts absolute path to relative path
 
 | Param | Type | Description |
 | --- | --- | --- |
-| absoluteDir | <code>string</code> | Absolute file location |
-| absoluteFile | <code>string</code> \| <code>Array.&lt;string&gt;</code> | File name|names |
+| rootDir | <code>string</code> | Absolute folder |
+| target | <code>string</code> \| <code>Array.&lt;string&gt;</code> | File/folder name|names |
 
-<a name="module_system..SystemLoader.toAbsolute"></a>
+<a name="module_system..SystemLoader.join"></a>
 
-## SystemLoader.toAbsolute(relativeDir, file) ⇒ <code>external.Promise</code>
+## SystemLoader.join(rootDir, target) ⇒ <code>external.Promise</code>
 
 Convert a file/folder or array of files/folders to absolute(system absolute) path.
 
@@ -491,8 +459,8 @@ Convert a file/folder or array of files/folders to absolute(system absolute) pat
 
 | Param | Type | Description |
 | --- | --- | --- |
-| relativeDir | <code>string</code> | Relative file location |
-| file | <code>string</code> \| <code>Array.&lt;string&gt;</code> | File name|names |
+| rootDir | <code>string</code> | Root folder |
+| target | <code>string</code> \| <code>Array.&lt;string&gt;</code> | File/folder name|names |
 
 <a name="module_system..SystemLoader.isFile"></a>
 
@@ -786,3 +754,18 @@ Specifies the time to wait between lock checks
 
 **Kind**: inner constant of [<code>AtomicLock</code>](#module_system..AtomicLock)  
 **Access**: private  
+<a name="module_system..systemOptions"></a>
+
+## system~systemOptions : <code>Object</code>
+
+**Kind**: inner typedef of [<code>system</code>](#module_system)  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| id | <code>number</code> | Instance identifier |
+| rootDir | <code>number</code> | Root directory; In general, expecting an absolute path |
+| relativeInitDir | <code>number</code> | Relative directory for the settings file |
+| initFilename | <code>number</code> | Initial filename |
+| notMute | <code>number</code> | Mute stdout |
+

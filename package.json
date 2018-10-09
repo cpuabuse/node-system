@@ -4,7 +4,7 @@
   "description": "System module",
   "main": "src/system.js",
   "scripts": {
-    "test": "node test/src/test.js && exit $?"
+    "test": "node ./node_modules/mocha/bin/mocha && exit $?"
   },
   "repository": {
     "type": "git",
@@ -14,6 +14,7 @@
     "js-yaml": "^3.12.0"
   },
   "devDependencies": {
-    "eslint": "^5.6.1"
+    "eslint": "^5.6.1",
+    "mocha": "^5.2.0"
   }
 }

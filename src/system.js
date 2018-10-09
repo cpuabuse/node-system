@@ -10,6 +10,16 @@ const systemBehavior = require("./systemBehavior.js");
 const error_errorExists = "error_exists";
 
 /**
+ * @typedef systemOptions
+ * @type {Object}
+ * @property {number} id Instance identifier
+ * @property {number} rootDir Root directory; In general, expecting an absolute path
+ * @property {number} relativeInitDir Relative directory for the settings file
+ * @property {number} initFilename Initial filename
+ * @property {number} notMute Mute stdout
+ */
+
+/**
  * Provides wide range of functionality for file loading and event exchange.
  * @extends module:system~SystemLoader
  * The constructor will perform necessary preparations, so that failures can be processed with system events. Up until these preparations are complete, the failure will result in thrown standard Error.
@@ -31,9 +41,9 @@ const error_errorExists = "error_exists";
  * }
  */
 class System extends loader.SystemLoader{
-	constructor(id, rootDir, relativeInitDir, initFilename, behaviors){
+	constructor(options, behaviors){
 		// First things first, call a loader, if loader has failed, there are no tools to report gracefully, so the errors from there will just go above
-		super(rootDir, relativeInitDir, initFilename, load => {
+		super(options.rootDir, options.relativeInitDir, options.initFilename, load => {
 			load.then(() => {
 				/**
 				 * Events to be populated by the loader.
@@ -41,7 +51,7 @@ class System extends loader.SystemLoader{
 				 * @abstract
 				 * @member events
 				 * @instance
-				 * @memberof module:system.System
+				 * @memberof module:system~System
 				 */
 				if(!(this.hasOwnProperty("events") && this.hasOwnProperty("behaviors"))){ // Make sure basic system carcass was initialized
 					throw new Error("loader_failed");
@@ -75,28 +85,19 @@ class System extends loader.SystemLoader{
 		// System constants
 		/**
 		 * Contains system info.
+		 * @type {systemOptions}
 		 * @readonly
+		 * @property {module:system~SystemBehavior} behavior Event emitter for the behaviors. Generally should use the public system instance methods instead.
+		 * @property {object} error Contains throwables
 		 */
 		this.system = {
-			/** Instance identifier. */
-			id,
-			/** Root directory; In general, expecting an absolute path. */
-			rootDir,
-			/** Relative directory for the settings file. */
-			relativeInitDir,
-			/** Initial filename. */
-			initFilename
+			id: options.id,
+			rootDir: options.rootDir,
+			relativeInitDir: options.relativeInitDir,
+			initFilename: options.relatoveInitFilename,
+			notMute: options.notMute
 		};
-
-		/**
-		 * Event emitter for the behaviors. Generally should use the public system instance methods instead.
-		 * @private
-		 */
 		this.system.behavior = new systemBehavior.SystemBehavior();
-
-		/**
-		 * Contains throwables
-		*/
 		this.system.error = {};
 
 		// System methods
@@ -238,7 +239,9 @@ class System extends loader.SystemLoader{
 	 */
 	log(text){
 		if (typeof text === "string"){
-			System.log(this.system.id + ": " + text);
+			if(this.system.notMute){
+				System.log(this.system.id + ": " + text);
+			}
 		} else {
 			// TODO: fix report text etc
 			this.fire("type_error", typeof text + " not string.");

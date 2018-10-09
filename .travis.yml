@@ -5,4 +5,4 @@ after_script:
   - |
     # Install and run Istanbul into Coveralls
     npm install -g istanbul@1.1.0-alpha.1 coveralls
-    istanbul cover ./test/src/test.js && cat ./coverage/lcov.info | coveralls
+    istanbul cover ./node_modules/mocha/bin/mocha && cat ./coverage/lcov.info | coveralls
