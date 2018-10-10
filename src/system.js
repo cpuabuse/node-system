@@ -10,23 +10,13 @@ const systemBehavior = require("./systemBehavior.js");
 const error_errorExists = "error_exists";
 
 /**
- * @typedef systemOptions
- * @type {Object}
- * @property {number} id Instance identifier
- * @property {number} rootDir Root directory; In general, expecting an absolute path
- * @property {number} relativeInitDir Relative directory for the settings file
- * @property {number} initFilename Initial filename
- * @property {number} notMute Mute stdout
- */
-
-/**
  * Provides wide range of functionality for file loading and event exchange.
  * @extends module:system~SystemLoader
  * The constructor will perform necessary preparations, so that failures can be processed with system events. Up until these preparations are complete, the failure will result in thrown standard Error.
- * @param {string} id - System instace internal ID
- * @param {string} rootDir - The root directory for the System instance
- * @param {string} relativeInitDir - The relative directory to root of the location of the initialization file
- * @param {string} initFilename - Initialization file filename
+ * @param {String} id - System instace internal ID
+ * @param {String} rootDir - The root directory for the System instance
+ * @param {String} relativeInitDir - The relative directory to root of the location of the initialization file
+ * @param {String} initFilename - Initialization file filename
  * @param {module:system.System~behavior=} behaviors - [Optional] Behaviors to add
  * @throws {external:Error} Throws standard error if failed to perform basic initializations, or system failure that cannot be reported otherwise has occured.
  *
@@ -41,6 +31,15 @@ const error_errorExists = "error_exists";
  * }
  */
 class System extends loader.SystemLoader{
+	/**
+	 * @typedef module:system~System~options
+	 * @type {Object}
+	 * @property {String} id Instance identifier
+	 * @property {String} rootDir Root directory; In general, expecting an absolute path
+	 * @property {String} relativeInitDir Relative directory for the settings file
+	 * @property {String} initFilename Initial filename
+	 * @property {Boolean} notMute Mute stdout
+	 */
 	constructor(options, behaviors){
 		// First things first, call a loader, if loader has failed, there are no tools to report gracefully, so the errors from there will just go above
 		super(options.rootDir, options.relativeInitDir, options.initFilename, load => {
@@ -49,9 +48,10 @@ class System extends loader.SystemLoader{
 				 * Events to be populated by the loader.
 				 * System by itself does not do anything about the events themselves, it only confirms that the events were initialized. Ofcourse, if the events are fired, and failure to fire event is set to throw, or undocumented events encountered, it would make troubles(System and standard throws).
 				 * @abstract
-				 * @member events
 				 * @instance
+				 * @member events
 				 * @memberof module:system~System
+				 * @type {Object}
 				 */
 				if(!(this.hasOwnProperty("events") && this.hasOwnProperty("behaviors"))){ // Make sure basic system carcass was initialized
 					throw new Error("loader_failed");
@@ -85,10 +85,14 @@ class System extends loader.SystemLoader{
 		// System constants
 		/**
 		 * Contains system info.
-		 * @type {systemOptions}
+		 * @instance
+		 * @member system
+		 * @memberof module:system~System
+		 * @type {module:system~System~options}
 		 * @readonly
 		 * @property {module:system~SystemBehavior} behavior Event emitter for the behaviors. Generally should use the public system instance methods instead.
 		 * @property {object} error Contains throwables
+		 * @property {module:system~System~file} error Contains throwables
 		 */
 		this.system = {
 			id: options.id,
@@ -100,14 +104,37 @@ class System extends loader.SystemLoader{
 		this.system.behavior = new systemBehavior.SystemBehavior();
 		this.system.error = {};
 
-		// System methods
-		/** File system methods */
+		/** File system methods
+		 * @instance
+		 * @member file
+		 * @memberof module:system~System#system
+		 * @type {Object}
+		 */
 		this.system.file = {
-			/** File level filters  */
+			/** File level filters
+			 * @instance
+			 * @member filter
+			 * @memberof module:system~System#system#file
+			*/
 			filter: {
-				/** Check if argument is a file (relative to system root directory) */
+				/** Check if argument is a file (relative to system root directory)
+				 * @instance
+				 * @member isFile
+				 * @memberof module:system~System#system#file#filter
+				 * @async
+				 * @function
+				 * @param {string} folder Root folder
+				 * @param {string} file File or folder within root
+				*/
 				isFile: async (folder, file) => await loader.SytemLoader.isFile(this.system.rootDir, folder, file),
-				/** Check if argument is a folder (relative to system root directory) */
+				/** Check if argument is a folder (relative to system root directory)
+				 * @instance
+				 * @member isFile
+				 * @memberof module:system~System#system#file#filter
+				 * @async
+				 * @function
+				 * @param {string} dir Folder
+				*/
 				isDir: async dir => await loader.SystemLoader.isDir(this.system.rootDir, dir)
 			},
 			/** Converts absolute path to relative path */
@@ -119,7 +146,7 @@ class System extends loader.SystemLoader{
 			/** List the contents of the folder, relative to system root directory.
 			 * @param {string} folder Folder to check
 			 * @param {external:Promise} [filter=null]
-			 * @returns {string[]} Filtered files/folders
+			 * @returns {string[]} Filtered files/folders relative to system root
 			 * @example <caption>List folders</caption>
 			 * systemInstance.system.file.list("css", systemInstance.system.file.isDir);
 			 */
@@ -161,8 +188,8 @@ class System extends loader.SystemLoader{
 	/**
 	 * Adds an error to the System dynamically
 	 * @instance
-	 * @param {string} code Error code
-	 * @param {string} message Error description
+	 * @param {String} code Error code
+	 * @param {String} message Error description
 	*/
 	addError(code, message){
 		if(this.system.error.hasOwnProperty(code)){
@@ -234,7 +261,7 @@ class System extends loader.SystemLoader{
 	/**
 	 * Log message from the System context
 	 * @instance
-	 * @param {string} text - Message
+	 * @param {String} text - Message
 	 * @fires module:system.System~type_error
 	 */
 	log(text){

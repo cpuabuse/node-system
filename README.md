@@ -29,16 +29,12 @@ System is intended more than anything, for centralized managment.
     * [~System](#module_system..System) ⇐ [<code>SystemLoader</code>](#module_system..SystemLoader)
         * [new System(id, rootDir, relativeInitDir, initFilename, [behaviors])](#new_module_system..System_new)
         * _instance_
-            * *[.events](#module_system..System+events)*
-            * [.system](#module_system..System+system) : <code>systemOptions</code>
-                * [.file](#module_system..System+system.file)
-                    * [.filter](#module_system..System+system.file.filter)
-                        * [.isFile()](#module_system..System+system.file.filter.isFile)
-                        * [.isDir()](#module_system..System+system.file.filter.isDir)
-                    * [.toRelative()](#module_system..System+system.file.toRelative)
-                    * [.join()](#module_system..System+system.file.join)
-                    * [.getFile()](#module_system..System+system.file.getFile)
-                    * [.list(folder, [filter])](#module_system..System+system.file.list) ⇒ <code>Array.&lt;string&gt;</code>
+            * *[.events](#module_system..System+events) : <code>Object</code>*
+            * [.system](#module_system..System+system) : [<code>options</code>](#module_system..System..options)
+                * [.file](#module_system..System+system+file) : <code>Object</code>
+                    * [.filter](#module_system..System+system+file+filter)
+                        * [.isFile(folder, file)](#module_system..System+system+file+filter+isFile)
+                        * [.isFile(folder)](#module_system..System+system+file+filter+isFile)
             * [.addError(code, message)](#module_system..System+addError)
             * [.addBehaviors(behaviors)](#module_system..System+addBehaviors)
             * [.log(text)](#module_system..System+log)
@@ -49,6 +45,8 @@ System is intended more than anything, for centralized managment.
         * _static_
             * [.error(text)](#module_system..System.error)
             * [.log(text)](#module_system..System.log)
+        * _inner_
+            * [~options](#module_system..System..options) : <code>Object</code>
     * [~SystemLoader](#module_system..SystemLoader)
         * [new SystemLoader(rootDir, relativeInitDir, initFilename, callback)](#new_module_system..SystemLoader_new)
         * _static_
@@ -80,7 +78,6 @@ System is intended more than anything, for centralized managment.
             * [.release()](#module_system..AtomicLock+release)
         * _inner_
             * [~waitTime](#module_system..AtomicLock..waitTime) ℗
-    * [~systemOptions](#module_system..systemOptions) : <code>Object</code>
 
 <a name="module_system..System"></a>
 
@@ -95,16 +92,12 @@ Provides wide range of functionality for file loading and event exchange.
 * [~System](#module_system..System) ⇐ [<code>SystemLoader</code>](#module_system..SystemLoader)
     * [new System(id, rootDir, relativeInitDir, initFilename, [behaviors])](#new_module_system..System_new)
     * _instance_
-        * *[.events](#module_system..System+events)*
-        * [.system](#module_system..System+system) : <code>systemOptions</code>
-            * [.file](#module_system..System+system.file)
-                * [.filter](#module_system..System+system.file.filter)
-                    * [.isFile()](#module_system..System+system.file.filter.isFile)
-                    * [.isDir()](#module_system..System+system.file.filter.isDir)
-                * [.toRelative()](#module_system..System+system.file.toRelative)
-                * [.join()](#module_system..System+system.file.join)
-                * [.getFile()](#module_system..System+system.file.getFile)
-                * [.list(folder, [filter])](#module_system..System+system.file.list) ⇒ <code>Array.&lt;string&gt;</code>
+        * *[.events](#module_system..System+events) : <code>Object</code>*
+        * [.system](#module_system..System+system) : [<code>options</code>](#module_system..System..options)
+            * [.file](#module_system..System+system+file) : <code>Object</code>
+                * [.filter](#module_system..System+system+file+filter)
+                    * [.isFile(folder, file)](#module_system..System+system+file+filter+isFile)
+                    * [.isFile(folder)](#module_system..System+system+file+filter+isFile)
         * [.addError(code, message)](#module_system..System+addError)
         * [.addBehaviors(behaviors)](#module_system..System+addBehaviors)
         * [.log(text)](#module_system..System+log)
@@ -115,6 +108,8 @@ Provides wide range of functionality for file loading and event exchange.
     * _static_
         * [.error(text)](#module_system..System.error)
         * [.log(text)](#module_system..System.log)
+    * _inner_
+        * [~options](#module_system..System..options) : <code>Object</code>
 
 <a name="new_module_system..System_new"></a>
 
@@ -131,10 +126,10 @@ Provides wide range of functionality for file loading and event exchange.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| id | <code>string</code> | System instace internal ID |
-| rootDir | <code>string</code> | The root directory for the System instance |
-| relativeInitDir | <code>string</code> | The relative directory to root of the location of the initialization file |
-| initFilename | <code>string</code> | Initialization file filename |
+| id | <code>String</code> | System instace internal ID |
+| rootDir | <code>String</code> | The root directory for the System instance |
+| relativeInitDir | <code>String</code> | The relative directory to root of the location of the initialization file |
+| initFilename | <code>String</code> | Initialization file filename |
 | [behaviors] | <code>module:system.System~behavior</code> | [Optional] Behaviors to add |
 
 **Example** *(Behaviors outline)*  
@@ -146,7 +141,7 @@ amazing_behavior: () => {
 ```
 <a name="module_system..System+events"></a>
 
-## *system.events*
+## *system.events : <code>Object</code>*
 
 Events to be populated by the loader.
 System by itself does not do anything about the events themselves, it only confirms that the events were initialized. Ofcourse, if the events are fired, and failure to fire event is set to throw, or undocumented events encountered, it would make troubles(System and standard throws).
@@ -154,7 +149,7 @@ System by itself does not do anything about the events themselves, it only confi
 **Kind**: instance abstract property of [<code>System</code>](#module_system..System)  
 <a name="module_system..System+system"></a>
 
-## system.system : <code>systemOptions</code>
+## system.system : [<code>options</code>](#module_system..System..options)
 
 Contains system info.
 
@@ -166,100 +161,65 @@ Contains system info.
 | --- | --- | --- |
 | behavior | [<code>SystemBehavior</code>](#module_system..SystemBehavior) | Event emitter for the behaviors. Generally should use the public system instance methods instead. |
 | error | <code>object</code> | Contains throwables |
+| error | <code>module:system~System~file</code> | Contains throwables |
 
 
-* [.system](#module_system..System+system) : <code>systemOptions</code>
-    * [.file](#module_system..System+system.file)
-        * [.filter](#module_system..System+system.file.filter)
-            * [.isFile()](#module_system..System+system.file.filter.isFile)
-            * [.isDir()](#module_system..System+system.file.filter.isDir)
-        * [.toRelative()](#module_system..System+system.file.toRelative)
-        * [.join()](#module_system..System+system.file.join)
-        * [.getFile()](#module_system..System+system.file.getFile)
-        * [.list(folder, [filter])](#module_system..System+system.file.list) ⇒ <code>Array.&lt;string&gt;</code>
+* [.system](#module_system..System+system) : [<code>options</code>](#module_system..System..options)
+    * [.file](#module_system..System+system+file) : <code>Object</code>
+        * [.filter](#module_system..System+system+file+filter)
+            * [.isFile(folder, file)](#module_system..System+system+file+filter+isFile)
+            * [.isFile(folder)](#module_system..System+system+file+filter+isFile)
 
-<a name="module_system..System+system.file"></a>
+<a name="module_system..System+system+file"></a>
 
-## system.file
+## system.file : <code>Object</code>
 
 File system methods
 
-**Kind**: static property of [<code>system</code>](#module_system..System+system)  
+**Kind**: instance property of [<code>system</code>](#module_system..System+system)  
 
-* [.file](#module_system..System+system.file)
-    * [.filter](#module_system..System+system.file.filter)
-        * [.isFile()](#module_system..System+system.file.filter.isFile)
-        * [.isDir()](#module_system..System+system.file.filter.isDir)
-    * [.toRelative()](#module_system..System+system.file.toRelative)
-    * [.join()](#module_system..System+system.file.join)
-    * [.getFile()](#module_system..System+system.file.getFile)
-    * [.list(folder, [filter])](#module_system..System+system.file.list) ⇒ <code>Array.&lt;string&gt;</code>
+* [.file](#module_system..System+system+file) : <code>Object</code>
+    * [.filter](#module_system..System+system+file+filter)
+        * [.isFile(folder, file)](#module_system..System+system+file+filter+isFile)
+        * [.isFile(folder)](#module_system..System+system+file+filter+isFile)
 
-<a name="module_system..System+system.file.filter"></a>
+<a name="module_system..System+system+file+filter"></a>
 
 ## file.filter
 
 File level filters
 
-**Kind**: static property of [<code>file</code>](#module_system..System+system.file)  
+**Kind**: instance property of [<code>file</code>](#module_system..System+system+file)  
 
-* [.filter](#module_system..System+system.file.filter)
-    * [.isFile()](#module_system..System+system.file.filter.isFile)
-    * [.isDir()](#module_system..System+system.file.filter.isDir)
+* [.filter](#module_system..System+system+file+filter)
+    * [.isFile(folder, file)](#module_system..System+system+file+filter+isFile)
+    * [.isFile(folder)](#module_system..System+system+file+filter+isFile)
 
-<a name="module_system..System+system.file.filter.isFile"></a>
+<a name="module_system..System+system+file+filter+isFile"></a>
 
-## filter.isFile()
+## filter.isFile(folder, file)
 
 Check if argument is a file (relative to system root directory)
 
-**Kind**: static method of [<code>filter</code>](#module_system..System+system.file.filter)  
-<a name="module_system..System+system.file.filter.isDir"></a>
+**Kind**: instance method of [<code>filter</code>](#module_system..System+system+file+filter)  
 
-## filter.isDir()
+| Param | Type | Description |
+| --- | --- | --- |
+| folder | <code>string</code> | Root folder |
+| file | <code>string</code> | File or folder within root |
+
+<a name="module_system..System+system+file+filter+isFile"></a>
+
+## filter.isFile(folder)
 
 Check if argument is a folder (relative to system root directory)
 
-**Kind**: static method of [<code>filter</code>](#module_system..System+system.file.filter)  
-<a name="module_system..System+system.file.toRelative"></a>
+**Kind**: instance method of [<code>filter</code>](#module_system..System+system+file+filter)  
 
-## file.toRelative()
+| Param | Type | Description |
+| --- | --- | --- |
+| folder | <code>string</code> | Folder |
 
-Converts absolute path to relative path
-
-**Kind**: static method of [<code>file</code>](#module_system..System+system.file)  
-<a name="module_system..System+system.file.join"></a>
-
-## file.join()
-
-Converts relative path to absolute path
-
-**Kind**: static method of [<code>file</code>](#module_system..System+system.file)  
-<a name="module_system..System+system.file.getFile"></a>
-
-## file.getFile()
-
-Get file contents relative to system\ root directory
-
-**Kind**: static method of [<code>file</code>](#module_system..System+system.file)  
-<a name="module_system..System+system.file.list"></a>
-
-## file.list(folder, [filter]) ⇒ <code>Array.&lt;string&gt;</code>
-
-List the contents of the folder, relative to system root directory.
-
-**Kind**: static method of [<code>file</code>](#module_system..System+system.file)  
-**Returns**: <code>Array.&lt;string&gt;</code> - Filtered files/folders  
-
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| folder | <code>string</code> |  | Folder to check |
-| [filter] | [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) | <code></code> |  |
-
-**Example** *(List folders)*  
-```js
-systemInstance.system.file.list("css", systemInstance.system.file.isDir);
-```
 <a name="module_system..System+addError"></a>
 
 ## system.addError(code, message)
@@ -270,8 +230,8 @@ Adds an error to the System dynamically
 
 | Param | Type | Description |
 | --- | --- | --- |
-| code | <code>string</code> | Error code |
-| message | <code>string</code> | Error description |
+| code | <code>String</code> | Error code |
+| message | <code>String</code> | Error description |
 
 <a name="module_system..System+addBehaviors"></a>
 
@@ -300,7 +260,7 @@ Log message from the System context
 
 | Param | Type | Description |
 | --- | --- | --- |
-| text | <code>string</code> | Message |
+| text | <code>String</code> | Message |
 
 <a name="module_system..System+fire"></a>
 
@@ -379,6 +339,21 @@ Access stdout
 | Param | Type |
 | --- | --- |
 | text | <code>string</code> | 
+
+<a name="module_system..System..options"></a>
+
+## System~options : <code>Object</code>
+
+**Kind**: inner typedef of [<code>System</code>](#module_system..System)  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| id | <code>String</code> | Instance identifier |
+| rootDir | <code>String</code> | Root directory; In general, expecting an absolute path |
+| relativeInitDir | <code>String</code> | Relative directory for the settings file |
+| initFilename | <code>String</code> | Initial filename |
+| notMute | <code>Boolean</code> | Mute stdout |
 
 <a name="module_system..SystemLoader"></a>
 
@@ -754,18 +729,3 @@ Specifies the time to wait between lock checks
 
 **Kind**: inner constant of [<code>AtomicLock</code>](#module_system..AtomicLock)  
 **Access**: private  
-<a name="module_system..systemOptions"></a>
-
-## system~systemOptions : <code>Object</code>
-
-**Kind**: inner typedef of [<code>system</code>](#module_system)  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| id | <code>number</code> | Instance identifier |
-| rootDir | <code>number</code> | Root directory; In general, expecting an absolute path |
-| relativeInitDir | <code>number</code> | Relative directory for the settings file |
-| initFilename | <code>number</code> | Initial filename |
-| notMute | <code>number</code> | Mute stdout |
-
