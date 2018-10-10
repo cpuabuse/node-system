@@ -41,6 +41,11 @@ class System extends loader.SystemLoader{
 	 * @property {Boolean} notMute Mute stdout
 	 */
 	constructor(options, behaviors){
+		// Throw an error if failure
+		if (System.checkOptionsFailure(options)){
+			throw new Error("Argument options is missing a property or a property is of incorrect type.");
+		}
+
 		// First things first, call a loader, if loader has failed, there are no tools to report gracefully, so the errors from there will just go above
 		super(options.rootDir, options.relativeInitDir, options.initFilename, load => {
 			load.then(() => {
@@ -184,6 +189,32 @@ class System extends loader.SystemLoader{
 			}
 		};
 	} // <== constructor
+
+	/** Checks options argument for missing incorrect property types
+	 * @param {module:system~System~options} options System options argument
+	 * @returns {boolean} Returns true if the arguments is corrupt; false if OK
+	 */
+	static checkOptionsFailure(options){
+		let failed = false;
+
+		// Checks boolean
+		if(!options.hasOwnProperty("notMute")){
+			failed = true;
+		} else if(typeof options.notMute !== "boolean"){
+			failed = true;
+		}
+
+		// Checks strings
+		let stringOptions = ["id","rootDir","relativeInitDir","initFilename"];
+		stringOptions.forEach(function(element){
+			if(!options.hasOwnProperty(element)){
+				failed = true;
+			} else if(typeof options[element] !== "string"){
+				failed = true;
+			}
+		});
+		return failed;
+	}
 
 	/**
 	 * Adds an error to the System dynamically
