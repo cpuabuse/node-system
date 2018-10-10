@@ -3,6 +3,6 @@ node_js:
   - "10"
 after_script:
   - |
-    # Install and run Istanbul into Coveralls
+    # Coverage
     npm run coverage
     cat ./coverage/lcov.info | node ./node_modules/coveralls/bin/coveralls.js
