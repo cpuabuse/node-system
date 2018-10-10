@@ -9,8 +9,7 @@ const systemError = require("./systemError.js");
 const systemBehavior = require("./systemBehavior.js");
 const error_errorExists = "error_exists";
 
-/**
- * Provides wide range of functionality for file loading and event exchange.
+/** Provides wide range of functionality for file loading and event exchange.
  * @extends module:system~SystemLoader
  * The constructor will perform necessary preparations, so that failures can be processed with system events. Up until these preparations are complete, the failure will result in thrown standard Error.
  * @param {String} id - System instace internal ID
@@ -34,11 +33,7 @@ class System extends loader.SystemLoader{
 	/**
 	 * @typedef module:system~System~options
 	 * @type {Object}
-	 * @property {String} id Instance identifier
-	 * @property {String} rootDir Root directory; In general, expecting an absolute path
-	 * @property {String} relativeInitDir Relative directory for the settings file
-	 * @property {String} initFilename Initial filename
-	 * @property {Boolean} notMute Mute stdout
+	 * @param {module:system~System~options} options System options
 	 */
 	constructor(options, behaviors){
 		// Throw an error if failure
@@ -49,8 +44,7 @@ class System extends loader.SystemLoader{
 		// First things first, call a loader, if loader has failed, there are no tools to report gracefully, so the errors from there will just go above
 		super(options.rootDir, options.relativeInitDir, options.initFilename, load => {
 			load.then(() => {
-				/**
-				 * Events to be populated by the loader.
+				/** Events to be populated by the loader.
 				 * System by itself does not do anything about the events themselves, it only confirms that the events were initialized. Ofcourse, if the events are fired, and failure to fire event is set to throw, or undocumented events encountered, it would make troubles(System and standard throws).
 				 * @abstract
 				 * @instance
@@ -88,8 +82,7 @@ class System extends loader.SystemLoader{
 		});
 
 		// System constants
-		/**
-		 * Contains system info.
+		/** Contains system info.
 		 * @instance
 		 * @member system
 		 * @memberof module:system~System
@@ -107,7 +100,7 @@ class System extends loader.SystemLoader{
 			notMute: options.notMute
 		};
 		this.system.behavior = new systemBehavior.SystemBehavior();
-		this.system.error = {};
+		this.system.error = new Object();
 
 		/** File system methods
 		 * @instance
@@ -128,32 +121,61 @@ class System extends loader.SystemLoader{
 				 * @memberof module:system~System#system#file#filter
 				 * @async
 				 * @function
-				 * @param {string} folder Root folder
-				 * @param {string} file File or folder within root
+				 * @param {String} folder Root folder
+				 * @param {String} file File or folder within root
 				*/
-				isFile: async (folder, file) => await loader.SytemLoader.isFile(this.system.rootDir, folder, file),
+				isFile: (folder, file) => loader.SytemLoader.isFile(this.system.rootDir, folder, file),
 				/** Check if argument is a folder (relative to system root directory)
 				 * @instance
-				 * @member isFile
+				 * @member isDir
 				 * @memberof module:system~System#system#file#filter
 				 * @async
 				 * @function
-				 * @param {string} dir Folder
+				 * @param {String} dir Folder
 				*/
-				isDir: async dir => await loader.SystemLoader.isDir(this.system.rootDir, dir)
+				isDir: dir => loader.SystemLoader.isDir(this.system.rootDir, dir)
 			},
-			/** Converts absolute path to relative path */
+			/** Converts absolute path to relative path
+			 * @instance
+			 * @member toRelative
+			 * @memberof module:system~System#system#file
+			 * @async
+			 * @function
+			 * @param {String} rootDir Relative directory
+			 * @param {String} target Absolute file/folder path
+			*/
 			toRelative: (rootDir, target) => loader.SystemLoader.toRelative(rootDir, target),
-			/** Converts relative path to absolute path */
+			/** Joins two paths
+			 * @instance
+			 * @member join
+			 * @memberof module:system~System#system#file
+			 * @async
+			 * @function
+			 * @param {String} rootDir Relative directory
+			 * @param {String} target File/folder path to rootDir
+			*/
 			join: (rootDir, target) => loader.SystemLoader.join(rootDir, target),
-			/** Get file contents relative to system\ root directory */
-			getFile: async (dir, file) => await loader.SystemLoader.getFile(this.system.rootDir, dir, file),
+			/** Get file contents relative to system\ root directory
+			 * @instance
+			 * @member getFile
+			 * @memberof module:system~System#system#file
+			 * @async
+			 * @function
+			 * @param {String} dir Directory, relative to system root
+			 * @param {String} file Filename
+			*/
+			getFile: (dir, file) => loader.SystemLoader.getFile(this.system.rootDir, dir, file),
 			/** List the contents of the folder, relative to system root directory.
-			 * @param {string} folder Folder to check
+			 * @instance
+			 * @member list
+			 * @memberof module:system~System#system#file
+			 * @async
+			 * @function
+			 * @param {String} folder Folder to check
 			 * @param {external:Promise} [filter=null]
-			 * @returns {string[]} Filtered files/folders relative to system root
+			 * @returns {String[]} Filtered files/folders relative to system root
 			 * @example <caption>List folders</caption>
-			 * systemInstance.system.file.list("css", systemInstance.system.file.isDir);
+			 * systemInstance.system.file.list("css", systemInstance.system.file.filter.isDir);
 			 */
 			list: async(dir, filter) => {
 				let filteredItems; // Return array
@@ -186,8 +208,8 @@ class System extends loader.SystemLoader{
 
 				// Finally - return filtered items
 				return filteredItems;
-			}
-		};
+			} // <== list
+		}; // <== file
 	} // <== constructor
 
 	/** Checks options argument for missing incorrect property types
@@ -216,8 +238,7 @@ class System extends loader.SystemLoader{
 		return failed;
 	}
 
-	/**
-	 * Adds an error to the System dynamically
+	/** Adds an error to the System dynamically
 	 * @instance
 	 * @param {String} code Error code
 	 * @param {String} message Error description
@@ -231,8 +252,7 @@ class System extends loader.SystemLoader{
 		}
 	}
 
-	/**
-	 * Adds behaviors to the system, and fires post-addtion events.
+	/** Adds behaviors to the system, and fires post-addtion events.
 	 * Firstly, this function attempts to add the behaviors.
 	 * When the behavior addition has been processed, the function will attempt to fire post-addition events, depending on success/failure of behavior additions.
 	 * Logically the two stage separation should be done with promises, but due to huge overhead of promises and low total processing required, it will be simplified to syncronous.
@@ -289,8 +309,7 @@ class System extends loader.SystemLoader{
 		this.fire("behavior_attach_request_fail");
 	} // <== addBehaviors
 
-	/**
-	 * Log message from the System context
+	/** Log message from the System context
 	 * @instance
 	 * @param {String} text - Message
 	 * @fires module:system.System~type_error
@@ -306,11 +325,10 @@ class System extends loader.SystemLoader{
 		}
 	} // <== log
 
-	/**
-	 * Fires a system event
+	/** Fires a system event
 	 * @instance
-	 * @param {string} name - Event name, as specified in {@link module:system.System#events}.
-	 * @param {string=} message - [Optional] Message is not strictly required, but preferred. If not specified, will assume value of the name
+	 * @param {String} name - Event name, as specified in {@link module:system.System#events}.
+	 * @param {String=} message - [Optional] Message is not strictly required, but preferred. If not specified, will assume value of the name
 	 * @throws {external:Error} Will throw `error_hell`. The inability to process error - if {@link module:system.System~event_fail} event fails.
 	 */
 	fire(name, message){
@@ -368,11 +386,10 @@ class System extends loader.SystemLoader{
 		}
 	} // <== fire
 
-	/**
-	 * Create and process an error
+	/** Create and process an error
 	 * @instance
-	 * @param {string} code
-	 * @param {string} message
+	 * @param {String} code
+	 * @param {String} message
 	 */
 	processNewSystemError(code, message){
 		this.processError(new systemError.SystemError(this, code, message));
@@ -381,7 +398,7 @@ class System extends loader.SystemLoader{
 	/**
 	 * Process a system error - log, behavior or further throw
 	 * @instance
-	 * @param {(module:system~SystemError|string)} error - SystemError error or error text
+	 * @param {(module:system~SystemError|String)} error - SystemError error or error text
 	 */
 	processError(error){
 		// First things first, decide on how this was called
@@ -413,8 +430,7 @@ class System extends loader.SystemLoader{
 	}
 
 	// FIXME: Do event type right; Add check that behavior exists
-	/**
-	 * Emit an event as a behavior.
+	/** Emit an event as a behavior.
 	 * @instance
 	 * @param {event} event
 	 */
@@ -433,19 +449,17 @@ class System extends loader.SystemLoader{
 		this.addBehaviors(behavior);
 	}
 
-	/**
-	 * Access stderr
+	/** Access stderr
 	 * @static
-	 * @param {string} text
+	 * @param {String} text
 	 */
 	static error(text){
 		console.error("[Error] " + text);
 	}
 
-	/**
-	 * Access stdout
+	/** Access stdout
 	 * @static
-	 * @param {string} text
+	 * @param {String} text
 	 */
 	static log(text){
 		console.log("[OK] " + text);

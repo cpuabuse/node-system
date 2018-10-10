@@ -12,9 +12,9 @@ const yaml = require("js-yaml");
  * Required by system to perform file initialization
  * @inner
  * @memberof module:system
- * @param {string} rootDir Absolute root directory
- * @param {string} relativeInitDir Relative path to root
- * @param {string} initFilename Filename
+ * @param {String} rootDir Absolute root directory
+ * @param {String} relativeInitDir Relative path to root
+ * @param {String} initFilename Filename
  * @param {function} callback Callback to call with Promise of completion
  * @throws {external:Error} Standard error with message
  */
@@ -26,9 +26,9 @@ class SystemLoader{
 
 	/**
 	 * Gets file contents
-	 * @param {string} rootDir Root directory
-	 * @param {string} relativeDir Directory relative to root
-	 * @param {string} file Full file name
+	 * @param {String} rootDir Root directory
+	 * @param {String} relativeDir Directory relative to root
+	 * @param {String} file Full file name
 	 * @returns {external.Promise} File contents
 	 */
 	static getFile(rootDir, relativeDir, file){
@@ -45,8 +45,8 @@ class SystemLoader{
 
 	/**
 	 * Converts absolute path to relative path
-	 * @param {string} rootDir Absolute folder
-	 * @param {string|string[]} target File/folder name|names
+	 * @param {String} rootDir Absolute folder
+	 * @param {String|String[]} target File/folder name|names
 	 * @returns {external.Promise} Relative path|paths
 	 */
 	static toRelative(rootDir, target){
@@ -58,7 +58,6 @@ class SystemLoader{
 				target.forEach(function(_target){
 					targets.push(path.relative(rootDir, _target));
 				})
-
 				// Resolve with the array
 				resolve(targets);
 			} else {
@@ -70,8 +69,8 @@ class SystemLoader{
 
 	/**
 	 * Convert a file/folder or array of files/folders to absolute(system absolute) path.
-	 * @param {string} rootDir Root folder
-	 * @param {string|string[]} target File/folder name|names
+	 * @param {String} rootDir Root folder
+	 * @param {String|String[]} target File/folder name|names
 	 * @returns {external.Promise} Absolute path|paths
 	 */
 	static join(rootDir, target){
@@ -95,9 +94,9 @@ class SystemLoader{
 
 	/**
 	 * Checks if is a file
-	 * @param {string} rootDir Absolute root directory
-	 * @param {string} relativeDir Relative directory to root
-	 * @param {string} filename Full filename
+	 * @param {Sstring} rootDir Absolute root directory
+	 * @param {Sstring} relativeDir Relative directory to root
+	 * @param {Sstring} filename Full filename
 	 * @returns {boolean} Returns `true` if a file, `false` if not
 	 */
 	static isFile(rootDir, relativeDir, filename){
@@ -114,8 +113,8 @@ class SystemLoader{
 
 	/**
 	 * Checks if is a directory
-	 * @param {string} rootDir Absolute root directory
-	 * @param {string} relativeDir Relative directory to root
+	 * @param {String} rootDir Absolute root directory
+	 * @param {String} relativeDir Relative directory to root
 	 * @returns {boolean} Returns `true` if a directory, `false` if not
 	 */
 	static isDir(rootDir, relativeDir){
@@ -132,8 +131,8 @@ class SystemLoader{
 
 	/**
 	 * Returns an array of strings, representing the contents of a folder
-	 * @param {sting} rootDir Root directory
-	 * @param {string} relativeDir Relative directory
+	 * @param {Sting} rootDir Root directory
+	 * @param {String} relativeDir Relative directory
 	 * @returns {external:Promise} Array with contents; Rejects with errors from https://nodejs.org/api/fs.html#fs_fs_readdir_path_options_callback
 	 */
 	static list(rootDir, relativeDir){
@@ -150,7 +149,7 @@ class SystemLoader{
 
 	/**
 	 * Converts YAML string to a JS object
-	 * @param {string} string YAML string
+	 * @param {String} string YAML string
 	 * @returns {object} Javascript object
 	 */
 	static yamlToObject(string){
@@ -161,9 +160,9 @@ class SystemLoader{
 /**
  * @inner
  * @memberof module:system~SystemLoader
- * @param {string} rootDir Root directory
+ * @param {String} rootDir Root directory
  * @param {object} relativePath Relative path
- * @param {string} initFilename Filename for settings
+ * @param {String} initFilename Filename for settings
  * @param {object} targetObject Object to be filled
  * @param {boolean} extend Extend the children objects or not
  * @returns {external:Promise}
@@ -271,9 +270,9 @@ async function initRecursion(
  * Semantically this function has broader purpose than loadYaml.
  * @inner
  * @memberof module:system~SystemLoader
- * @param {string} rootDir Root directory
- * @param {string} initPath Relative directory to root
- * @param {string} filename Filename
+ * @param {String} rootDir Root directory
+ * @param {String} initPath Relative directory to root
+ * @param {String} filename Filename
  * @returns {object} Javascript object with settings
  */
 async function initSettings(
@@ -295,9 +294,9 @@ async function initSettings(
  * Parses YAML file, and returns and object; Adds extension if absent
  * @inner
  * @memberof module:system~SystemLoader
- * @param {string} rootDir Absolute directory path
- * @param {string} relativeDir Relative directory to root
- * @param {string} filename Filename, with or without extension
+ * @param {String} rootDir Absolute directory path
+ * @param {String} relativeDir Relative directory to root
+ * @param {String} filename Filename, with or without extension
  * @returns {external:Promise} Javascript object
  */
 async function loadYaml(rootDir, relativeDir, filename){
