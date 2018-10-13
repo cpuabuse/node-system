@@ -1,4 +1,4 @@
-// systemAtomic.js
+// atomic.js
 /**
  * Virtual atomic operations
  */

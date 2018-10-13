@@ -2,7 +2,7 @@
 "use strict";
 
 const events = require("events");
-const systemAtomic = require("./systemAtomic.js");
+const atomic = require("./atomic.js");
 
 /**
  * System behavior class
@@ -19,7 +19,7 @@ class SystemBehavior extends events.EventEmitter{
 		 * Atomic lock to perform counter increments
 		 * @private
 		 */
-		this.atomicLock = new systemAtomic.AtomicLock();
+		this.atomicLock = new atomic.AtomicLock();
 
 		/**
 		 * ID to use as actual event identifier

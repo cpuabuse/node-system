@@ -12,7 +12,6 @@
 const system 				= require("../src/system.js");
 const systemError		= require("../src/systemError.js");
 const systemLoader 	= require("../src/systemLoader.js");
-const systemAtomic 	= require("../src/systemAtomic.js");
 const assert 				= require("assert");
 const starsFolderItemsAmount = 3;
 const flowerShopErrorCode = "all_flowers_gone";
@@ -122,7 +121,7 @@ describe("System", function() {
 
 describe("AtomicLock", function() {
 	// Assing variables
-	let atomicLock = new systemAtomic.AtomicLock();
+	let atomicLock = new system.AtomicLock();
 
 	describe("initial state", function(){
 		it("should be unlocked", function() {

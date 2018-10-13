@@ -8,6 +8,7 @@ const loader = require("./systemLoader.js"); // Auxiliary system lib
 const systemError = require("./systemError.js");
 const systemBehavior = require("./systemBehavior.js");
 const error_errorExists = "error_exists";
+const atomic = require("./atomic.js");
 
 /** Provides wide range of functionality for file loading and event exchange.
  * @extends module:system~SystemLoader
@@ -466,4 +467,7 @@ class System extends loader.SystemLoader{
 	}
 }
 
-exports.System = System;
+module.exports = {
+	System,
+	AtomicLock: atomic.AtomicLock
+};
