@@ -14,6 +14,7 @@ const systemError		= require("../src/systemError.js");
 const systemLoader 	= require("../src/systemLoader.js");
 const assert 				= require("assert");
 const starsFolderItemsAmount = 3;
+const waitTime = 200;
 const flowerShopErrorCode = "all_flowers_gone";
 const flowerShopId = "flower_shop";
 const flowerShopOptions = {
@@ -132,15 +133,27 @@ describe("AtomicLock", function() {
 	let atomicLock = new system.AtomicLock();
 
 	describe("initial state", function(){
-		it("should be unlocked", function() {
+		it("should be unlocked", function(){
 			assert.equal(atomicLock.locked, false);
 		});
 	});
 
 	describe("locked state", function(){
-		it("should be locked", function() {
-			atomicLock.lock();
-			assert.equal(atomicLock.locked, true);
+		it("should be locked", function(done){
+			atomicLock.lock().then(function(){
+				assert.equal(atomicLock.locked, true);
+				done();
+			});
 		});
 	});
+
+	describe("lock while locked", function(){
+		it("should lock after timed release", function(done){
+			setTimeout(function(){
+				atomicLock.release();
+			}, waitTime);
+			atomicLock.lock().then(() => done());
+			assert.equal(atomicLock.locked, true);
+		})
+	})
 });

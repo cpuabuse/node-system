@@ -10,7 +10,7 @@
  * @inner
  * @memberof module:system~AtomicLock
  */
-const waitTime = 400;
+const waitTime = 100;
 
 /**
  * Creates an instance of AtomicLock.
@@ -24,9 +24,10 @@ class AtomicLock {
 
 	/**
 	 * Lock an atomic lock
+	 * @returns {external:Promise} Resolves when lock succeeds
 	 */
 	lock(){
-		(async () => {
+		return (async () => {
 			/* eslint no-constant-condition: "off" */
 			while(true){
 				if(this.locked){
