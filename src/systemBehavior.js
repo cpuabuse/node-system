@@ -47,11 +47,11 @@ class SystemBehavior extends events.EventEmitter{
 	 * @param {function} callback Behavior callback function
 	 * @return {number} ID of the behavior; -1 if creation failed
 	 */
-	addBehavior(name, callback){
+	async addBehavior(name, callback){
 		if(typeof name === "string"){
 			if(typeof callback === "function"){
 				if(this.nextBehaviorCounter < this.getMaxListeners()){
-					this.atomicLock.lock();
+					await this.atomicLock.lock();
 					let id = this.nextBehaviorCounter++;
 					if(!this.behaviorId.hasOwnProperty(name)){
 						this.behaviorId[name] = new Array();

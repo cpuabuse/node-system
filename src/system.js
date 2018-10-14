@@ -76,9 +76,10 @@ class System extends loader.SystemLoader{
 
 				// Initialize the behaviors; If behaviors not provided as argument, it is OK; Not immediate, since the load.then() code will execute after the instance finish initializing.
 				if(behaviors){
-					this.addBehaviors(behaviors);
+					this.addBehaviors(behaviors).then(() => this.fire("system_load"));
+				} else {
+					this.fire("system_load");
 				}
-				this.fire("system_load");
 			});
 		});
 
@@ -263,14 +264,11 @@ class System extends loader.SystemLoader{
 	 * @fires module:system.System~behavior_attach_fail
 	 * @fires module:system.System~behavior_attach_request_fail
 	 */
-	addBehaviors(behaviors){
+	async addBehaviors(behaviors){
 		if(Array.isArray(behaviors)){ // Sanity check - is an array
 			if (behaviors.length > 0){ // Sanity check - is not empty
-				// Array to use for firing post addition events
-				let postAttachment = [];
-
 				// Loop - attachment
-				behaviors.forEach(element => {
+				await Promise.all(behaviors.map(element => {
 					if(typeof element === "object"){
 						let properties = Object.getOwnPropertyNames(element);
 						if(properties.length == 1){
@@ -278,28 +276,32 @@ class System extends loader.SystemLoader{
 							let value = element[key];
 							if(typeof key === "string"){
 								if (key.length > 0 && typeof value === "function"){
-									this.system.behavior.addBehavior(key, () => value(this));
-									postAttachment.push([true, key]);
-									return;
+									return {
+										behaviorAdded: this.system.behavior.addBehavior(key, () => value(this)),
+										key
+									};
 								}
-								postAttachment.push([false, key]);
-								return;
+								return {
+									behaviorAdded: null,
+									key
+								}
 							}
 						}
 					}
-					postAttachment.push(null);
-				});
-
-				// Loop - post-attachment event fire
-				postAttachment.forEach(element => {
+					return null;
+				}).map(element => { // Loop - post-attachment event fire
 					if(element === null){
 						this.fire("behavior_attach_fail", "Request garbage");
-					} else if (element[0]){
-						this.fire("behavior_attach", element[1]);
-					} else {
-						this.fire("behavior_attach_fail", "Event not described.");
+						return Promise.resolve();
+					} else if (element.behaviorAdded){
+						this.fire("behavior_attach", element.key);
+						return element.behaviorAdded;
 					}
-				});
+
+					// Behavior not added
+					this.fire("behavior_attach_fail", "Event not described.");
+					return Promise.resolve();
+				}));
 
 				// Terminate if successfully processed arrays
 				return;
