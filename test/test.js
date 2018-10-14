@@ -17,13 +17,8 @@ const starsFolderItemsAmount = 3;
 const waitTime = 200;
 const flowerShopErrorCode = "all_flowers_gone";
 const flowerShopId = "flower_shop";
-const flowerShopOptions = {
-	id: flowerShopId,
-	rootDir: "./test",
-	relativeInitDir: "flowerShop",
-	initFilename: "init",
-	notMute: false
-};
+const flowerShop2Id = "flower_shop2"
+
 
 // DEBUG: Devonly - promise throw
 process.on("unhandledRejection", up => {
@@ -67,62 +62,85 @@ describe("SystemLoader", function() {
 });
 
 describe("System", function() {
-	describe("flowerShop", function(){
-		let flowerShop;
-		let flowerShopLoad = new Promise(function(resolve){
-			flowerShop = new system.System(
-				flowerShopOptions,
-				[
-					{
-						"system_load": () => {
-							resolve();
-						}
-					}
-				]
-			);
-		});
+	var systems = [
+		{ // Flower shop
+			options: {
+				id: flowerShopId,
+				rootDir: "./test",
+				relativeInitDir: "flowerShop",
+				initFilename: "init",
+				notMute: false
+			}
+		},
+		{ // Example
+			options: {
+				id: flowerShop2Id,
+				rootDir: "./test",
+				relativeInitDir: "flowerShop",
+				initFilename: "init",
+				notMute: false
+			}
+		}
+	]
 
-		describe("#system", function(){
-			describe("id", function(){
-				it("should be " + flowerShopId, function(done) {
-					flowerShopLoad.then(function(){
-						assert.equal(flowerShop.system.id, flowerShopId);
-						done();
-					})
-				});
+	systems.forEach(function(element) {
+		describe(element.options.id, function(){
+			let systemTest;
+			let systemTestLoad = new Promise(function(resolve){
+				systemTest = new system.System(
+					element.options,
+					[
+						{
+							"system_load": () => {
+								resolve();
+							}
+						}
+					]
+				);
 			});
 
-			describe("error", function() {
-				describe("all_flowers_gone", function() {
-					// It should be a SystemError
-					it("should be SystemError", function(done){
-						flowerShopLoad.then(function(){
-							if (systemError.SystemError.isSystemError(flowerShop.system.error.all_flowers_gone)){
-								done();
-							}
-						});
-					});
-					it("should be " + flowerShopErrorCode, function(done) {
-						flowerShopLoad.then(function(){
-							try {
-								throw flowerShop.system.error.all_flowers_gone;
-							} catch(error){
-								assert.equal(error.code, flowerShopErrorCode);
-								done();
-							}
+			describe("#system", function(){
+				describe("id", function(){
+					it("should be " + element.options.id, function(done) {
+						systemTestLoad.then(function(){
+							assert.equal(systemTest.system.id, element.options.id);
+							done();
 						})
 					});
 				});
 
-				describe("carShopError", function(){
-					it("should not be SystemError", function(done){
-						flowerShopLoad.then(function(){
-							if(!systemError.SystemError.isSystemError("carShopError")){
-								done();
-							}
+				describe("error", function() {
+					describe("all_flowers_gone", function() {
+						// It should be a SystemError
+						it("should be SystemError", function(done){
+							systemTestLoad.then(function(){
+								if (systemError.SystemError.isSystemError(systemTest.system.error.all_flowers_gone)){
+									done();
+								}
+							});
+						});
+						it("should be " + flowerShopErrorCode, function(done) {
+							systemTestLoad.then(function(){
+								try {
+									throw systemTest.system.error.all_flowers_gone;
+								} catch(error){
+									assert.equal(error.code, flowerShopErrorCode);
+									done();
+								}
+							})
+						});
+					});
+
+					describe("carShopError", function(){
+						it("should not be SystemError", function(done){
+							systemTestLoad.then(function(){
+								if(!systemError.SystemError.isSystemError("carShopError")){
+									done();
+								}
+							})
 						})
 					})
-				})
+				});
 			});
 		});
 	});
