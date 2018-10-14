@@ -93,6 +93,14 @@ describe("System", function() {
 
 			describe("error", function() {
 				describe("all_flowers_gone", function() {
+					// It should be a SystemError
+					it("should be SystemError", function(done){
+						flowerShopLoad.then(function(){
+							if (systemError.SystemError.isSystemError(flowerShop.system.error.all_flowers_gone)){
+								done();
+							}
+						});
+					});
 					it("should be " + flowerShopErrorCode, function(done) {
 						flowerShopLoad.then(function(){
 							try {
@@ -106,9 +114,9 @@ describe("System", function() {
 				});
 
 				describe("carShopError", function(){
-					it("should not exist", function(done){
+					it("should not be SystemError", function(done){
 						flowerShopLoad.then(function(){
-							if(!systemError.SystemError.isSystemError(flowerShop.system.error.carShopError)){
+							if(!systemError.SystemError.isSystemError("carShopError")){
 								done();
 							}
 						})
