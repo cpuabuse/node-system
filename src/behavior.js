@@ -1,4 +1,4 @@
-// systemBehaviors.js
+// behaviors.js
 "use strict";
 
 const events = require("events");

@@ -6,11 +6,12 @@
 "use strict";
 const loader = require("./systemLoader.js"); // Auxiliary system lib
 const systemError = require("./systemError.js");
-const systemBehavior = require("./systemBehavior.js");
+const systemBehavior = require("./behavior.js");
 const error_errorExists = "error_exists";
 const atomic = require("./atomic.js");
 
-/** Provides wide range of functionality for file loading and event exchange.
+/**
+ * Provides wide range of functionality for file loading and event exchange.
  * @extends module:system~SystemLoader
  * The constructor will perform necessary preparations, so that failures can be processed with system events. Up until these preparations are complete, the failure will result in thrown standard Error.
  * @param {String} id - System instace internal ID
@@ -85,9 +86,6 @@ class System extends loader.SystemLoader{
 
 		// System constants
 		/** Contains system info.
-		 * @instance
-		 * @member system
-		 * @memberof module:system~System
 		 * @type {module:system~System~options}
 		 * @readonly
 		 * @property {module:system~SystemBehavior} behavior Event emitter for the behaviors. Generally should use the public system instance methods instead.
@@ -214,7 +212,8 @@ class System extends loader.SystemLoader{
 		}; // <== file
 	} // <== constructor
 
-	/** Checks options argument for missing incorrect property types
+	/**
+	 * Checks options argument for missing incorrect property types
 	 * @param {module:system~System~options} options System options argument
 	 * @returns {boolean} Returns true if the arguments is corrupt; false if OK
 	 */
@@ -254,7 +253,8 @@ class System extends loader.SystemLoader{
 		}
 	}
 
-	/** Adds behaviors to the system, and fires post-addtion events.
+	/**
+	 * Adds behaviors to the system, and fires post-addtion events.
 	 * Firstly, this function attempts to add the behaviors.
 	 * When the behavior addition has been processed, the function will attempt to fire post-addition events, depending on success/failure of behavior additions.
 	 * Logically the two stage separation should be done with promises, but due to huge overhead of promises and low total processing required, it will be simplified to syncronous.
@@ -328,7 +328,8 @@ class System extends loader.SystemLoader{
 		}
 	} // <== log
 
-	/** Fires a system event
+	/**
+	 * Fires a system event
 	 * @instance
 	 * @param {String} name - Event name, as specified in {@link module:system.System#events}.
 	 * @param {String=} message - [Optional] Message is not strictly required, but preferred. If not specified, will assume value of the name
@@ -389,7 +390,8 @@ class System extends loader.SystemLoader{
 		}
 	} // <== fire
 
-	/** Create and process an error
+	/**
+	 * Create and process an error
 	 * @instance
 	 * @param {String} code
 	 * @param {String} message
@@ -410,7 +412,6 @@ class System extends loader.SystemLoader{
 			try {
 				// Try to set a behavior or something...
 				let {behavior} = this.errors[error.code];
-				console.log(behavior);
 				if(typeof behavior === "string"){
 					this.behave(behavior);
 				}
@@ -433,7 +434,8 @@ class System extends loader.SystemLoader{
 	}
 
 	// FIXME: Do event type right; Add check that behavior exists
-	/** Emit an event as a behavior.
+	/**
+	 * Emit an event as a behavior.
 	 * @instance
 	 * @param {event} event
 	 */

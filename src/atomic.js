@@ -1,35 +1,41 @@
 // atomic.js
-/**
- * Virtual atomic operations
- */
 "use strict";
 
 /**
- * Specifies the time to wait between lock checks
+ * Specifies the time to wait between lock checks.
  * @private
- * @inner
+ * @readonly
+ * @default
+ * @type {string}
  * @memberof module:system~AtomicLock
  */
-const waitTime = 100;
+const waitTime = 1;
 
 /**
  * Creates an instance of AtomicLock.
- * @inner
  * @memberof module:system
  */
 class AtomicLock {
+	/**
+	 * Creates an instance of AtomicLock.
+	 * Does not take any arguments or return any values.
+	 */
 	constructor(){
+		/**
+		 * Indicates the locked/unlocked state.
+		 * @private
+		 * @type {boolean}
+		 */
 		this.locked = false;
 	}
 
 	/**
-	 * Lock an atomic lock
+	 * Lock an atomic lock.
 	 * @returns {external:Promise} Resolves when lock succeeds
 	 */
 	lock(){
 		return (async () => {
-			/* eslint no-constant-condition: "off" */
-			while(true){
+			while(true){ /* eslint-disable-line no-constant-condition */// <== Necessary to achieve the exclusive functionality
 				if(this.locked){
 					let timeout = new Promise(function(resolve){
 						setTimeout(function(){
