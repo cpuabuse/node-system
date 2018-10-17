@@ -1,4 +1,7 @@
 // atomic.js
+/*
+	Atomic operations.
+*/
 "use strict";
 
 /**
@@ -9,10 +12,11 @@
  * @type {string}
  * @memberof module:system~AtomicLock
  */
-const waitTime = 1;
+const waitTime = 10;
 
 /**
  * Creates an instance of AtomicLock.
+ * It is not intended to be actually used for parallel processing, and mutual exlusion. It is intended for abstraction of atomic logic more than anything.
  * @memberof module:system
  */
 class AtomicLock {

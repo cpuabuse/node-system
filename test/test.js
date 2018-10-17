@@ -10,14 +10,14 @@
 /* global it:true */
 
 const system 				= require("../src/system.js");
-const systemError		= require("../src/systemError.js");
-const systemLoader 	= require("../src/systemLoader.js");
+const systemError		= require("../src/error.js");
+const loader 	= require("../src/loader.js");
 const assert 				= require("assert");
 const starsFolderItemsAmount = 3;
 const waitTime = 200;
 const flowerShopErrorCode = "all_flowers_gone";
 const flowerShopId = "flower_shop";
-const flowerShop2Id = "flower_shop2"
+const flowerShop2Id = "flower_shop2";
 
 
 // DEBUG: Devonly - promise throw
@@ -25,11 +25,11 @@ process.on("unhandledRejection", up => {
 	throw up
 });
 
-describe("SystemLoader", function() {
+describe("Loader", function() {
 	describe("stars", function(){
 		let stars;
 		let load = new Promise(function(resolve){
-			stars = new systemLoader.SystemLoader("./test", "stars", "stars", load => {
+			stars = new loader.Loader("./test", "stars", "stars", load => {
 				load.then(() => {
 					resolve();
 				});
@@ -49,7 +49,7 @@ describe("SystemLoader", function() {
 
 		describe(".list()", function(){
 			// Test
-			let list = systemLoader.SystemLoader.list("./test", "stars");
+			let list = loader.Loader.list("./test", "stars");
 
 			it("should have a length of " + starsFolderItemsAmount.toString(), function(done) {
 				list.then(function(result){

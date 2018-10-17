@@ -4,15 +4,15 @@
  * @module system
  */
 "use strict";
-const loader = require("./systemLoader.js"); // Auxiliary system lib
-const systemError = require("./systemError.js");
-const systemBehavior = require("./behavior.js");
+const loader = require("./loader.js"); // Auxiliary system lib
+const systemError = require("./error.js");
+const behavior = require("./behavior.js");
 const error_errorExists = "error_exists";
 const atomic = require("./atomic.js");
 
 /**
  * Provides wide range of functionality for file loading and event exchange.
- * @extends module:system~SystemLoader
+ * @extends module:system~Loader
  * The constructor will perform necessary preparations, so that failures can be processed with system events. Up until these preparations are complete, the failure will result in thrown standard Error.
  * @param {String} id - System instace internal ID
  * @param {String} rootDir - The root directory for the System instance
@@ -31,7 +31,7 @@ const atomic = require("./atomic.js");
  *   amazingProcessor(this);
  * }
  */
-class System extends loader.SystemLoader{
+class System extends loader.Loader{
 	/**
 	 * @typedef module:system~System~options
 	 * @type {Object}
@@ -88,7 +88,7 @@ class System extends loader.SystemLoader{
 		/** Contains system info.
 		 * @type {module:system~System~options}
 		 * @readonly
-		 * @property {module:system~SystemBehavior} behavior Event emitter for the behaviors. Generally should use the public system instance methods instead.
+		 * @property {module:system~Behavior} behavior Event emitter for the behaviors. Generally should use the public system instance methods instead.
 		 * @property {object} error Contains throwables
 		 * @property {module:system~System~file} error Contains throwables
 		 */
@@ -99,7 +99,7 @@ class System extends loader.SystemLoader{
 			initFilename: options.relatoveInitFilename,
 			notMute: options.notMute
 		};
-		this.system.behavior = new systemBehavior.SystemBehavior();
+		this.system.behavior = new behavior.Behavior();
 		this.system.error = new Object();
 
 		/** File system methods
@@ -133,7 +133,7 @@ class System extends loader.SystemLoader{
 				 * @function
 				 * @param {String} dir Folder
 				*/
-				isDir: dir => loader.SystemLoader.isDir(this.system.rootDir, dir)
+				isDir: dir => loader.Loader.isDir(this.system.rootDir, dir)
 			},
 			/** Converts absolute path to relative path
 			 * @instance
@@ -144,7 +144,7 @@ class System extends loader.SystemLoader{
 			 * @param {String} rootDir Relative directory
 			 * @param {String} target Absolute file/folder path
 			*/
-			toRelative: (rootDir, target) => loader.SystemLoader.toRelative(rootDir, target),
+			toRelative: (rootDir, target) => loader.Loader.toRelative(rootDir, target),
 			/** Joins two paths
 			 * @instance
 			 * @member join
@@ -154,7 +154,7 @@ class System extends loader.SystemLoader{
 			 * @param {String} rootDir Relative directory
 			 * @param {String} target File/folder path to rootDir
 			*/
-			join: (rootDir, target) => loader.SystemLoader.join(rootDir, target),
+			join: (rootDir, target) => loader.Loader.join(rootDir, target),
 			/** Get file contents relative to system\ root directory
 			 * @instance
 			 * @member getFile
@@ -164,7 +164,7 @@ class System extends loader.SystemLoader{
 			 * @param {String} dir Directory, relative to system root
 			 * @param {String} file Filename
 			*/
-			getFile: (dir, file) => loader.SystemLoader.getFile(this.system.rootDir, dir, file),
+			getFile: (dir, file) => loader.Loader.getFile(this.system.rootDir, dir, file),
 			/** List the contents of the folder, relative to system root directory.
 			 * @instance
 			 * @member list
@@ -179,7 +179,7 @@ class System extends loader.SystemLoader{
 			 */
 			list: async(dir, filter) => {
 				let filteredItems; // Return array
-				let items = await loader.SystemLoader.list(this.system.rootDir, dir); // Wait for folder contets
+				let items = await loader.Loader.list(this.system.rootDir, dir); // Wait for folder contets
 				items = await this.system.file.join(dir, items);
 
 				// Was the filter even specified?

@@ -1,6 +1,6 @@
-// systemLoader.js
-/**
- * Contains methods necessary to initialize the system and work with file system.
+// loader.js
+/*
+	Contains methods necessary to initialize the system and work with file system.
 */
 "use strict";
 
@@ -9,27 +9,28 @@ const fs   = require("fs");
 const yaml = require("js-yaml");
 
 /**
- * Required by system to perform file initialization
+ * Required by system to perform file initialization.
  * @inner
  * @memberof module:system
- * @param {String} rootDir Absolute root directory
- * @param {String} relativeInitDir Relative path to root
- * @param {String} initFilename Filename
- * @param {function} callback Callback to call with Promise of completion
- * @throws {external:Error} Standard error with message
  */
-class SystemLoader{
+class Loader{
+	/**
+	 * @param {string} rootDir Absolute root directory.
+	 * @param {string} relativeInitDir Relative path to root.
+	 * @param {string} initFilename Filename.
+	 * @param {function} callback Callback to call with Promise of completion.
+	 */
 	constructor(rootDir, arg_relativeInitDir, arg_initFilename, callback){
 		// Initialization recursion
 		callback(initRecursion(rootDir, arg_relativeInitDir, arg_initFilename, this, true));
 	}
 
 	/**
-	 * Gets file contents
-	 * @param {String} rootDir Root directory
-	 * @param {String} relativeDir Directory relative to root
-	 * @param {String} file Full file name
-	 * @returns {external.Promise} File contents
+	 * Gets file contents.
+	 * @param {string} rootDir Root directory.
+	 * @param {string} relativeDir Directory relative to root.
+	 * @param {string} file Full file name.
+	 * @returns {external.Promise} File contents.
 	 */
 	static getFile(rootDir, relativeDir, file){
 		return new Promise(function(resolve, reject){
@@ -44,10 +45,10 @@ class SystemLoader{
 	}
 
 	/**
-	 * Converts absolute path to relative path
-	 * @param {String} rootDir Absolute folder
-	 * @param {String|String[]} target File/folder name|names
-	 * @returns {external.Promise} Relative path|paths
+	 * Converts absolute path to relative path.
+	 * @param {string} rootDir Absolute folder.
+	 * @param {string|string[]} target File/folder name|names.
+	 * @returns {external.Promise} Relative path|paths.
 	 */
 	static toRelative(rootDir, target){
 		return new Promise(function(resolve){
@@ -69,9 +70,9 @@ class SystemLoader{
 
 	/**
 	 * Convert a file/folder or array of files/folders to absolute(system absolute) path.
-	 * @param {String} rootDir Root folder
-	 * @param {String|String[]} target File/folder name|names
-	 * @returns {external.Promise} Absolute path|paths
+	 * @param {string} rootDir Root folder.
+	 * @param {string|string[]} target File/folder name|names.
+	 * @returns {external.Promise} Absolute path|paths.
 	 */
 	static join(rootDir, target){
 		return new Promise(function(resolve){
@@ -94,10 +95,10 @@ class SystemLoader{
 
 	/**
 	 * Checks if is a file
-	 * @param {Sstring} rootDir Absolute root directory
-	 * @param {Sstring} relativeDir Relative directory to root
-	 * @param {Sstring} filename Full filename
-	 * @returns {boolean} Returns `true` if a file, `false` if not
+	 * @param {string} rootDir Absolute root directory.
+	 * @param {string} relativeDir Relative directory to root.
+	 * @param {string} filename Full filename.
+	 * @returns {boolean} Returns `true` if a file, `false` if not.
 	 */
 	static isFile(rootDir, relativeDir, filename){
 		return new Promise(function(resolve){
@@ -112,10 +113,10 @@ class SystemLoader{
 	}
 
 	/**
-	 * Checks if is a directory
-	 * @param {String} rootDir Absolute root directory
-	 * @param {String} relativeDir Relative directory to root
-	 * @returns {boolean} Returns `true` if a directory, `false` if not
+	 * Checks if is a directory.
+	 * @param {string} rootDir Absolute root directory.
+	 * @param {string} relativeDir Relative directory to root.
+	 * @returns {boolean} Returns `true` if a directory, `false` if not.
 	 */
 	static isDir(rootDir, relativeDir){
 		return new Promise(function(resolve){
@@ -130,10 +131,10 @@ class SystemLoader{
 	}
 
 	/**
-	 * Returns an array of strings, representing the contents of a folder
-	 * @param {Sting} rootDir Root directory
-	 * @param {String} relativeDir Relative directory
-	 * @returns {external:Promise} Array with contents; Rejects with errors from https://nodejs.org/api/fs.html#fs_fs_readdir_path_options_callback
+	 * Returns an array of strings, representing the contents of a folder.
+	 * @param {string} rootDir Root directory.
+	 * @param {string} relativeDir Relative directory.
+	 * @returns {external:Promise} Array with contents; Rejects with errors from [fs.readdir](https://nodejs.org/api/fs.html#fs_fs_readdir_path_options_callback).
 	 */
 	static list(rootDir, relativeDir){
 		return new Promise(function(resolve, reject){
@@ -148,9 +149,9 @@ class SystemLoader{
 	}
 
 	/**
-	 * Converts YAML string to a JS object
-	 * @param {String} string YAML string
-	 * @returns {object} Javascript object
+	 * Converts YAML string to a JS object.
+	 * @param {string} string YAML string.
+	 * @returns {Object} Javascript object.
 	 */
 	static yamlToObject(string){
 		return yaml.load(string);
@@ -158,35 +159,51 @@ class SystemLoader{
 }
 
 /**
- * @inner
- * @memberof module:system~SystemLoader
- * @param {String} rootDir Root directory
- * @param {object} relativePath Relative path
- * @param {String} initFilename Filename for settings
- * @param {object} targetObject Object to be filled
+ * System loader recursion.
+ *
+ * Note:
+ *
+ * - Default values are assumed for unspecified or empty values.
+ * - Extension means recursive loading of data into variable, as if loading a new file into the current variable as new system.
+ * - Relative path is relative to the directory location of current file.
+ *  * @inner
+ * @memberof module:system~Loader
+ * @param {string} rootDir Root directory
+ * @param {Object} relativePath Relative path
+ * @param {string} initFilename Filename for settings
+ * @param {Object} targetObject Object to be filled
  * @param {boolean} extend Extend the children objects or not
  * @returns {external:Promise}
  * @example <caption>Default filename - null</caption> @lang yaml
  * # Variable settings to be populated with data from "system_root_dir/settings.yml"
- * [settings:]
+ * settings: # Defaults to "settings"
  * @example <caption>Default filename - empty string</caption> @lang yaml
- * # Variable to be assigned an empty string
- * [settings: ""]
+ * # Variable settings to be populated with data from "system_root_dir/settings.yml"
+ * settings: "" # Defaults to "settings"
  * @example <caption>Specified filename</caption> @lang yaml
  * # Variable settings to be populated with data from "system_root_dir/xxx.yml"
- * [settings: "xxx"]
- * @example <caption>Default extension</caption> @lang yaml
- * # The "extension"(recursion) with default variables will be assumed, so that variable "settings" will be recursively populated with files in "system_root_dir/settings.yml"
+ * settings: "xxx"
+ * @example <caption>Default values</caption> @lang yaml
+ * # Variable settings to be populated with data from "system_root_dir/settings.yml"
  * settings:
- *   folder:
- *   file:
- *   path: # Note: path may be either absolute(default) or relative(relative to the folder from which the file containing instructions is read), the system will not read files outside of system_root_dir tree.
- * @example <caption>Specified extension</caption> @lang yaml
- * # The  "extension"(recursion) with only specified variables will be performed, in this example "settings" variable will be populated with the files described in the "system_root_dir/hello/settings.yml"
+ *   folder: # Defaults to "./"
+ *   file: # Defaults to "settings"
+ *   path: # Defaults to "absolute"
+ *   extend: # Defaults to "false"
+ * @example <caption>Specified values</caption> @lang yaml
+ * # Variable settings to be populated with data from "current_dir/hello/xxx.yml"
  * settings:
  *   folder: "hello"
- *   file:
- *   path: # Note: path may be either absolute(default) or relative(relative to the folder from which the file containing instructions is read), the system will not read files outside of system_root_dir tree.
+ *   file: xxx
+ *   path: relative
+ *   extend: false
+ * @example <caption>Extension</caption> @lang yaml
+ * # Variable settings to be populated **recursively** with data from "current_dir/hello/xxx.yml"
+ * settings:
+ *   folder: "hello"
+ *   file: xxx
+ *   path: relative
+ * 	 extend: true
  */
 async function initRecursion(
 	rootDir,
@@ -269,11 +286,11 @@ async function initRecursion(
  * Init and populate globalspace with settings - specific global object member per file.
  * Semantically this function has broader purpose than loadYaml.
  * @inner
- * @memberof module:system~SystemLoader
- * @param {String} rootDir Root directory
- * @param {String} initPath Relative directory to root
- * @param {String} filename Filename
- * @returns {object} Javascript object with settings
+ * @memberof module:system~Loader
+ * @param {string} rootDir Root directory.
+ * @param {string} initPath Relative directory to root.
+ * @param {string} filename Filename.
+ * @returns {Object} Javascript object with settings.
  */
 async function initSettings(
 	rootDir,
@@ -291,13 +308,13 @@ async function initSettings(
 }
 
 /**
- * Parses YAML file, and returns and object; Adds extension if absent
+ * Parses YAML file, and returns and object; Adds extension if absent.
  * @inner
- * @memberof module:system~SystemLoader
- * @param {String} rootDir Absolute directory path
- * @param {String} relativeDir Relative directory to root
- * @param {String} filename Filename, with or without extension
- * @returns {external:Promise} Javascript object
+ * @memberof module:system~Loader
+ * @param {string} rootDir Absolute directory path.
+ * @param {string} relativeDir Relative directory to root.
+ * @param {string} filename Filename, with or without extension.
+ * @returns {external:Promise} Javascript object.
  */
 async function loadYaml(rootDir, relativeDir, filename){
 	var fileExtension = ".yml"; // Making a variale for interpreted language like this would not even save any memory, but it feels right
@@ -309,7 +326,7 @@ async function loadYaml(rootDir, relativeDir, filename){
 
 	// Try to read the file contents and retuen them; If we fail, we log filename to error stream, and rethrow the error
 	try {
-		var contents = await SystemLoader.getFile(rootDir, relativeDir, filename);
+		var contents = await Loader.getFile(rootDir, relativeDir, filename);
 		return yaml.load(contents);
 	} catch (err) {
 		// Prints path of problem filename
@@ -318,4 +335,4 @@ async function loadYaml(rootDir, relativeDir, filename){
 	}
 }
 
-exports.SystemLoader = SystemLoader;
+exports.Loader = Loader;
