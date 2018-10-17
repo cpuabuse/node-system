@@ -166,7 +166,7 @@ class Loader{
  * - Default values are assumed for unspecified or empty values.
  * - Extension means recursive loading of data into variable, as if loading a new file into the current variable as new system.
  * - Relative path is relative to the directory location of current file.
- *  * @inner
+ * @inner
  * @memberof module:system~Loader
  * @param {string} rootDir Root directory
  * @param {Object} relativePath Relative path

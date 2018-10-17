@@ -36,6 +36,9 @@ class AtomicLock {
 	/**
 	 * Lock an atomic lock.
 	 * @returns {external:Promise} Resolves when lock succeeds
+	 * @example <caption>Usage</caption>
+	 * // Lock
+	 * exampleAtomicLock.lock();
 	 */
 	lock(){
 		return (async () => {
@@ -57,6 +60,9 @@ class AtomicLock {
 
 	/**
 	 * Release atomic lock
+	 * @example <caption>Usage</caption>
+	 * // Release
+	 * exampleAtomicLock.release();
 	 */
 	release(){
 		this.locked = false;

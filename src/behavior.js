@@ -59,6 +59,12 @@ class Behavior extends events.EventEmitter{
 	 * @param {string} name Name of the bahavior
 	 * @param {function} callback Behavior callback function
 	 * @return {number} ID of the behavior; `-1` if creation failed
+	 * @example <caption>Usage</caption>
+	 * // Create a new instance of Behavior
+	 * var behavior = new Behavior();
+	 *
+	 * // Add a behavior
+	 * behavior.addBehavior("hello_behavior", () => console.log("Hello World"));
 	 */
 	async addBehavior(name, callback){
 		if(typeof name === "string"){ // Name must be string
@@ -95,6 +101,18 @@ class Behavior extends events.EventEmitter{
 	/**
 	 * Triggers behaviors registered for name
 	 * @param {string} name Behavior name
+	 * @example <caption>Usage</caption>
+	 * // Create a new instance of Behavior
+	 * var behavior = new Behavior();
+	 *
+	 * // Add a behavior
+	 * behavior.addBehavior("hello_behavior", () => console.log("Hello World"));
+	 *
+	 * // Call a behavior
+	 * behavior.behave("hello_behavior");
+	 *
+	 * // Output:
+	 * // "Hello World"
 	 */
 	behave(name){
 		if(typeof name === "string"){
