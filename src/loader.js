@@ -203,7 +203,7 @@ class Loader{
  *   folder: "hello"
  *   file: xxx
  *   path: relative
- * 	 extend: true
+ *   extend: true
  */
 async function initRecursion(
 	rootDir,
