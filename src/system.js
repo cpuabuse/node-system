@@ -7,28 +7,29 @@
 const loader = require("./loader.js"); // Auxiliary system lib
 const systemError = require("./error.js");
 const behavior = require("./behavior.js");
-const error_errorExists = "error_exists";
 const atomic = require("./atomic.js");
+const events = require("./events.js");
 
 /**
  * Provides wide range of functionality for file loading and event exchange.
+ * @memberof module:system
  * @extends module:system~Loader
  * The constructor will perform necessary preparations, so that failures can be processed with system events. Up until these preparations are complete, the failure will result in thrown standard Error.
- * @param {String} id - System instace internal ID
- * @param {String} rootDir - The root directory for the System instance
- * @param {String} relativeInitDir - The relative directory to root of the location of the initialization file
- * @param {String} initFilename - Initialization file filename
+ * @param {string} id - System instace internal ID
+ * @param {string} rootDir - The root directory for the System instance
+ * @param {string} relativeInitDir - The relative directory to root of the location of the initialization file
+ * @param {string} initFilename - Initialization file filename
  * @param {module:system.System~behavior=} behaviors - [Optional] Behaviors to add
  * @throws {external:Error} Throws standard error if failed to perform basic initializations, or system failure that cannot be reported otherwise has occured.
  *
  * - `loader_failed` - Loader did not construct the property
  *
  * **Note**: typeof SystemError will return false
- * @fires system_load Load complete.
+ * @fires module:system.System#events#system_load
  * @example <caption>Behaviors outline</caption>
- * amazing_behavior: () => {
+ * amazing_behavior: (that) => {
  *   // Process system instance on "amazing_behavior"
- *   amazingProcessor(this);
+ *   amazingProcessor(that);
  * }
  */
 class System extends loader.Loader{
@@ -51,7 +52,7 @@ class System extends loader.Loader{
 				 * @abstract
 				 * @instance
 				 * @member events
-				 * @memberof module:system~System
+				 * @memberof module:system.System
 				 * @type {Object}
 				 */
 				if(!(this.hasOwnProperty("events") && this.hasOwnProperty("behaviors"))){ // Make sure basic system carcass was initialized
@@ -247,7 +248,7 @@ class System extends loader.Loader{
 	addError(code, message){
 		if(this.system.error.hasOwnProperty(code)){
 			// Fire an error event that error already exists
-			this.fire(error_errorExists);
+			this.fire(events.errorExists);
 		} else {
 			this.system.error[code] = new systemError.SystemError(code, message);
 		}

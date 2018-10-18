@@ -19,10 +19,15 @@ class Loader{
 	 * @param {string} relativeInitDir Relative path to root.
 	 * @param {string} initFilename Filename.
 	 * @param {function} callback Callback to call with Promise of completion.
+	 * @throws Will rethrow errors from initRecursion
 	 */
 	constructor(rootDir, arg_relativeInitDir, arg_initFilename, callback){
-		// Initialization recursion
-		callback(initRecursion(rootDir, arg_relativeInitDir, arg_initFilename, this, true));
+		try{
+			// Initialization recursion
+			callback(initRecursion(rootDir, arg_relativeInitDir, arg_initFilename, this, true));/* eslint-disable-line callback-return */// Unnecessary here, as there is single execution path
+		} catch(error){
+			throw error;
+		}
 	}
 
 	/**
@@ -168,12 +173,13 @@ class Loader{
  * - Relative path is relative to the directory location of current file.
  * @inner
  * @memberof module:system~Loader
- * @param {string} rootDir Root directory
- * @param {Object} relativePath Relative path
- * @param {string} initFilename Filename for settings
- * @param {Object} targetObject Object to be filled
- * @param {boolean} extend Extend the children objects or not
+ * @param {string} rootDir Root directory.
+ * @param {Object} relativePath Relative path.
+ * @param {string} initFilename Filename for settings.
+ * @param {Object} targetObject Object to be filled.
+ * @param {boolean} extend Extend the children objects or not.
  * @returns {external:Promise}
+ * @throws Will throw an error if the directive is not an allowed one (folder, file, path, extend).
  * @example <caption>Default filename - null</caption> @lang yaml
  * # Variable settings to be populated with data from "system_root_dir/settings.yml"
  * settings: # Defaults to "settings"
@@ -270,7 +276,7 @@ async function initRecursion(
 			} // <== case "object"
 
 			default:
-			throw("critical_system_error", "Invalid intialization entry type - " + key);
+			throw new Error("Invalid intialization entry type - " + key);
 		}
 		await initRecursion(
 			rootDir,
