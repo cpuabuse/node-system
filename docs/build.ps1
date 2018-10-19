@@ -1,4 +1,4 @@
-# Set concolse encoding
+# Set console encoding
 if([console]::InputEncoding.CodePage -ne 65001) {[console]::InputEncoding = [console]::OutputEncoding = New-Object System.Text.UTF8Encoding}
 
 # Run from framework repo directory

@@ -93,7 +93,7 @@ Provides wide range of functionality for file loading and event exchange.
 
 **Kind**: static class of [<code>system</code>](#module_system)  
 **Extends**: [<code>Loader</code>](#module_system..Loader)  
-**Emits**: [<code>system_load</code>](#module_system.System+events+event_system_load)  
+**Emits**: [<code>system\_load</code>](#module_system.System+events+event_system_load)  
 
 * [.System](#module_system.System) ⇐ [<code>Loader</code>](#module_system..Loader)
     * [new System(id, rootDir, relativeInitDir, initFilename, [behaviors])](#new_module_system.System_new)
@@ -201,7 +201,7 @@ When the behavior addition has been processed, the function will attempt to fire
 Logically the two stage separation should be done with promises, but due to huge overhead of promises and low total processing required, it will be simplified to syncronous.
 
 **Kind**: instance method of [<code>System</code>](#module_system.System)  
-**Emits**: [<code>behavior_attach</code>](#module_system.System..event_behavior_attach), [<code>behavior_attach_fail</code>](#module_system.System..event_behavior_attach_fail), [<code>behavior_attach_request_fail</code>](#module_system.System..event_behavior_attach_request_fail)  
+**Emits**: [<code>behavior\_attach</code>](#module_system.System..event_behavior_attach), [<code>behavior\_attach\_fail</code>](#module_system.System..event_behavior_attach_fail), [<code>behavior\_attach\_request\_fail</code>](#module_system.System..event_behavior_attach_request_fail)  
 
 | Param | Type |
 | --- | --- |
@@ -214,7 +214,7 @@ Logically the two stage separation should be done with promises, but due to huge
 Log message from the System context
 
 **Kind**: instance method of [<code>System</code>](#module_system.System)  
-**Emits**: [<code>type_error</code>](#module_system.System..event_type_error)  
+**Emits**: [<code>type\_error</code>](#module_system.System..event_type_error)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -678,6 +678,21 @@ Note:
 | --- | --- | --- |
 | error | <code>module:system.SystemError</code> | Error to check |
 
+**Example** *(Usage)*  
+```js
+// Try to load JSON
+try{
+	loadJson();
+} catch(error) {
+	if (SystemError.isSystemError(error)){
+		// If error is something that we have defined, throw a more generic error
+		throw new SystemError("json_load_fail", "Failed to load JSON file.");
+	} else {
+		// Rethrow the original error
+		throw error;
+	}
+}
+```
 <a name="module_system..Behavior"></a>
 
 ## system~Behavior ⇐ [<code>EventEmitter</code>](https://nodejs.org/api/events.html#events_class_eventemitter)

@@ -36,6 +36,19 @@ class SystemError extends Error{
 	 * - Empty code errors will return false, due to the ambiguity.
 	 * @param {module:system.SystemError} error Error to check
 	 * @returns {boolean} Returns `true` if is is a SystemError, `false` if not.
+	 * @example <caption>Usage</caption>
+	 * // Try to load JSON
+	 * try{
+	 * 	loadJson();
+	 * } catch(error) {
+	 * 	if (SystemError.isSystemError(error)){
+	 * 		// If error is something that we have defined, throw a more generic error
+	 * 		throw new SystemError("json_load_fail", "Failed to load JSON file.");
+	 * 	} else {
+	 * 		// Rethrow the original error
+	 * 		throw error;
+	 * 	}
+	 * }
 	 */
 	static isSystemError(error){
 		if((error instanceof SystemError)){
