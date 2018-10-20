@@ -18,25 +18,24 @@ const events = require("./events.js");
  * @throws {external:Error}
  *
  * - `loader_failed` - Loader did not construct the mandatory properties
- *
- * **Note**: typeof SystemError will return false
  * @fires module:system.System#events#system_load
  */
 class System extends loader.Loader{
 	/**
 	 * System options
 	 * @typedef {Object} module:system.System~options
-	 * @property {string} id - System instace internal ID
-   * @property {string} rootDir - The root directory for the System instance
-   * @property {string} relativeInitDir - The relative directory to root of the location of the initialization file
-   * @property {string} initFilename - Initialization file filename
+	 * @property {string} id - System instace internal ID.
+   * @property {string} rootDir - The root directory for the System instance.
+   * @property {string} relativeInitDir - The relative directory to root of the location of the initialization file.
+   * @property {string} initFilename - Initialization file filename.
+	 * @property {bool} notMute - Whether the system logs or not.
 	 */
 
 	/**
 	 * System behavior - an object, with a property where key is the name of the behavior, and value is the function, taking a system context as an argument.
 	 * @typedef {Object} module:system.System~behavior
 	 * @property {function}
-	 * @example <caption>Behaviors - argument outline</caption>
+	 * @example <caption>Behavior - argument outline</caption>
    * amazing_behavior: (that) => {
    *   // Process system instance on "amazing_behavior"
    *   amazingProcessor(that);
@@ -45,8 +44,8 @@ class System extends loader.Loader{
 
 	/**
 	 * The constructor will perform necessary preparations, so that failures can be processed with system events. Up until these preparations are complete, the failure will result in thrown standard Error.
-	 * @param {module:system.System~options} options System options
-	 * @param {module:system.System~behavior[]} [behaviors] - [Optional] Behaviors to add
+	 * @param {module:system.System~options} options System options.
+	 * @param {module:system.System~behavior[]} [behaviors] - [Optional] Behaviors to add.
 	 */
 	constructor(options, behaviors){
 		// Throw an error if failure
@@ -57,14 +56,24 @@ class System extends loader.Loader{
 		// First things first, call a loader, if loader has failed, there are no tools to report gracefully, so the errors from there will just go above
 		super(options.rootDir, options.relativeInitDir, options.initFilename, load => {
 			load.then(() => {
-				/** Events to be populated by the loader.
-				 * System by itself does not do anything about the events themselves, it only confirms that the events were initialized. Ofcourse, if the events are fired, and failure to fire event is set to throw, or undocumented events encountered, it would make troubles(System and standard throws).
+				/**
+				 * Events to be populated by the loader.
+				 * System by itself does not deal with events, it only confirms that the events were initialized. Although, if the events are fired, and failure to fire event is set to throw, or undocumented events encountered, it would throw errors.
 				 * @abstract
 				 * @instance
 				 * @member events
 				 * @memberof module:system.System
 				 * @type {Object}
 				 */
+
+				/**
+				 * Behavior describtions initialized by loader.
+				 * @abstract
+				 * @instance
+				 * @member behaviors
+				 * @memberof module:system.System
+				 * @type {Object}
+				*/
 				if(!(this.hasOwnProperty("events") && this.hasOwnProperty("behaviors"))){ // Make sure basic system carcass was initialized
 					throw new Error("loader_failed");
 				}
@@ -100,8 +109,7 @@ class System extends loader.Loader{
 		 * @type {module:system.System~options}
 		 * @readonly
 		 * @property {module:system~Behavior} behavior Event emitter for the behaviors. Generally should use the public system instance methods instead.
-		 * @property {object} error Contains throwables
-		 * @property {module:system~System~file} error Contains throwables
+		 * @property {object} error Contains throwables.
 		 */
 		this.system = {
 			id: options.id,
@@ -113,78 +121,92 @@ class System extends loader.Loader{
 		this.system.behavior = new behavior.Behavior();
 		this.system.error = new Object();
 
-		/** File system methods
+		/**
+		 * File system methods.
 		 * @instance
 		 * @member file
-		 * @memberof module:system~System#system
+		 * @memberof module:system.System#system
 		 * @type {Object}
 		 */
 		this.system.file = {
-			/** File level filters
+			/**
+			 * File level filters.
 			 * @instance
 			 * @member filter
-			 * @memberof module:system~System#system#file
-			*/
+			 * @memberof module:system.System#system#file
+			 * @type {Object}
+			 */
 			filter: {
-				/** Check if argument is a file (relative to system root directory)
+				/**
+				 * Check if argument is a file (relative to system root directory).
 				 * @instance
 				 * @member isFile
-				 * @memberof module:system~System#system#file#filter
+				 * @memberof module:system.System#system#file#filter
 				 * @async
 				 * @function
-				 * @param {String} folder Root folder
-				 * @param {String} file File or folder within root
+				 * @param {string} folder Root folder.
+				 * @param {string} file File or folder within root.
+				 * @returns {external:Promise} Promise, containing boolean result.
 				*/
 				isFile: (folder, file) => loader.SytemLoader.isFile(this.system.rootDir, folder, file),
-				/** Check if argument is a folder (relative to system root directory)
+				/**
+				 * Check if argument is a folder (relative to system root directory).
 				 * @instance
 				 * @member isDir
-				 * @memberof module:system~System#system#file#filter
+				 * @memberof module:system.System#system#file#filter
 				 * @async
 				 * @function
-				 * @param {String} dir Folder
+				 * @param {string} dir Folder.
+				 * @returns {external:Promise} Promise, containing boolean result.
 				*/
 				isDir: dir => loader.Loader.isDir(this.system.rootDir, dir)
 			},
-			/** Converts absolute path to relative path
+			/**
+			 * Converts absolute path to relative path.
 			 * @instance
 			 * @member toRelative
-			 * @memberof module:system~System#system#file
+			 * @memberof module:system.System#system#file
 			 * @async
 			 * @function
-			 * @param {String} rootDir Relative directory
-			 * @param {String} target Absolute file/folder path
+			 * @param {string} rootDir Relative directory.
+			 * @param {string} target Absolute file/folder path.
+			 * @returns {external:Promise} Promise, containing string relative path.
 			*/
 			toRelative: (rootDir, target) => loader.Loader.toRelative(rootDir, target),
-			/** Joins two paths
+			/**
+			 * Joins two paths.
 			 * @instance
 			 * @member join
-			 * @memberof module:system~System#system#file
+			 * @memberof module:system.System#system#file
 			 * @async
 			 * @function
-			 * @param {String} rootDir Relative directory
-			 * @param {String} target File/folder path to rootDir
+			 * @param {string} rootDir Relative directory.
+			 * @param {string} target File/folder path to rootDir.
+			 * @returns {external:Promise} Promise, containing string path.
 			*/
 			join: (rootDir, target) => loader.Loader.join(rootDir, target),
-			/** Get file contents relative to system\ root directory
+			/**
+			 * Get file contents relative to system root directory.
 			 * @instance
 			 * @member getFile
-			 * @memberof module:system~System#system#file
+			 * @memberof module:system.System#system#file
 			 * @async
 			 * @function
-			 * @param {String} dir Directory, relative to system root
-			 * @param {String} file Filename
+			 * @param {string} dir Directory, relative to system root.
+			 * @param {string} file Filename.
+			 * @returns {external:Promise} Promise, containing string with file contents..
 			*/
 			getFile: (dir, file) => loader.Loader.getFile(this.system.rootDir, dir, file),
-			/** List the contents of the folder, relative to system root directory.
+			/**
+			 * List the contents of the folder, relative to system root directory.
 			 * @instance
 			 * @member list
-			 * @memberof module:system~System#system#file
+			 * @memberof module:system.System#system#file
 			 * @async
 			 * @function
-			 * @param {String} folder Folder to check
-			 * @param {external:Promise} [filter=null]
-			 * @returns {String[]} Filtered files/folders relative to system root
+			 * @param {string} dir Folder relative to system root.
+			 * @param {string} file Filename.
+			 * @returns {external:Promise} Promise, containing an array of filtered strings - files/folders relative to system root.
 			 * @example <caption>List folders</caption>
 			 * systemInstance.system.file.list("css", systemInstance.system.file.filter.isDir);
 			 */

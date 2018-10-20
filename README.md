@@ -32,7 +32,16 @@ System is intended more than anything, for centralized managment.
             * _instance_
                 * *[.events](#module_system.System+events) : <code>Object</code>*
                     * *["system_load"](#module_system.System+events+event_system_load)*
+                * *[.behaviors](#module_system.System+behaviors) : <code>Object</code>*
                 * [.system](#module_system.System+system) : [<code>options</code>](#module_system.System..options)
+                    * [.file](#module_system.System+system+file) : <code>Object</code>
+                        * [.filter](#module_system.System+system+file+filter) : <code>Object</code>
+                            * [.isFile(folder, file)](#module_system.System+system+file+filter+isFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+                            * [.isDir(dir)](#module_system.System+system+file+filter+isDir) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+                        * [.toRelative(rootDir, target)](#module_system.System+system+file+toRelative) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+                        * [.join(rootDir, target)](#module_system.System+system+file+join) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+                        * [.getFile(dir, file)](#module_system.System+system+file+getFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+                        * [.list(dir, file)](#module_system.System+system+file+list) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
                 * [.addError(code, message)](#module_system.System+addError)
                 * [.addBehaviors(behaviors)](#module_system.System+addBehaviors)
                 * [.log(text)](#module_system.System+log)
@@ -103,7 +112,16 @@ Throws standard error if failed to perform basic initializations, or system fail
     * _instance_
         * *[.events](#module_system.System+events) : <code>Object</code>*
             * *["system_load"](#module_system.System+events+event_system_load)*
+        * *[.behaviors](#module_system.System+behaviors) : <code>Object</code>*
         * [.system](#module_system.System+system) : [<code>options</code>](#module_system.System..options)
+            * [.file](#module_system.System+system+file) : <code>Object</code>
+                * [.filter](#module_system.System+system+file+filter) : <code>Object</code>
+                    * [.isFile(folder, file)](#module_system.System+system+file+filter+isFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+                    * [.isDir(dir)](#module_system.System+system+file+filter+isDir) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+                * [.toRelative(rootDir, target)](#module_system.System+system+file+toRelative) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+                * [.join(rootDir, target)](#module_system.System+system+file+join) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+                * [.getFile(dir, file)](#module_system.System+system+file+getFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+                * [.list(dir, file)](#module_system.System+system+file+list) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
         * [.addError(code, message)](#module_system.System+addError)
         * [.addBehaviors(behaviors)](#module_system.System+addBehaviors)
         * [.log(text)](#module_system.System+log)
@@ -134,29 +152,35 @@ The constructor will perform necessary preparations, so that failures can be pro
 
 - [<code>Error</code>](https://nodejs.org/api/errors.html#errors_class_error) - `loader_failed` - Loader did not construct the mandatory properties
 
-**Note**: typeof SystemError will return false
-
 
 | Param | Type | Description |
 | --- | --- | --- |
-| options | [<code>options</code>](#module_system.System..options) | System options |
-| [behaviors] | [<code>Array.&lt;behavior&gt;</code>](#module_system.System..behavior) | [Optional] Behaviors to add |
+| options | [<code>options</code>](#module_system.System..options) | System options. |
+| [behaviors] | [<code>Array.&lt;behavior&gt;</code>](#module_system.System..behavior) | [Optional] Behaviors to add. |
 
 <a name="module_system.System+events"></a>
 
 ## *system.events : <code>Object</code>*
 
 Events to be populated by the loader.
-System by itself does not do anything about the events themselves, it only confirms that the events were initialized. Ofcourse, if the events are fired, and failure to fire event is set to throw, or undocumented events encountered, it would make troubles(System and standard throws).
+System by itself does not deal with events, it only confirms that the events were initialized. Although, if the events are fired, and failure to fire event is set to throw, or undocumented events encountered, it would throw errors.
 
 **Kind**: instance abstract property of [<code>System</code>](#module_system.System)  
 <a name="module_system.System+events+event_system_load"></a>
 
 ## *"system_load"*
 
-System load event
+System load event.
+Fires at the end of system load, so it is safe to execute code in the then() directive of behavior associated.
 
 **Kind**: event emitted by [<code>events</code>](#module_system.System+events)  
+<a name="module_system.System+behaviors"></a>
+
+## *system.behaviors : <code>Object</code>*
+
+Behavior describtions initialized by loader.
+
+**Kind**: instance abstract property of [<code>System</code>](#module_system.System)  
 <a name="module_system.System+system"></a>
 
 ## system.system : [<code>options</code>](#module_system.System..options)
@@ -170,9 +194,135 @@ Contains system info.
 | Name | Type | Description |
 | --- | --- | --- |
 | behavior | [<code>Behavior</code>](#module_system..Behavior) | Event emitter for the behaviors. Generally should use the public system instance methods instead. |
-| error | <code>object</code> | Contains throwables |
-| error | <code>module:system~System~file</code> | Contains throwables |
+| error | <code>object</code> | Contains throwables. |
 
+
+* [.system](#module_system.System+system) : [<code>options</code>](#module_system.System..options)
+    * [.file](#module_system.System+system+file) : <code>Object</code>
+        * [.filter](#module_system.System+system+file+filter) : <code>Object</code>
+            * [.isFile(folder, file)](#module_system.System+system+file+filter+isFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+            * [.isDir(dir)](#module_system.System+system+file+filter+isDir) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+        * [.toRelative(rootDir, target)](#module_system.System+system+file+toRelative) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+        * [.join(rootDir, target)](#module_system.System+system+file+join) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+        * [.getFile(dir, file)](#module_system.System+system+file+getFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+        * [.list(dir, file)](#module_system.System+system+file+list) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+
+<a name="module_system.System+system+file"></a>
+
+## system.file : <code>Object</code>
+
+File system methods.
+
+**Kind**: instance property of [<code>system</code>](#module_system.System+system)  
+
+* [.file](#module_system.System+system+file) : <code>Object</code>
+    * [.filter](#module_system.System+system+file+filter) : <code>Object</code>
+        * [.isFile(folder, file)](#module_system.System+system+file+filter+isFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+        * [.isDir(dir)](#module_system.System+system+file+filter+isDir) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+    * [.toRelative(rootDir, target)](#module_system.System+system+file+toRelative) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+    * [.join(rootDir, target)](#module_system.System+system+file+join) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+    * [.getFile(dir, file)](#module_system.System+system+file+getFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+    * [.list(dir, file)](#module_system.System+system+file+list) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+
+<a name="module_system.System+system+file+filter"></a>
+
+## file.filter : <code>Object</code>
+
+File level filters.
+
+**Kind**: instance property of [<code>file</code>](#module_system.System+system+file)  
+
+* [.filter](#module_system.System+system+file+filter) : <code>Object</code>
+    * [.isFile(folder, file)](#module_system.System+system+file+filter+isFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+    * [.isDir(dir)](#module_system.System+system+file+filter+isDir) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+
+<a name="module_system.System+system+file+filter+isFile"></a>
+
+## filter.isFile(folder, file) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+
+Check if argument is a file (relative to system root directory).
+
+**Kind**: instance method of [<code>filter</code>](#module_system.System+system+file+filter)  
+**Returns**: [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) - Promise, containing boolean result.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| folder | <code>string</code> | Root folder. |
+| file | <code>string</code> | File or folder within root. |
+
+<a name="module_system.System+system+file+filter+isDir"></a>
+
+## filter.isDir(dir) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+
+Check if argument is a folder (relative to system root directory).
+
+**Kind**: instance method of [<code>filter</code>](#module_system.System+system+file+filter)  
+**Returns**: [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) - Promise, containing boolean result.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| dir | <code>string</code> | Folder. |
+
+<a name="module_system.System+system+file+toRelative"></a>
+
+## file.toRelative(rootDir, target) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+
+Converts absolute path to relative path.
+
+**Kind**: instance method of [<code>file</code>](#module_system.System+system+file)  
+**Returns**: [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) - Promise, containing string relative path.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| rootDir | <code>string</code> | Relative directory. |
+| target | <code>string</code> | Absolute file/folder path. |
+
+<a name="module_system.System+system+file+join"></a>
+
+## file.join(rootDir, target) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+
+Joins two paths.
+
+**Kind**: instance method of [<code>file</code>](#module_system.System+system+file)  
+**Returns**: [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) - Promise, containing string path.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| rootDir | <code>string</code> | Relative directory. |
+| target | <code>string</code> | File/folder path to rootDir. |
+
+<a name="module_system.System+system+file+getFile"></a>
+
+## file.getFile(dir, file) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+
+Get file contents relative to system root directory.
+
+**Kind**: instance method of [<code>file</code>](#module_system.System+system+file)  
+**Returns**: [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) - Promise, containing string with file contents..  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| dir | <code>string</code> | Directory, relative to system root. |
+| file | <code>string</code> | Filename. |
+
+<a name="module_system.System+system+file+list"></a>
+
+## file.list(dir, file) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+
+List the contents of the folder, relative to system root directory.
+
+**Kind**: instance method of [<code>file</code>](#module_system.System+system+file)  
+**Returns**: [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) - Promise, containing an array of filtered strings - files/folders relative to system root.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| dir | <code>string</code> | Folder relative to system root. |
+| file | <code>string</code> | Filename. |
+
+**Example** *(List folders)*  
+```js
+systemInstance.system.file.list("css", systemInstance.system.file.filter.isDir);
+```
 <a name="module_system.System+addError"></a>
 
 ## system.addError(code, message)
@@ -342,10 +492,11 @@ System options
 
 | Name | Type | Description |
 | --- | --- | --- |
-| id | <code>string</code> | System instace internal ID |
-| rootDir | <code>string</code> | The root directory for the System instance |
-| relativeInitDir | <code>string</code> | The relative directory to root of the location of the initialization file |
-| initFilename | <code>string</code> | Initialization file filename |
+| id | <code>string</code> | System instace internal ID. |
+| rootDir | <code>string</code> | The root directory for the System instance. |
+| relativeInitDir | <code>string</code> | The relative directory to root of the location of the initialization file. |
+| initFilename | <code>string</code> | Initialization file filename. |
+| notMute | <code>bool</code> | Whether the system logs or not. |
 
 <a name="module_system.System..behavior"></a>
 
@@ -360,7 +511,7 @@ System behavior - an object, with a property where key is the name of the behavi
 | --- |
 | <code>function</code> | 
 
-**Example** *(Behaviors - argument outline)*  
+**Example** *(Behavior - argument outline)*  
 ```js
 amazing_behavior: (that) => {
   // Process system instance on "amazing_behavior"
