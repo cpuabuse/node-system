@@ -28,11 +28,11 @@ System is intended more than anything, for centralized managment.
 * [system](#module_system)
     * _static_
         * [.System](#module_system.System) ⇐ [<code>Loader</code>](#module_system..Loader)
-            * [new System(id, rootDir, relativeInitDir, initFilename, [behaviors])](#new_module_system.System_new)
+            * [new System(options, [behaviors])](#new_module_system.System_new)
             * _instance_
                 * *[.events](#module_system.System+events) : <code>Object</code>*
                     * *["system_load"](#module_system.System+events+event_system_load)*
-                * [.system](#module_system.System+system) : [<code>options</code>](#module_system..System..options)
+                * [.system](#module_system.System+system) : [<code>options</code>](#module_system.System..options)
                 * [.addError(code, message)](#module_system.System+addError)
                 * [.addBehaviors(behaviors)](#module_system.System+addBehaviors)
                 * [.log(text)](#module_system.System+log)
@@ -50,6 +50,8 @@ System is intended more than anything, for centralized managment.
                 * ["behavior_attach_request_fail"](#module_system.System..event_behavior_attach_request_fail)
                 * ["type_error"](#module_system.System..event_type_error)
                 * ["event_fail"](#module_system.System..event_event_fail)
+                * [~options](#module_system.System..options) : <code>Object</code>
+                * [~behavior](#module_system.System..behavior) : <code>Object</code>
         * [.AtomicLock](#module_system.AtomicLock)
             * [new AtomicLock()](#new_module_system.AtomicLock_new)
             * [.locked](#module_system.AtomicLock+locked) : <code>boolean</code> ℗
@@ -90,17 +92,18 @@ System is intended more than anything, for centralized managment.
 ## system.System ⇐ [<code>Loader</code>](#module_system..Loader)
 
 Provides wide range of functionality for file loading and event exchange.
+Throws standard error if failed to perform basic initializations, or system failure that cannot be reported otherwise has occured.
 
 **Kind**: static class of [<code>system</code>](#module_system)  
 **Extends**: [<code>Loader</code>](#module_system..Loader)  
-**Emits**: [<code>system\_load</code>](#module_system.System+events+event_system_load)  
+**Emits**: [<code>system_load</code>](#module_system.System+events+event_system_load)  
 
 * [.System](#module_system.System) ⇐ [<code>Loader</code>](#module_system..Loader)
-    * [new System(id, rootDir, relativeInitDir, initFilename, [behaviors])](#new_module_system.System_new)
+    * [new System(options, [behaviors])](#new_module_system.System_new)
     * _instance_
         * *[.events](#module_system.System+events) : <code>Object</code>*
             * *["system_load"](#module_system.System+events+event_system_load)*
-        * [.system](#module_system.System+system) : [<code>options</code>](#module_system..System..options)
+        * [.system](#module_system.System+system) : [<code>options</code>](#module_system.System..options)
         * [.addError(code, message)](#module_system.System+addError)
         * [.addBehaviors(behaviors)](#module_system.System+addBehaviors)
         * [.log(text)](#module_system.System+log)
@@ -118,35 +121,27 @@ Provides wide range of functionality for file loading and event exchange.
         * ["behavior_attach_request_fail"](#module_system.System..event_behavior_attach_request_fail)
         * ["type_error"](#module_system.System..event_type_error)
         * ["event_fail"](#module_system.System..event_event_fail)
+        * [~options](#module_system.System..options) : <code>Object</code>
+        * [~behavior](#module_system.System..behavior) : <code>Object</code>
 
 <a name="new_module_system.System_new"></a>
 
-## new System(id, rootDir, relativeInitDir, initFilename, [behaviors])
+## new System(options, [behaviors])
+
+The constructor will perform necessary preparations, so that failures can be processed with system events. Up until these preparations are complete, the failure will result in thrown standard Error.
 
 **Throws**:
 
-- [<code>Error</code>](https://nodejs.org/api/errors.html#errors_class_error) Throws standard error if failed to perform basic initializations, or system failure that cannot be reported otherwise has occured.
-
-- `loader_failed` - Loader did not construct the property
+- [<code>Error</code>](https://nodejs.org/api/errors.html#errors_class_error) - `loader_failed` - Loader did not construct the mandatory properties
 
 **Note**: typeof SystemError will return false
 
 
 | Param | Type | Description |
 | --- | --- | --- |
-| id | <code>string</code> | System instace internal ID |
-| rootDir | <code>string</code> | The root directory for the System instance |
-| relativeInitDir | <code>string</code> | The relative directory to root of the location of the initialization file |
-| initFilename | <code>string</code> | Initialization file filename |
-| [behaviors] | <code>module:system.System~behavior</code> | [Optional] Behaviors to add |
+| options | [<code>options</code>](#module_system.System..options) | System options |
+| [behaviors] | [<code>Array.&lt;behavior&gt;</code>](#module_system.System..behavior) | [Optional] Behaviors to add |
 
-**Example** *(Behaviors outline)*  
-```js
-amazing_behavior: (that) => {
-  // Process system instance on "amazing_behavior"
-  amazingProcessor(that);
-}
-```
 <a name="module_system.System+events"></a>
 
 ## *system.events : <code>Object</code>*
@@ -164,7 +159,7 @@ System load event
 **Kind**: event emitted by [<code>events</code>](#module_system.System+events)  
 <a name="module_system.System+system"></a>
 
-## system.system : [<code>options</code>](#module_system..System..options)
+## system.system : [<code>options</code>](#module_system.System..options)
 
 Contains system info.
 
@@ -201,11 +196,11 @@ When the behavior addition has been processed, the function will attempt to fire
 Logically the two stage separation should be done with promises, but due to huge overhead of promises and low total processing required, it will be simplified to syncronous.
 
 **Kind**: instance method of [<code>System</code>](#module_system.System)  
-**Emits**: [<code>behavior\_attach</code>](#module_system.System..event_behavior_attach), [<code>behavior\_attach\_fail</code>](#module_system.System..event_behavior_attach_fail), [<code>behavior\_attach\_request\_fail</code>](#module_system.System..event_behavior_attach_request_fail)  
+**Emits**: [<code>behavior_attach</code>](#module_system.System..event_behavior_attach), [<code>behavior_attach_fail</code>](#module_system.System..event_behavior_attach_fail), [<code>behavior_attach_request_fail</code>](#module_system.System..event_behavior_attach_request_fail)  
 
 | Param | Type |
 | --- | --- |
-| behaviors | <code>Array.&lt;module:system.System~behavior&gt;</code> | 
+| behaviors | [<code>Array.&lt;behavior&gt;</code>](#module_system.System..behavior) | 
 
 <a name="module_system.System+log"></a>
 
@@ -214,7 +209,7 @@ Logically the two stage separation should be done with promises, but due to huge
 Log message from the System context
 
 **Kind**: instance method of [<code>System</code>](#module_system.System)  
-**Emits**: [<code>type\_error</code>](#module_system.System..event_type_error)  
+**Emits**: [<code>type_error</code>](#module_system.System..event_type_error)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -285,7 +280,7 @@ Checks options argument for missing incorrect property types
 
 | Param | Type | Description |
 | --- | --- | --- |
-| options | [<code>options</code>](#module_system..System..options) | System options argument |
+| options | <code>module:system~System~options</code> | System options argument |
 
 <a name="module_system.System.error"></a>
 
@@ -336,6 +331,42 @@ Access stdout
 ## "event_fail"
 
 **Kind**: event emitted by [<code>System</code>](#module_system.System)  
+<a name="module_system.System..options"></a>
+
+## System~options : <code>Object</code>
+
+System options
+
+**Kind**: inner typedef of [<code>System</code>](#module_system.System)  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| id | <code>string</code> | System instace internal ID |
+| rootDir | <code>string</code> | The root directory for the System instance |
+| relativeInitDir | <code>string</code> | The relative directory to root of the location of the initialization file |
+| initFilename | <code>string</code> | Initialization file filename |
+
+<a name="module_system.System..behavior"></a>
+
+## System~behavior : <code>Object</code>
+
+System behavior - an object, with a property where key is the name of the behavior, and value is the function, taking a system context as an argument.
+
+**Kind**: inner typedef of [<code>System</code>](#module_system.System)  
+**Properties**
+
+| Type |
+| --- |
+| <code>function</code> | 
+
+**Example** *(Behaviors - argument outline)*  
+```js
+amazing_behavior: (that) => {
+  // Process system instance on "amazing_behavior"
+  amazingProcessor(that);
+}
+```
 <a name="module_system.AtomicLock"></a>
 
 ## system.AtomicLock
@@ -682,15 +713,15 @@ Note:
 ```js
 // Try to load JSON
 try{
-	loadJson();
+  loadJson();
 } catch(error) {
-	if (SystemError.isSystemError(error)){
-		// If error is something that we have defined, throw a more generic error
-		throw new SystemError("json_load_fail", "Failed to load JSON file.");
-	} else {
-		// Rethrow the original error
-		throw error;
-	}
+  if (SystemError.isSystemError(error)){
+    // If error is something that we have defined, throw a more generic error
+    throw new SystemError("json_load_fail", "Failed to load JSON file.");
+  } else {
+    // Rethrow the original error
+    throw error;
+  }
 }
 ```
 <a name="module_system..Behavior"></a>

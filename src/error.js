@@ -39,15 +39,15 @@ class SystemError extends Error{
 	 * @example <caption>Usage</caption>
 	 * // Try to load JSON
 	 * try{
-	 * 	loadJson();
+	 *   loadJson();
 	 * } catch(error) {
-	 * 	if (SystemError.isSystemError(error)){
-	 * 		// If error is something that we have defined, throw a more generic error
-	 * 		throw new SystemError("json_load_fail", "Failed to load JSON file.");
-	 * 	} else {
-	 * 		// Rethrow the original error
-	 * 		throw error;
-	 * 	}
+	 *   if (SystemError.isSystemError(error)){
+	 *     // If error is something that we have defined, throw a more generic error
+	 *     throw new SystemError("json_load_fail", "Failed to load JSON file.");
+	 *   } else {
+	 *     // Rethrow the original error
+	 *     throw error;
+	 *   }
 	 * }
 	 */
 	static isSystemError(error){

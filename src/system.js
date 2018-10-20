@@ -12,31 +12,41 @@ const events = require("./events.js");
 
 /**
  * Provides wide range of functionality for file loading and event exchange.
+ * Throws standard error if failed to perform basic initializations, or system failure that cannot be reported otherwise has occured.
  * @memberof module:system
  * @extends module:system~Loader
- * The constructor will perform necessary preparations, so that failures can be processed with system events. Up until these preparations are complete, the failure will result in thrown standard Error.
- * @param {string} id - System instace internal ID
- * @param {string} rootDir - The root directory for the System instance
- * @param {string} relativeInitDir - The relative directory to root of the location of the initialization file
- * @param {string} initFilename - Initialization file filename
- * @param {module:system.System~behavior=} behaviors - [Optional] Behaviors to add
- * @throws {external:Error} Throws standard error if failed to perform basic initializations, or system failure that cannot be reported otherwise has occured.
+ * @throws {external:Error}
  *
- * - `loader_failed` - Loader did not construct the property
+ * - `loader_failed` - Loader did not construct the mandatory properties
  *
  * **Note**: typeof SystemError will return false
  * @fires module:system.System#events#system_load
- * @example <caption>Behaviors outline</caption>
- * amazing_behavior: (that) => {
- *   // Process system instance on "amazing_behavior"
- *   amazingProcessor(that);
- * }
  */
 class System extends loader.Loader{
 	/**
-	 * @typedef module:system~System~options
-	 * @type {Object}
-	 * @param {module:system~System~options} options System options
+	 * System options
+	 * @typedef {Object} module:system.System~options
+	 * @property {string} id - System instace internal ID
+   * @property {string} rootDir - The root directory for the System instance
+   * @property {string} relativeInitDir - The relative directory to root of the location of the initialization file
+   * @property {string} initFilename - Initialization file filename
+	 */
+
+	/**
+	 * System behavior - an object, with a property where key is the name of the behavior, and value is the function, taking a system context as an argument.
+	 * @typedef {Object} module:system.System~behavior
+	 * @property {function}
+	 * @example <caption>Behaviors - argument outline</caption>
+   * amazing_behavior: (that) => {
+   *   // Process system instance on "amazing_behavior"
+   *   amazingProcessor(that);
+   * }
+	 */
+
+	/**
+	 * The constructor will perform necessary preparations, so that failures can be processed with system events. Up until these preparations are complete, the failure will result in thrown standard Error.
+	 * @param {module:system.System~options} options System options
+	 * @param {module:system.System~behavior[]} [behaviors] - [Optional] Behaviors to add
 	 */
 	constructor(options, behaviors){
 		// Throw an error if failure
@@ -87,7 +97,7 @@ class System extends loader.Loader{
 
 		// System constants
 		/** Contains system info.
-		 * @type {module:system~System~options}
+		 * @type {module:system.System~options}
 		 * @readonly
 		 * @property {module:system~Behavior} behavior Event emitter for the behaviors. Generally should use the public system instance methods instead.
 		 * @property {object} error Contains throwables
