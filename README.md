@@ -31,7 +31,8 @@ System is intended more than anything, for centralized managment.
             * [new System(options, [behaviors])](#new_module_system.System_new)
             * _instance_
                 * *[.events](#module_system.System+events) : <code>Object</code>*
-                    * *["system_load"](#module_system.System+events+event_system_load)*
+                    * *["errorExists"](#module_system.System+events+event_errorExists)*
+                    * *["systemLoad"](#module_system.System+events+event_systemLoad)*
                 * *[.behaviors](#module_system.System+behaviors) : <code>Object</code>*
                 * [.system](#module_system.System+system) : [<code>options</code>](#module_system.System..options)
                     * [.file](#module_system.System+system+file) : <code>Object</code>
@@ -105,13 +106,14 @@ Throws standard error if failed to perform basic initializations, or system fail
 
 **Kind**: static class of [<code>system</code>](#module_system)  
 **Extends**: [<code>Loader</code>](#module_system..Loader)  
-**Emits**: [<code>system_load</code>](#module_system.System+events+event_system_load)  
+**Emits**: [<code>systemLoad</code>](#module_system.System+events+event_systemLoad)  
 
 * [.System](#module_system.System) ⇐ [<code>Loader</code>](#module_system..Loader)
     * [new System(options, [behaviors])](#new_module_system.System_new)
     * _instance_
         * *[.events](#module_system.System+events) : <code>Object</code>*
-            * *["system_load"](#module_system.System+events+event_system_load)*
+            * *["errorExists"](#module_system.System+events+event_errorExists)*
+            * *["systemLoad"](#module_system.System+events+event_systemLoad)*
         * *[.behaviors](#module_system.System+behaviors) : <code>Object</code>*
         * [.system](#module_system.System+system) : [<code>options</code>](#module_system.System..options)
             * [.file](#module_system.System+system+file) : <code>Object</code>
@@ -166,14 +168,28 @@ Events to be populated by the loader.
 System by itself does not deal with events, it only confirms that the events were initialized. Although, if the events are fired, and failure to fire event is set to throw, or undocumented events encountered, it would throw errors.
 
 **Kind**: instance abstract property of [<code>System</code>](#module_system.System)  
-<a name="module_system.System+events+event_system_load"></a>
 
-## *"system_load"*
+* *[.events](#module_system.System+events) : <code>Object</code>*
+    * *["errorExists"](#module_system.System+events+event_errorExists)*
+    * *["systemLoad"](#module_system.System+events+event_systemLoad)*
+
+<a name="module_system.System+events+event_errorExists"></a>
+
+## *"errorExists"*
+
+Error could not be added, because error with same code already exists.
+
+**Kind**: event emitted by [<code>events</code>](#module_system.System+events)  
+**Default**: <code>error_exists</code>  
+<a name="module_system.System+events+event_systemLoad"></a>
+
+## *"systemLoad"*
 
 System load event.
 Fires at the end of system load, so it is safe to execute code in the then() directive of behavior associated.
 
 **Kind**: event emitted by [<code>events</code>](#module_system.System+events)  
+**Default**: <code>system_load</code>  
 <a name="module_system.System+behaviors"></a>
 
 ## *system.behaviors : <code>Object</code>*
@@ -330,11 +346,12 @@ systemInstance.system.file.list("css", systemInstance.system.file.filter.isDir);
 Adds an error to the System dynamically
 
 **Kind**: instance method of [<code>System</code>](#module_system.System)  
+**Emits**: [<code>errorExists</code>](#module_system.System+events+event_errorExists)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| code | <code>String</code> | Error code |
-| message | <code>String</code> | Error description |
+| code | <code>string</code> | Error code |
+| message | <code>string</code> | Error description |
 
 <a name="module_system.System+addBehaviors"></a>
 

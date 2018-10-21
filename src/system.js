@@ -18,7 +18,7 @@ const events = require("./events.js");
  * @throws {external:Error}
  *
  * - `loader_failed` - Loader did not construct the mandatory properties
- * @fires module:system.System#events#system_load
+ * @fires module:system.System#events#systemLoad
  */
 class System extends loader.Loader{
 	/**
@@ -97,9 +97,9 @@ class System extends loader.Loader{
 
 				// Initialize the behaviors; If behaviors not provided as argument, it is OK; Not immediate, since the load.then() code will execute after the instance finish initializing.
 				if(behaviors){
-					this.addBehaviors(behaviors).then(() => this.fire("system_load"));
+					this.addBehaviors(behaviors).then(() => this.fire(events.systemLoad));
 				} else {
-					this.fire("system_load");
+					this.fire(events.systemLoad);
 				}
 			});
 		});
@@ -272,11 +272,13 @@ class System extends loader.Loader{
 		return failed;
 	}
 
-	/** Adds an error to the System dynamically
+	/**
+	 * Adds an error to the System dynamically
 	 * @instance
-	 * @param {String} code Error code
-	 * @param {String} message Error description
-	*/
+	 * @param {string} code Error code
+	 * @param {string} message Error description
+	 * @fires module:system.System#events#errorExists
+	 */
 	addError(code, message){
 		if(this.system.error.hasOwnProperty(code)){
 			// Fire an error event that error already exists
