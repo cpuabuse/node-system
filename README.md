@@ -72,8 +72,8 @@ System is intended more than anything, for centralized managment.
             * [new Loader(rootDir, relativeInitDir, initFilename, callback)](#new_module_system..Loader_new)
             * _static_
                 * [.getFile(rootDir, relativeDir, file)](#module_system..Loader.getFile) ⇒ <code>external.Promise</code>
-                * [.toRelative(rootDir, target)](#module_system..Loader.toRelative) ⇒ <code>external.Promise</code>
-                * [.join(rootDir, target)](#module_system..Loader.join) ⇒ <code>external.Promise</code>
+                * [.toRelative(dir, target)](#module_system..Loader.toRelative) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+                * [.join(rootDir, target)](#module_system..Loader.join) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
                 * [.isFile(rootDir, relativeDir, filename)](#module_system..Loader.isFile) ⇒ <code>boolean</code>
                 * [.isDir(rootDir, relativeDir)](#module_system..Loader.isDir) ⇒ <code>boolean</code>
                 * [.list(rootDir, relativeDir)](#module_system..Loader.list) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
@@ -602,8 +602,8 @@ Required by system to perform file initialization.
     * [new Loader(rootDir, relativeInitDir, initFilename, callback)](#new_module_system..Loader_new)
     * _static_
         * [.getFile(rootDir, relativeDir, file)](#module_system..Loader.getFile) ⇒ <code>external.Promise</code>
-        * [.toRelative(rootDir, target)](#module_system..Loader.toRelative) ⇒ <code>external.Promise</code>
-        * [.join(rootDir, target)](#module_system..Loader.join) ⇒ <code>external.Promise</code>
+        * [.toRelative(dir, target)](#module_system..Loader.toRelative) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+        * [.join(rootDir, target)](#module_system..Loader.join) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
         * [.isFile(rootDir, relativeDir, filename)](#module_system..Loader.isFile) ⇒ <code>boolean</code>
         * [.isDir(rootDir, relativeDir)](#module_system..Loader.isDir) ⇒ <code>boolean</code>
         * [.list(rootDir, relativeDir)](#module_system..Loader.list) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
@@ -636,38 +636,76 @@ Gets file contents.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| rootDir | <code>string</code> | Root directory. |
+| rootDir | <code>string</code> | Absolute root directory. |
 | relativeDir | <code>string</code> | Directory relative to root. |
 | file | <code>string</code> | Full file name. |
 
+**Example** *(Usage)*  
+```js
+// Load files
+var grapefruitJuicer = Loader.getFile("c:\machines", "appliances", "grapefruitJuicer.txt");
+
+// Output the result
+grapefruitJuicer.then(function(result){ // grapefruitJuicer - on resolve
+  console.log(result);
+}, function(error){ // grapefruitJuicer - on reject
+  console.error("Could not load a file.");
+});
+
+// Input - grapefruitJuicer.txt
+// 1000W powerful juicer
+
+// Output
+// 1000W powerful juicer
+```
 <a name="module_system..Loader.toRelative"></a>
 
-## Loader.toRelative(rootDir, target) ⇒ <code>external.Promise</code>
+## Loader.toRelative(dir, target) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 
-Converts absolute path to relative path.
+Extracts relative path from rootDir to target.
 
 **Kind**: static method of [<code>Loader</code>](#module_system..Loader)  
-**Returns**: <code>external.Promise</code> - Relative path|paths.  
+**Returns**: [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) - Relative path|paths.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| rootDir | <code>string</code> | Absolute folder. |
+| dir | <code>string</code> | Source folder. |
 | target | <code>string</code> \| <code>Array.&lt;string&gt;</code> | File/folder name|names. |
 
+**Example** *(Usage)*  
+```js
+// Convert path and output the result
+Loader.toRelative("c:\machines\refrigerators", "c:\machines\appliances").then(function(result){
+  console.log(result);
+});
+
+// Output
+// ..\appliances
+```
 <a name="module_system..Loader.join"></a>
 
-## Loader.join(rootDir, target) ⇒ <code>external.Promise</code>
+## Loader.join(rootDir, target) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 
-Convert a file/folder or array of files/folders to absolute(system absolute) path.
+Join a root directory with a file/folder or an array of files/folders to absolute path.
 
 **Kind**: static method of [<code>Loader</code>](#module_system..Loader)  
-**Returns**: <code>external.Promise</code> - Absolute path|paths.  
+**Returns**: [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) - Absolute path|paths.  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | rootDir | <code>string</code> | Root folder. |
 | target | <code>string</code> \| <code>Array.&lt;string&gt;</code> | File/folder name|names. |
 
+**Example** *(Usage)*  
+```js
+// Join and log result
+Loader.join("c:\machines", "appliances").then(function(result){
+  console.log(result)
+});
+
+// Output
+// c:\machines\appliances
+```
 <a name="module_system..Loader.isFile"></a>
 
 ## Loader.isFile(rootDir, relativeDir, filename) ⇒ <code>boolean</code>
@@ -683,6 +721,19 @@ Checks if is a file
 | relativeDir | <code>string</code> | Relative directory to root. |
 | filename | <code>string</code> | Full filename. |
 
+**Example** *(Usage)*  
+```js
+// Verify file
+Loader.isFile("c:\machines","appliances","grapefruitJuicer.txt").then(function(result){
+  console.log(result);
+});
+
+// Input - grapefruitJuicer.txt
+// 1000W powerful juicer
+
+// Output
+// true
+```
 <a name="module_system..Loader.isDir"></a>
 
 ## Loader.isDir(rootDir, relativeDir) ⇒ <code>boolean</code>
@@ -697,6 +748,19 @@ Checks if is a directory.
 | rootDir | <code>string</code> | Absolute root directory. |
 | relativeDir | <code>string</code> | Relative directory to root. |
 
+**Example** *(Usage)*  
+```js
+// Verify directory
+Loader.isDir("c:\machines\appliances","grapefruitJuicer.txt").then(function(result){
+  console.log(result);
+});
+
+// Input - grapefruitJuicer.txt
+// 1000W powerful juicer
+
+// Output
+// false
+```
 <a name="module_system..Loader.list"></a>
 
 ## Loader.list(rootDir, relativeDir) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
@@ -711,6 +775,18 @@ Returns an array of strings, representing the contents of a folder.
 | rootDir | <code>string</code> | Root directory. |
 | relativeDir | <code>string</code> | Relative directory. |
 
+**Example** *(Usage)*  
+```js
+// List directory contents
+Loader.list("c:","machines").then(function(result){
+  console.log(result);
+}, function(error){
+  console.error("Folder not found.");
+});
+
+// Output
+// ["machines", "appliances"]
+```
 <a name="module_system..Loader.yamlToObject"></a>
 
 ## Loader.yamlToObject(string) ⇒ <code>Object</code>
@@ -724,6 +800,14 @@ Converts YAML string to a JS object.
 | --- | --- | --- |
 | string | <code>string</code> | YAML string. |
 
+**Example** *(Usage)*  
+```js
+// Ouput conversion of YAML to JSON
+console.log(Loader.yamlToObject("Wine: Red"));
+
+// Output
+// {"Wine": "Red"}
+```
 <a name="module_system..Loader..initRecursion"></a>
 
 ## Loader~initRecursion(rootDir, relativePath, initFilename, targetObject, extend) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)

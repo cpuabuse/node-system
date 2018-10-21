@@ -32,10 +32,26 @@ class Loader{
 
 	/**
 	 * Gets file contents.
-	 * @param {string} rootDir Root directory.
+	 * @param {string} rootDir Absolute root directory.
 	 * @param {string} relativeDir Directory relative to root.
 	 * @param {string} file Full file name.
 	 * @returns {external.Promise} File contents.
+	 * @example <caption>Usage</caption>
+	 * // Load files
+	 * var grapefruitJuicer = Loader.getFile("c:\machines", "appliances", "grapefruitJuicer.txt");
+	 *
+	 * // Output the result
+	 * grapefruitJuicer.then(function(result){ // grapefruitJuicer - on resolve
+	 *   console.log(result);
+	 * }, function(error){ // grapefruitJuicer - on reject
+	 *   console.error("Could not load a file.");
+	 * });
+	 *
+	 * // Input - grapefruitJuicer.txt
+	 * // 1000W powerful juicer
+	 *
+	 * // Output
+	 * // 1000W powerful juicer
 	 */
 	static getFile(rootDir, relativeDir, file){
 		return new Promise(function(resolve, reject){
@@ -50,34 +66,50 @@ class Loader{
 	}
 
 	/**
-	 * Converts absolute path to relative path.
-	 * @param {string} rootDir Absolute folder.
+	 * Extracts relative path from rootDir to target.
+	 * @param {string} dir Source folder.
 	 * @param {string|string[]} target File/folder name|names.
-	 * @returns {external.Promise} Relative path|paths.
+	 * @returns {external:Promise} Relative path|paths.
+	 * @example <caption>Usage</caption>
+	 * // Convert path and output the result
+	 * Loader.toRelative("c:\machines\refrigerators", "c:\machines\appliances").then(function(result){
+	 *   console.log(result);
+	 * });
+	 *
+	 * // Output
+	 * // ..\appliances
 	 */
-	static toRelative(rootDir, target){
+	static toRelative(dir, target){
 		return new Promise(function(resolve){
 			if (Array.isArray(target)){
 				var targets = new Array(); // Prepare the return array
 
 				// Populate return array
 				target.forEach(function(_target){
-					targets.push(path.relative(rootDir, _target));
+					targets.push(path.relative(dir, _target));
 				})
 				// Resolve with the array
 				resolve(targets);
 			} else {
 				// Resolve with a string
-				resolve(path.relative(rootDir, target));
+				resolve(path.relative(dir, target));
 			}
 		});
 	}
 
 	/**
-	 * Convert a file/folder or array of files/folders to absolute(system absolute) path.
+	 * Join a root directory with a file/folder or an array of files/folders to absolute path.
 	 * @param {string} rootDir Root folder.
 	 * @param {string|string[]} target File/folder name|names.
-	 * @returns {external.Promise} Absolute path|paths.
+	 * @returns {external:Promise} Absolute path|paths.
+	 * @example <caption>Usage</caption>
+	 * // Join and log result
+	 * Loader.join("c:\machines", "appliances").then(function(result){
+	 *   console.log(result)
+	 * });
+	 *
+	 * // Output
+	 * // c:\machines\appliances
 	 */
 	static join(rootDir, target){
 		return new Promise(function(resolve){
@@ -104,6 +136,17 @@ class Loader{
 	 * @param {string} relativeDir Relative directory to root.
 	 * @param {string} filename Full filename.
 	 * @returns {boolean} Returns `true` if a file, `false` if not.
+	 * @example <caption>Usage</caption>
+	 * // Verify file
+	 * Loader.isFile("c:\machines","appliances","grapefruitJuicer.txt").then(function(result){
+	 *   console.log(result);
+	 * });
+	 *
+	 * // Input - grapefruitJuicer.txt
+	 * // 1000W powerful juicer
+	 *
+	 * // Output
+	 * // true
 	 */
 	static isFile(rootDir, relativeDir, filename){
 		return new Promise(function(resolve){
@@ -122,6 +165,17 @@ class Loader{
 	 * @param {string} rootDir Absolute root directory.
 	 * @param {string} relativeDir Relative directory to root.
 	 * @returns {boolean} Returns `true` if a directory, `false` if not.
+	 * @example <caption>Usage</caption>
+	 * // Verify directory
+	 * Loader.isDir("c:\machines\appliances","grapefruitJuicer.txt").then(function(result){
+	 *   console.log(result);
+	 * });
+	 *
+	 * // Input - grapefruitJuicer.txt
+	 * // 1000W powerful juicer
+	 *
+	 * // Output
+	 * // false
 	 */
 	static isDir(rootDir, relativeDir){
 		return new Promise(function(resolve){
@@ -140,6 +194,16 @@ class Loader{
 	 * @param {string} rootDir Root directory.
 	 * @param {string} relativeDir Relative directory.
 	 * @returns {external:Promise} Array with contents; Rejects with errors from [fs.readdir](https://nodejs.org/api/fs.html#fs_fs_readdir_path_options_callback).
+	 * @example <caption>Usage</caption>
+	 * // List directory contents
+	 * Loader.list("c:","machines").then(function(result){
+	 *   console.log(result);
+	 * }, function(error){
+	 *   console.error("Folder not found.");
+	 * });
+	 *
+	 * // Output
+	 * // ["machines", "appliances"]
 	 */
 	static list(rootDir, relativeDir){
 		return new Promise(function(resolve, reject){
@@ -157,6 +221,12 @@ class Loader{
 	 * Converts YAML string to a JS object.
 	 * @param {string} string YAML string.
 	 * @returns {Object} Javascript object.
+	 * @example <caption>Usage</caption>
+	 * // Ouput conversion of YAML to JSON
+	 * console.log(Loader.yamlToObject("Wine: Red"));
+	 *
+	 * // Output
+	 * // {"Wine": "Red"}
 	 */
 	static yamlToObject(string){
 		return yaml.load(string);
