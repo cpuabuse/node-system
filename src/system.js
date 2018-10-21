@@ -99,7 +99,7 @@ class System extends loader.Loader{
 				if(behaviors){
 					this.addBehaviors(behaviors).then(() => this.fire(events.systemLoad));
 				} else {
-					this.fire(events.systemLoad);
+					this.fire(events.systemLoad, "System loading complete.");
 				}
 			});
 		});
@@ -282,7 +282,7 @@ class System extends loader.Loader{
 	addError(code, message){
 		if(this.system.error.hasOwnProperty(code)){
 			// Fire an error event that error already exists
-			this.fire(events.errorExists);
+			this.fire(events.errorExists, "Error to be added already exists.");
 		} else {
 			this.system.error[code] = new systemError.SystemError(code, message);
 		}
@@ -292,12 +292,11 @@ class System extends loader.Loader{
 	 * Adds behaviors to the system, and fires post-addtion events.
 	 * Firstly, this function attempts to add the behaviors.
 	 * When the behavior addition has been processed, the function will attempt to fire post-addition events, depending on success/failure of behavior additions.
-	 * Logically the two stage separation should be done with promises, but due to huge overhead of promises and low total processing required, it will be simplified to syncronous.
 	 * @instance
 	 * @param {module:system.System~behavior[]} behaviors
-	 * @fires module:system.System~behavior_attach
-	 * @fires module:system.System~behavior_attach_fail
-	 * @fires module:system.System~behavior_attach_request_fail
+	 * @fires module:system.System#events#behaviorAttach
+	 * @fires module:system.System#events#behaviorAttachFail
+	 * @fires module:system.System#events#behaviorAttachRequestFail
 	 */
 	async addBehaviors(behaviors){
 		if(Array.isArray(behaviors)){ // Sanity check - is an array
@@ -326,15 +325,15 @@ class System extends loader.Loader{
 					return null;
 				}).map(element => { // Loop - post-attachment event fire
 					if(element === null){
-						this.fire("behavior_attach_fail", "Request garbage");
+						this.fire(events.behaviorAttachFail, "Behavior could not be added.");
 						return Promise.resolve();
 					} else if (element.behaviorAdded){
-						this.fire("behavior_attach", element.key);
+						this.fire(events.behaviorAttach, element.key);
 						return element.behaviorAdded;
 					}
 
 					// Behavior not added
-					this.fire("behavior_attach_fail", "Event not described.");
+					this.fire(events.behaviorAttachRequestFail, "Event not described.");
 					return Promise.resolve();
 				}));
 
@@ -344,12 +343,12 @@ class System extends loader.Loader{
 		}
 
 		// Behaviors not an array || empty array
-		this.fire("behavior_attach_request_fail");
+		this.fire(events.behaviorAttachRequestFail, "Incorrect request.");
 	} // <== addBehaviors
 
 	/** Log message from the System context
 	 * @instance
-	 * @param {String} text - Message
+	 * @param {string} text - Message
 	 * @fires module:system.System~type_error
 	 */
 	log(text){
@@ -366,20 +365,22 @@ class System extends loader.Loader{
 	/**
 	 * Fires a system event
 	 * @instance
-	 * @param {String} name - Event name, as specified in {@link module:system.System#events}.
-	 * @param {String=} message - [Optional] Message is not strictly required, but preferred. If not specified, will assume value of the name
-	 * @throws {external:Error} Will throw `error_hell`. The inability to process error - if {@link module:system.System~event_fail} event fails.
+	 * @param {string} name - Event name, as specified in {@link module:system.System#events}.
+	 * @param {string=} message - [Optional] Message is not strictly required, but preferred. If not specified, will assume value of the name
+	 * @throws {external:Error} Will throw `error_hell`. The inability to process error - if {@link module:system.System#events#event:eventFail} event fails.
+	 * @fires module:system.System#events#eventFail
 	 */
 	fire(name, message){
-		let event_absent = "event_absent";
-		let event_fail = "event_fail";
+		const eventAbsent = "event_absent";
+		const errorHell = "error_hell";
+
 		try{
 			let event;
 
 			// Verify event exists
 			if(!this.events.hasOwnProperty(name)){
 				// throw new system error
-				throw new systemError.SystemError(this, "event_absent", "Could not fire an event that is not described.");
+				throw new systemError.SystemError(this, eventAbsent, "Could not fire an event that is not described.");
 			}
 
 			// Locate event
@@ -407,72 +408,29 @@ class System extends loader.Loader{
 			// Callback
 		} catch (error) {
 			let noFail = true;
-			if(name == event_fail){
+			if(name == events.eventFail){
 				noFail = false;
 			}
-			if(name == event_absent){
+			if(name == eventAbsent){
 				if(systemError.SystemError.isSystemError(error)){
-					if(error.code == event_absent){
+					if(error.code == eventAbsent){
 						noFail = false;
 					}
 				}
 			}
 			if(noFail){
-				this.fire(event_fail);
+				this.fire(events.eventFail);
 			} else {
-				throw ("error_hell");
+				throw (errorHell);
 			}
 		}
 	} // <== fire
-
-	/**
-	 * Create and process an error
-	 * @instance
-	 * @param {String} code
-	 * @param {String} message
-	 */
-	processNewSystemError(code, message){
-		this.processError(new systemError.SystemError(this, code, message));
-	}
-
-	/**
-	 * Process a system error - log, behavior or further throw
-	 * @instance
-	 * @param {(module:system~SystemError|String)} error - SystemError error or error text
-	 */
-	processError(error){
-		// First things first, decide on how this was called
-		if (error instanceof systemError.SystemError){ // We process it as plain system error
-			let final_text = this.system.id + ": "; // To go to std_err
-			try {
-				// Try to set a behavior or something...
-				let {behavior} = this.errors[error.code];
-				if(typeof behavior === "string"){
-					this.behave(behavior);
-				}
-
-				// Set text for error log
-				final_text += this.errors[error.code].text + " - " + error.message;
-			} catch (exception){
-				// Complete final text
-				final_text += "Error hell."
-
-				// This will generate an exception out of system context since "null" as argument will generate a throw
-				this.processNewSystemError(null, "Error hell");
-			} finally {
-				// Finaly log the error
-				System.error(final_text);
-			}
-		} else { // Out of context
-			throw error;
-		}
-	}
 
 	// FIXME: Do event type right; Add check that behavior exists
 	/**
 	 * Emit an event as a behavior.
 	 * @instance
-	 * @param {event} event
+	 * @param {string} event Behavior name.
 	 */
 	behave(event){
 		if (typeof this.behaviors[event] !== "undefined"){
@@ -483,23 +441,28 @@ class System extends loader.Loader{
 		this.system.behavior.behave(event);
 	}
 
-	on(event,callback){
+	/**
+	 * Adds a behavior bound to "this".
+	 * @param {string} event Behavior name.
+	 * @param {function} callback Behavior.
+	 */
+	static on(event, callback){
 		let behavior = {};
-		behavior[event] = callback;
+		behavior[event] = () => callback(this);
 		this.addBehaviors(behavior);
 	}
 
-	/** Access stderr
-	 * @static
-	 * @param {String} text
+	/**
+	 * Access stderr
+	 * @param {string} text
 	 */
 	static error(text){
 		console.error("[Error] " + text);
 	}
 
-	/** Access stdout
-	 * @static
-	 * @param {String} text
+	/**
+	 * Access stdout
+	 * @param {string} text
 	 */
 	static log(text){
 		console.log("[OK] " + text);

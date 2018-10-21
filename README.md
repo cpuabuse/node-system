@@ -33,6 +33,11 @@ System is intended more than anything, for centralized managment.
                 * *[.events](#module_system.System+events) : <code>Object</code>*
                     * *["errorExists"](#module_system.System+events+event_errorExists)*
                     * *["systemLoad"](#module_system.System+events+event_systemLoad)*
+                    * *["behaviorAttach"](#module_system.System+events+event_behaviorAttach)*
+                    * *["behaviorAttachFail"](#module_system.System+events+event_behaviorAttachFail)*
+                    * *["behaviorAttachRequestFail"](#module_system.System+events+event_behaviorAttachRequestFail)*
+                    * *["typeError"](#module_system.System+events+event_typeError)*
+                    * *["eventFail"](#module_system.System+events+event_eventFail)*
                 * *[.behaviors](#module_system.System+behaviors) : <code>Object</code>*
                 * [.system](#module_system.System+system) : [<code>options</code>](#module_system.System..options)
                     * [.file](#module_system.System+system+file) : <code>Object</code>
@@ -47,11 +52,10 @@ System is intended more than anything, for centralized managment.
                 * [.addBehaviors(behaviors)](#module_system.System+addBehaviors)
                 * [.log(text)](#module_system.System+log)
                 * [.fire(name, [message])](#module_system.System+fire)
-                * [.processNewSystemError(code, message)](#module_system.System+processNewSystemError)
-                * [.processError(error)](#module_system.System+processError)
                 * [.behave(event)](#module_system.System+behave)
             * _static_
                 * [.checkOptionsFailure(options)](#module_system.System.checkOptionsFailure) ⇒ <code>boolean</code>
+                * [.on(event, callback)](#module_system.System.on)
                 * [.error(text)](#module_system.System.error)
                 * [.log(text)](#module_system.System.log)
             * _inner_
@@ -114,6 +118,11 @@ Throws standard error if failed to perform basic initializations, or system fail
         * *[.events](#module_system.System+events) : <code>Object</code>*
             * *["errorExists"](#module_system.System+events+event_errorExists)*
             * *["systemLoad"](#module_system.System+events+event_systemLoad)*
+            * *["behaviorAttach"](#module_system.System+events+event_behaviorAttach)*
+            * *["behaviorAttachFail"](#module_system.System+events+event_behaviorAttachFail)*
+            * *["behaviorAttachRequestFail"](#module_system.System+events+event_behaviorAttachRequestFail)*
+            * *["typeError"](#module_system.System+events+event_typeError)*
+            * *["eventFail"](#module_system.System+events+event_eventFail)*
         * *[.behaviors](#module_system.System+behaviors) : <code>Object</code>*
         * [.system](#module_system.System+system) : [<code>options</code>](#module_system.System..options)
             * [.file](#module_system.System+system+file) : <code>Object</code>
@@ -128,11 +137,10 @@ Throws standard error if failed to perform basic initializations, or system fail
         * [.addBehaviors(behaviors)](#module_system.System+addBehaviors)
         * [.log(text)](#module_system.System+log)
         * [.fire(name, [message])](#module_system.System+fire)
-        * [.processNewSystemError(code, message)](#module_system.System+processNewSystemError)
-        * [.processError(error)](#module_system.System+processError)
         * [.behave(event)](#module_system.System+behave)
     * _static_
         * [.checkOptionsFailure(options)](#module_system.System.checkOptionsFailure) ⇒ <code>boolean</code>
+        * [.on(event, callback)](#module_system.System.on)
         * [.error(text)](#module_system.System.error)
         * [.log(text)](#module_system.System.log)
     * _inner_
@@ -172,6 +180,11 @@ System by itself does not deal with events, it only confirms that the events wer
 * *[.events](#module_system.System+events) : <code>Object</code>*
     * *["errorExists"](#module_system.System+events+event_errorExists)*
     * *["systemLoad"](#module_system.System+events+event_systemLoad)*
+    * *["behaviorAttach"](#module_system.System+events+event_behaviorAttach)*
+    * *["behaviorAttachFail"](#module_system.System+events+event_behaviorAttachFail)*
+    * *["behaviorAttachRequestFail"](#module_system.System+events+event_behaviorAttachRequestFail)*
+    * *["typeError"](#module_system.System+events+event_typeError)*
+    * *["eventFail"](#module_system.System+events+event_eventFail)*
 
 <a name="module_system.System+events+event_errorExists"></a>
 
@@ -190,6 +203,51 @@ Fires at the end of system load, so it is safe to execute code in the then() dir
 
 **Kind**: event emitted by [<code>events</code>](#module_system.System+events)  
 **Default**: <code>system_load</code>  
+<a name="module_system.System+events+event_behaviorAttach"></a>
+
+## *"behaviorAttach"*
+
+System load event.
+Fires at the end of system load, so it is safe to execute code in the then() directive of behavior associated.
+
+**Kind**: event emitted by [<code>events</code>](#module_system.System+events)  
+**Default**: <code>behavior_attach</code>  
+<a name="module_system.System+events+event_behaviorAttachFail"></a>
+
+## *"behaviorAttachFail"*
+
+System load event.
+Fires at the end of system load, so it is safe to execute code in the then() directive of behavior associated.
+
+**Kind**: event emitted by [<code>events</code>](#module_system.System+events)  
+**Default**: <code>behavior_attach_fail</code>  
+<a name="module_system.System+events+event_behaviorAttachRequestFail"></a>
+
+## *"behaviorAttachRequestFail"*
+
+System load event.
+Fires at the end of system load, so it is safe to execute code in the then() directive of behavior associated.
+
+**Kind**: event emitted by [<code>events</code>](#module_system.System+events)  
+**Default**: <code>behavior_attach_request_fail</code>  
+<a name="module_system.System+events+event_typeError"></a>
+
+## *"typeError"*
+
+System load event.
+Fires at the end of system load, so it is safe to execute code in the then() directive of behavior associated.
+
+**Kind**: event emitted by [<code>events</code>](#module_system.System+events)  
+**Default**: <code>type_error</code>  
+<a name="module_system.System+events+event_eventFail"></a>
+
+## *"eventFail"*
+
+System load event.
+Fires at the end of system load, so it is safe to execute code in the then() directive of behavior associated.
+
+**Kind**: event emitted by [<code>events</code>](#module_system.System+events)  
+**Default**: <code>event_fail</code>  
 <a name="module_system.System+behaviors"></a>
 
 ## *system.behaviors : <code>Object</code>*
@@ -360,10 +418,9 @@ Adds an error to the System dynamically
 Adds behaviors to the system, and fires post-addtion events.
 Firstly, this function attempts to add the behaviors.
 When the behavior addition has been processed, the function will attempt to fire post-addition events, depending on success/failure of behavior additions.
-Logically the two stage separation should be done with promises, but due to huge overhead of promises and low total processing required, it will be simplified to syncronous.
 
 **Kind**: instance method of [<code>System</code>](#module_system.System)  
-**Emits**: [<code>behavior_attach</code>](#module_system.System..event_behavior_attach), [<code>behavior_attach_fail</code>](#module_system.System..event_behavior_attach_fail), [<code>behavior_attach_request_fail</code>](#module_system.System..event_behavior_attach_request_fail)  
+**Emits**: [<code>behaviorAttach</code>](#module_system.System+events+event_behaviorAttach), [<code>behaviorAttachFail</code>](#module_system.System+events+event_behaviorAttachFail), [<code>behaviorAttachRequestFail</code>](#module_system.System+events+event_behaviorAttachRequestFail)  
 
 | Param | Type |
 | --- | --- |
@@ -380,7 +437,7 @@ Log message from the System context
 
 | Param | Type | Description |
 | --- | --- | --- |
-| text | <code>String</code> | Message |
+| text | <code>string</code> | Message |
 
 <a name="module_system.System+fire"></a>
 
@@ -391,38 +448,14 @@ Fires a system event
 **Kind**: instance method of [<code>System</code>](#module_system.System)  
 **Throws**:
 
-- [<code>Error</code>](https://nodejs.org/api/errors.html#errors_class_error) Will throw `error_hell`. The inability to process error - if [module:system.System~event_fail](module:system.System~event_fail) event fails.
+- [<code>Error</code>](https://nodejs.org/api/errors.html#errors_class_error) Will throw `error_hell`. The inability to process error - if [eventFail](#module_system.System+events+event_eventFail) event fails.
 
-
-| Param | Type | Description |
-| --- | --- | --- |
-| name | <code>String</code> | Event name, as specified in [events](#module_system.System+events). |
-| [message] | <code>String</code> | [Optional] Message is not strictly required, but preferred. If not specified, will assume value of the name |
-
-<a name="module_system.System+processNewSystemError"></a>
-
-## system.processNewSystemError(code, message)
-
-Create and process an error
-
-**Kind**: instance method of [<code>System</code>](#module_system.System)  
-
-| Param | Type |
-| --- | --- |
-| code | <code>String</code> | 
-| message | <code>String</code> | 
-
-<a name="module_system.System+processError"></a>
-
-## system.processError(error)
-
-Process a system error - log, behavior or further throw
-
-**Kind**: instance method of [<code>System</code>](#module_system.System)  
+**Emits**: [<code>eventFail</code>](#module_system.System+events+event_eventFail)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| error | [<code>SystemError</code>](#module_system..SystemError) \| <code>String</code> | SystemError error or error text |
+| name | <code>string</code> | Event name, as specified in [events](#module_system.System+events). |
+| [message] | <code>string</code> | [Optional] Message is not strictly required, but preferred. If not specified, will assume value of the name |
 
 <a name="module_system.System+behave"></a>
 
@@ -432,9 +465,9 @@ Emit an event as a behavior.
 
 **Kind**: instance method of [<code>System</code>](#module_system.System)  
 
-| Param | Type |
-| --- | --- |
-| event | <code>event</code> | 
+| Param | Type | Description |
+| --- | --- | --- |
+| event | <code>string</code> | Behavior name. |
 
 <a name="module_system.System.checkOptionsFailure"></a>
 
@@ -449,6 +482,19 @@ Checks options argument for missing incorrect property types
 | --- | --- | --- |
 | options | <code>module:system~System~options</code> | System options argument |
 
+<a name="module_system.System.on"></a>
+
+## System.on(event, callback)
+
+Adds a behavior bound to "this".
+
+**Kind**: static method of [<code>System</code>](#module_system.System)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| event | <code>string</code> | Behavior name. |
+| callback | <code>function</code> | Behavior. |
+
 <a name="module_system.System.error"></a>
 
 ## System.error(text)
@@ -459,7 +505,7 @@ Access stderr
 
 | Param | Type |
 | --- | --- |
-| text | <code>String</code> | 
+| text | <code>string</code> | 
 
 <a name="module_system.System.log"></a>
 
@@ -471,7 +517,7 @@ Access stdout
 
 | Param | Type |
 | --- | --- |
-| text | <code>String</code> | 
+| text | <code>string</code> | 
 
 <a name="module_system.System..event_behavior_attach"></a>
 
