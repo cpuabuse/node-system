@@ -8,7 +8,7 @@
  * Extended system error class.
  * @inner
  * @memberof module:system
- * @extends external:error
+ * @extends external:Error
  */
 class SystemError extends Error{
 	/**

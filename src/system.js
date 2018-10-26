@@ -109,7 +109,6 @@ class System extends loader.Loader{
 		 * @type {module:system.System~options}
 		 * @readonly
 		 * @property {module:system~Behavior} behavior Event emitter for the behaviors. Generally should use the public system instance methods instead.
-		 * @property {object} error Contains throwables.
 		 */
 		this.system = {
 			id: options.id,
@@ -119,6 +118,13 @@ class System extends loader.Loader{
 			notMute: options.notMute
 		};
 		this.system.behavior = new behavior.Behavior();
+		/**
+		 * @abstract
+		 * @instance
+		 * @type {Object}
+		 * @member error
+		 * @memberof module:system.System#system
+		 */
 		this.system.error = new Object();
 
 		/**
@@ -426,19 +432,23 @@ class System extends loader.Loader{
 		}
 	} // <== fire
 
-	// FIXME: Do event type right; Add check that behavior exists
 	/**
 	 * Emit an event as a behavior.
 	 * @instance
 	 * @param {string} event Behavior name.
+	 * @throws {module:system~SystemError} Throws {@link module:system.System#system#error#behavior_does_not_exist} if the behavior is not in the behavior list.
 	 */
 	behave(event){
-		if (typeof this.behaviors[event] !== "undefined"){
-			this.log("Behavior - " + this.behaviors[event].text);
-		} else { // Complain about undocumented behaviors
-			this.log("Behavior - Undocumented behavior - " + event)
+		if(this.behaviors.hasOwnProperty(event)){
+			if (typeof this.behaviors[event] !== "undefined"){
+				this.log("Behavior - " + this.behaviors[event].text);
+			} else { // Complain about undocumented behaviors
+				this.log("Behavior - Undocumented behavior - " + event)
+			}
+			this.system.behavior.behave(event);
+		} else {
+			throw this.error.behavior_does_not_exist;
 		}
-		this.system.behavior.behave(event);
 	}
 
 	/**

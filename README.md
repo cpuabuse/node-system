@@ -40,6 +40,8 @@ System is intended more than anything, for centralized managment.
                     * *["eventFail"](#module_system.System+events+event_eventFail)*
                 * *[.behaviors](#module_system.System+behaviors) : <code>Object</code>*
                 * [.system](#module_system.System+system) : [<code>options</code>](#module_system.System..options)
+                    * *[.error](#module_system.System+system+error) : <code>Object</code>*
+                        * *[.behavior_does_not_exist](#module_system.System+system+error+behavior_does_not_exist) : [<code>SystemError</code>](#module_system..SystemError)*
                     * [.file](#module_system.System+system+file) : <code>Object</code>
                         * [.filter](#module_system.System+system+file+filter) : <code>Object</code>
                             * [.isFile(folder, file)](#module_system.System+system+file+filter+isFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
@@ -86,7 +88,7 @@ System is intended more than anything, for centralized managment.
                 * [~initRecursion(rootDir, relativePath, initFilename, targetObject, extend)](#module_system..Loader..initRecursion) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
                 * [~initSettings(rootDir, initPath, filename)](#module_system..Loader..initSettings) ⇒ <code>Object</code>
                 * [~loadYaml(rootDir, relativeDir, filename)](#module_system..Loader..loadYaml) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-        * [~SystemError](#module_system..SystemError) ⇐ <code>external:error</code>
+        * [~SystemError](#module_system..SystemError) ⇐ [<code>Error</code>](https://nodejs.org/api/errors.html#errors_class_error)
             * [new SystemError(code, message)](#new_module_system..SystemError_new)
             * _instance_
                 * [.code](#module_system..SystemError+code) : <code>string</code> ℗
@@ -125,6 +127,8 @@ Throws standard error if failed to perform basic initializations, or system fail
             * *["eventFail"](#module_system.System+events+event_eventFail)*
         * *[.behaviors](#module_system.System+behaviors) : <code>Object</code>*
         * [.system](#module_system.System+system) : [<code>options</code>](#module_system.System..options)
+            * *[.error](#module_system.System+system+error) : <code>Object</code>*
+                * *[.behavior_does_not_exist](#module_system.System+system+error+behavior_does_not_exist) : [<code>SystemError</code>](#module_system..SystemError)*
             * [.file](#module_system.System+system+file) : <code>Object</code>
                 * [.filter](#module_system.System+system+file+filter) : <code>Object</code>
                     * [.isFile(folder, file)](#module_system.System+system+file+filter+isFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
@@ -268,10 +272,11 @@ Contains system info.
 | Name | Type | Description |
 | --- | --- | --- |
 | behavior | [<code>Behavior</code>](#module_system..Behavior) | Event emitter for the behaviors. Generally should use the public system instance methods instead. |
-| error | <code>object</code> | Contains throwables. |
 
 
 * [.system](#module_system.System+system) : [<code>options</code>](#module_system.System..options)
+    * *[.error](#module_system.System+system+error) : <code>Object</code>*
+        * *[.behavior_does_not_exist](#module_system.System+system+error+behavior_does_not_exist) : [<code>SystemError</code>](#module_system..SystemError)*
     * [.file](#module_system.System+system+file) : <code>Object</code>
         * [.filter](#module_system.System+system+file+filter) : <code>Object</code>
             * [.isFile(folder, file)](#module_system.System+system+file+filter+isFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
@@ -281,6 +286,16 @@ Contains system info.
         * [.getFile(dir, file)](#module_system.System+system+file+getFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
         * [.list(dir, file)](#module_system.System+system+file+list) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 
+<a name="module_system.System+system+error"></a>
+
+## *system.error : <code>Object</code>*
+
+**Kind**: instance abstract property of [<code>system</code>](#module_system.System+system)  
+<a name="module_system.System+system+error+behavior_does_not_exist"></a>
+
+## *error.behavior_does_not_exist : [<code>SystemError</code>](#module_system..SystemError)*
+
+**Kind**: instance property of [<code>error</code>](#module_system.System+system+error)  
 <a name="module_system.System+system+file"></a>
 
 ## system.file : <code>Object</code>
@@ -464,6 +479,10 @@ Fires a system event
 Emit an event as a behavior.
 
 **Kind**: instance method of [<code>System</code>](#module_system.System)  
+**Throws**:
+
+- [<code>SystemError</code>](#module_system..SystemError) - [behavior_does_not_exist](#module_system.System+system+error+behavior_does_not_exist) - The behavior is not in the behavior list.
+
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -955,14 +974,14 @@ Parses YAML file, and returns and object; Adds extension if absent.
 
 <a name="module_system..SystemError"></a>
 
-## system~SystemError ⇐ <code>external:error</code>
+## system~SystemError ⇐ [<code>Error</code>](https://nodejs.org/api/errors.html#errors_class_error)
 
 Extended system error class.
 
 **Kind**: inner class of [<code>system</code>](#module_system)  
-**Extends**: <code>external:error</code>  
+**Extends**: [<code>Error</code>](https://nodejs.org/api/errors.html#errors_class_error)  
 
-* [~SystemError](#module_system..SystemError) ⇐ <code>external:error</code>
+* [~SystemError](#module_system..SystemError) ⇐ [<code>Error</code>](https://nodejs.org/api/errors.html#errors_class_error)
     * [new SystemError(code, message)](#new_module_system..SystemError_new)
     * _instance_
         * [.code](#module_system..SystemError+code) : <code>string</code> ℗
