@@ -18,6 +18,10 @@ static | `.` | Default
 inner | `~` | `@inner`<br>`@memberof module:myModule~myMember`
 instance | `#` | `@instance`
 
+** Structure **
+
+![Structure](https://s3.ap-northeast-2.amazonaws.com/file.cpuabuse.com/public/boop/imageset/programming/site/2018-10-26/4d3f5711c3c47d3eb60a7c08281aa2a2.png)
+
 <a name="module_system"></a>
 
 ## system
@@ -53,6 +57,7 @@ System is intended more than anything, for centralized managment.
                 * [.addError(code, message)](#module_system.System+addError)
                 * [.addBehaviors(behaviors)](#module_system.System+addBehaviors)
                 * [.log(text)](#module_system.System+log)
+                * [.error(text)](#module_system.System+error)
                 * [.fire(name, [message])](#module_system.System+fire)
                 * [.behave(event)](#module_system.System+behave)
             * _static_
@@ -61,11 +66,6 @@ System is intended more than anything, for centralized managment.
                 * [.error(text)](#module_system.System.error)
                 * [.log(text)](#module_system.System.log)
             * _inner_
-                * ["behavior_attach"](#module_system.System..event_behavior_attach)
-                * ["behavior_attach_fail"](#module_system.System..event_behavior_attach_fail)
-                * ["behavior_attach_request_fail"](#module_system.System..event_behavior_attach_request_fail)
-                * ["type_error"](#module_system.System..event_type_error)
-                * ["event_fail"](#module_system.System..event_event_fail)
                 * [~options](#module_system.System..options) : <code>Object</code>
                 * [~behavior](#module_system.System..behavior) : <code>Object</code>
         * [.AtomicLock](#module_system.AtomicLock)
@@ -140,6 +140,7 @@ Throws standard error if failed to perform basic initializations, or system fail
         * [.addError(code, message)](#module_system.System+addError)
         * [.addBehaviors(behaviors)](#module_system.System+addBehaviors)
         * [.log(text)](#module_system.System+log)
+        * [.error(text)](#module_system.System+error)
         * [.fire(name, [message])](#module_system.System+fire)
         * [.behave(event)](#module_system.System+behave)
     * _static_
@@ -148,11 +149,6 @@ Throws standard error if failed to perform basic initializations, or system fail
         * [.error(text)](#module_system.System.error)
         * [.log(text)](#module_system.System.log)
     * _inner_
-        * ["behavior_attach"](#module_system.System..event_behavior_attach)
-        * ["behavior_attach_fail"](#module_system.System..event_behavior_attach_fail)
-        * ["behavior_attach_request_fail"](#module_system.System..event_behavior_attach_request_fail)
-        * ["type_error"](#module_system.System..event_type_error)
-        * ["event_fail"](#module_system.System..event_event_fail)
         * [~options](#module_system.System..options) : <code>Object</code>
         * [~behavior](#module_system.System..behavior) : <code>Object</code>
 
@@ -448,7 +444,20 @@ When the behavior addition has been processed, the function will attempt to fire
 Log message from the System context
 
 **Kind**: instance method of [<code>System</code>](#module_system.System)  
-**Emits**: [<code>type_error</code>](#module_system.System..event_type_error)  
+**Emits**: <code>module:system.System~event:type_error</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| text | <code>string</code> | Message |
+
+<a name="module_system.System+error"></a>
+
+## system.error(text)
+
+Log an error  message from the System context
+
+**Kind**: instance method of [<code>System</code>](#module_system.System)  
+**Emits**: <code>module:system.System~event:type_error</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -481,7 +490,7 @@ Emit an event as a behavior.
 **Kind**: instance method of [<code>System</code>](#module_system.System)  
 **Throws**:
 
-- [<code>SystemError</code>](#module_system..SystemError) - [behavior_does_not_exist](#module_system.System+system+error+behavior_does_not_exist) - The behavior is not in the behavior list.
+- [<code>SystemError</code>](#module_system..SystemError) Throws [behavior_does_not_exist](#module_system.System+system+error+behavior_does_not_exist) if the behavior is not in the behavior list.
 
 
 | Param | Type | Description |
@@ -538,31 +547,6 @@ Access stdout
 | --- | --- |
 | text | <code>string</code> | 
 
-<a name="module_system.System..event_behavior_attach"></a>
-
-## "behavior_attach"
-
-**Kind**: event emitted by [<code>System</code>](#module_system.System)  
-<a name="module_system.System..event_behavior_attach_fail"></a>
-
-## "behavior_attach_fail"
-
-**Kind**: event emitted by [<code>System</code>](#module_system.System)  
-<a name="module_system.System..event_behavior_attach_request_fail"></a>
-
-## "behavior_attach_request_fail"
-
-**Kind**: event emitted by [<code>System</code>](#module_system.System)  
-<a name="module_system.System..event_type_error"></a>
-
-## "type_error"
-
-**Kind**: event emitted by [<code>System</code>](#module_system.System)  
-<a name="module_system.System..event_event_fail"></a>
-
-## "event_fail"
-
-**Kind**: event emitted by [<code>System</code>](#module_system.System)  
 <a name="module_system.System..options"></a>
 
 ## System~options : <code>Object</code>
