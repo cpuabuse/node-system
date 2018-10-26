@@ -352,7 +352,8 @@ class System extends loader.Loader{
 		this.fire(events.behaviorAttachRequestFail, "Incorrect request.");
 	} // <== addBehaviors
 
-	/** Log message from the System context
+	/**
+	 * Log message from the System context
 	 * @instance
 	 * @param {string} text - Message
 	 * @fires module:system.System~type_error
@@ -361,6 +362,23 @@ class System extends loader.Loader{
 		if (typeof text === "string"){
 			if(this.system.notMute){
 				System.log(this.system.id + ": " + text);
+			}
+		} else {
+			// TODO: fix report text etc
+			this.fire("type_error", typeof text + " not string.");
+		}
+	} // <== log
+
+	/**
+	 * Log an error  message from the System context
+	 * @instance
+	 * @param {string} text - Message
+	 * @fires module:system.System~type_error
+	 */
+	error(text){
+		if (typeof text === "string"){
+			if(this.system.notMute){
+				System.error(this.system.id + ": " + text);
 			}
 		} else {
 			// TODO: fix report text etc
@@ -413,6 +431,7 @@ class System extends loader.Loader{
 			}
 			// Callback
 		} catch (error) {
+			console.log(error)
 			let noFail = true;
 			if(name == events.eventFail){
 				noFail = false;
@@ -439,16 +458,12 @@ class System extends loader.Loader{
 	 * @throws {module:system~SystemError} Throws {@link module:system.System#system#error#behavior_does_not_exist} if the behavior is not in the behavior list.
 	 */
 	behave(event){
-		if(this.behaviors.hasOwnProperty(event)){
-			if (typeof this.behaviors[event] !== "undefined"){
-				this.log("Behavior - " + this.behaviors[event].text);
-			} else { // Complain about undocumented behaviors
-				this.log("Behavior - Undocumented behavior - " + event)
-			}
-			this.system.behavior.behave(event);
-		} else {
-			throw this.error.behavior_does_not_exist;
+		try{
+			this.log("Behavior - " + this.behaviors[event].text);
+		} catch(error){
+			this.log("Behavior - Undocumented behavior - " + event)
 		}
+		this.system.behavior.behave(event);
 	}
 
 	/**
