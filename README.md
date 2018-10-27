@@ -18,7 +18,7 @@ static | `.` | Default
 inner | `~` | `@inner`<br>`@memberof module:myModule~myMember`
 instance | `#` | `@instance`
 
-** Structure **
+**Structure**
 
 ![Structure](https://s3.ap-northeast-2.amazonaws.com/file.cpuabuse.com/public/boop/imageset/programming/site/2018-10-26/4d3f5711c3c47d3eb60a7c08281aa2a2.png)
 
@@ -488,10 +488,6 @@ Fires a system event
 Emit an event as a behavior.
 
 **Kind**: instance method of [<code>System</code>](#module_system.System)  
-**Throws**:
-
-- [<code>SystemError</code>](#module_system..SystemError) Throws [behavior_does_not_exist](#module_system.System+system+error+behavior_does_not_exist) if the behavior is not in the behavior list.
-
 
 | Param | Type | Description |
 | --- | --- | --- |
