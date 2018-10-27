@@ -455,7 +455,6 @@ class System extends loader.Loader{
 	 * Emit an event as a behavior.
 	 * @instance
 	 * @param {string} event Behavior name.
-	 * @throws {module:system~SystemError} Throws {@link module:system.System#system#error#behavior_does_not_exist} if the behavior is not in the behavior list.
 	 */
 	behave(event){
 		try{

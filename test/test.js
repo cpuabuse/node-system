@@ -65,9 +65,9 @@ describe("System", function() {
 	var systems = [
 		{ // Flower shop
 			options: {
-				id: flowerShopId,
+				id: "example",
 				rootDir: "./test",
-				relativeInitDir: "flowerShop",
+				relativeInitDir: "example",
 				initFilename: "init",
 				notMute: false
 			}
@@ -79,6 +79,9 @@ describe("System", function() {
 				relativeInitDir: "flowerShop",
 				initFilename: "init",
 				notMute: false
+			},
+			error: {
+
 			}
 		}
 	]
@@ -109,38 +112,40 @@ describe("System", function() {
 					});
 				});
 
-				describe("error", function() {
-					describe("all_flowers_gone", function() {
-						// It should be a SystemError
-						it("should be SystemError", function(done){
-							systemTestLoad.then(function(){
-								if (systemError.SystemError.isSystemError(systemTest.system.error.all_flowers_gone)){
-									done();
-								}
+				if(element.hasOwnProperty("error")){
+					describe("error", function() {
+						describe("all_flowers_gone", function() {
+							// It should be a SystemError
+							it("should be SystemError", function(done){
+								systemTestLoad.then(function(){
+									if (systemError.SystemError.isSystemError(systemTest.system.error.all_flowers_gone)){
+										done();
+									}
+								});
+							});
+							it("should be " + flowerShopErrorCode, function(done) {
+								systemTestLoad.then(function(){
+									try {
+										throw systemTest.system.error.all_flowers_gone;
+									} catch(error){
+										assert.equal(error.code, flowerShopErrorCode);
+										done();
+									}
+								})
 							});
 						});
-						it("should be " + flowerShopErrorCode, function(done) {
-							systemTestLoad.then(function(){
-								try {
-									throw systemTest.system.error.all_flowers_gone;
-								} catch(error){
-									assert.equal(error.code, flowerShopErrorCode);
-									done();
-								}
-							})
-						});
-					});
 
-					describe("carShopError", function(){
-						it("should not be SystemError", function(done){
-							systemTestLoad.then(function(){
-								if(!systemError.SystemError.isSystemError("carShopError")){
-									done();
-								}
+						describe("carShopError", function(){
+							it("should not be SystemError", function(done){
+								systemTestLoad.then(function(){
+									if(!systemError.SystemError.isSystemError("carShopError")){
+										done();
+									}
+								})
 							})
 						})
-					})
-				});
+					});
+				}
 			});
 		});
 	});
