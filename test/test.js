@@ -61,9 +61,11 @@ describe("Loader", function() {
 	});
 });
 
+// System Instances
 describe("System", function() {
+	// Array of testing unit initialization data
 	var systems = [
-		{ // Flower shop
+		{ // Example
 			options: {
 				id: "example",
 				rootDir: "./test",
@@ -72,7 +74,7 @@ describe("System", function() {
 				notMute: false
 			}
 		},
-		{ // Example
+		{ // Flower shop
 			options: {
 				id: flowerShop2Id,
 				rootDir: "./test",
@@ -81,14 +83,17 @@ describe("System", function() {
 				notMute: false
 			},
 			error: {
-
+				errorInstances: ["all_flowers_gone"],
+				stringErrors: ["carShopError"]
 			}
 		}
 	]
 
 	systems.forEach(function(element) {
 		describe(element.options.id, function(){
-			let systemTest;
+			let systemTest; // Variable for the instance of the System class
+
+			// Promise that will resolve on system_load
 			let systemTestLoad = new Promise(function(resolve){
 				systemTest = new system.System(
 					element.options,
@@ -102,7 +107,9 @@ describe("System", function() {
 				);
 			});
 
+			// System property of System instance
 			describe("#system", function(){
+				// System instance ID
 				describe("id", function(){
 					it("should be " + element.options.id, function(done) {
 						systemTestLoad.then(function(){
@@ -112,38 +119,55 @@ describe("System", function() {
 					});
 				});
 
+				/*
+					Perform test only on units that have the error property.
+					Iterate through "errorInstances" array, if present, and check that respective errors are indeed of type SystemError.
+					Iterate through "stringErrors" array, if present, and check that respective errors are not of type SystemError.
+				*/
 				if(element.hasOwnProperty("error")){
 					describe("error", function() {
-						describe("all_flowers_gone", function() {
-							// It should be a SystemError
-							it("should be SystemError", function(done){
-								systemTestLoad.then(function(){
-									if (systemError.SystemError.isSystemError(systemTest.system.error.all_flowers_gone)){
-										done();
-									}
+						if (element.error.hasOwnProperty("errorInstances")){
+							describe("errorInstances", function(){
+								element.error.errorInstances.forEach(function(error){
+									describe(error, function() {
+										// It should be a SystemError
+										it("should be SystemError", function(done){
+											systemTestLoad.then(function(){
+												if (systemError.SystemError.isSystemError(systemTest.system.error[error])){
+													done();
+												}
+											});
+										});
+										it("should be " + error, function(done) {
+											systemTestLoad.then(function(){
+												try {
+													throw systemTest.system.error[error];
+												} catch(err){
+													assert.equal(err.code, error);
+													done();
+												}
+											});
+										});
+									});
 								});
 							});
-							it("should be " + flowerShopErrorCode, function(done) {
-								systemTestLoad.then(function(){
-									try {
-										throw systemTest.system.error.all_flowers_gone;
-									} catch(error){
-										assert.equal(error.code, flowerShopErrorCode);
-										done();
-									}
-								})
-							});
-						});
+						}
 
-						describe("carShopError", function(){
-							it("should not be SystemError", function(done){
-								systemTestLoad.then(function(){
-									if(!systemError.SystemError.isSystemError("carShopError")){
-										done();
-									}
-								})
-							})
-						})
+						if (element.error.hasOwnProperty("stringErrors")){
+							describe("stringErrors", function(){
+								element.error.stringErrors.forEach(function(error){
+									describe(error, function(){
+										it("should not be SystemError", function(done){
+											systemTestLoad.then(function(){
+												if(!systemError.SystemError.isSystemError(error)){
+													done();
+												}
+											});
+										});
+									});
+								});
+							});
+						}
 					});
 				}
 			});
