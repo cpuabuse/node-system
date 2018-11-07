@@ -55,7 +55,7 @@ class Loader{
 	 */
 	static getFile(rootDir, relativeDir, file){
 		return new Promise(function(resolve, reject){
-			return fs.readFile(path.join(rootDir, relativeDir, file), "utf8", function(err, data){
+			return fs.readFile(path.join(rootDir, relativeDir, file), function(err, data){
 				if (err){
 					reject(err);
 				} else {

@@ -17,6 +17,8 @@ const waitTime = 10;
 /**
  * Creates an instance of AtomicLock.
  * It is not intended to be actually used for parallel processing, and mutual exlusion. It is intended for abstraction of atomic logic more than anything.
+ * 
+ * Note: To be eventually split into a primitive lock to objectify the functionality of a lock, and a lock with timout and a queue.
  * @memberof module:system
  */
 class AtomicLock {
