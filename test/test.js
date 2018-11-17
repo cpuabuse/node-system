@@ -20,7 +20,6 @@ const system 				= require("../src/system.js");
 const systemError		= require("../src/error.js");
 const loader 	= require("../src/loader.js");
 const assert 				= require("assert");
-const starsFolderItemsAmount = 3;
 const waitTime = 200;
 const flowerShopErrorCode = "all_flowers_gone";
 const flowerShopId = "flower_shop";
@@ -39,72 +38,100 @@ process.on("unhandledRejection", up => {
  * @memberof module:system~test
  */
 describe("Loader", function() {
-	describe("stars", function(){
-		let stars;
-		let load = new Promise(function(resolve){
-			stars = new loader.Loader("./test", "stars", "stars", load => {
-				load.then(() => {
-					resolve();
+	var loaders = [
+		// Stars
+		{
+			name: "Stars",
+			rootDir: "test",
+			dir: "stars",
+			file: "stars",
+			filesAndFoldersAmount: 3,
+			compare: [
+				{
+					child: "sol",
+					grandchild: "planet2",
+					value: "Earth"
+				},
+				{
+					child: "sol",
+					grandchild: "planet3",
+					value: "Mars"
+				}
+			]
+		}
+	];
+	loaders.forEach(function(element){
+		describe(element.name, function(){
+			let loaderTest;
+			let load = new Promise(function(resolve){
+				loaderTest = new loader.Loader(element.rootDir, element.dir, element.file, load => {
+					load.then(() => {
+						resolve();
+					});
 				});
 			});
-		});
 
-		describe("#sol", function() {
-			describe("planet2", function() {
-				it("should be Earth", function(done) {
-					load.then(function(){
-						assert.equal(stars.sol.planet2, "Earth");
+			if(element.hasOwnProperty("compare")){
+				if(element.compare.length > 0){
+					element.compare.forEach(function(compare){
+						describe("#" + compare.child + "." + compare.grandchild, function() {
+							it("should be " + compare.value, function(done) {
+								load.then(function(){
+									assert.equal(loaderTest[compare.child][compare.grandchild], compare.value);
+									done();
+								});
+							});
+						});
+					});
+				}
+			}
+
+			describe(".list(\"" + element.rootDir + "\", \"" + element.dir + "\")", function(){
+				// Test
+				let list = loader.Loader.list(element.rootDir, element.dir);
+
+				it("should have a length of " + element.filesAndFoldersAmount.toString(), function(done) {
+					list.then(function(result){
+						assert.equal(result.length, element.filesAndFoldersAmount);
 						done();
 					});
 				});
 			});
-		});
 
-		describe(".list()", function(){
-			// Test
-			let list = loader.Loader.list("./test", "stars");
-
-			it("should have a length of " + starsFolderItemsAmount.toString(), function(done) {
-				list.then(function(result){
-					assert.equal(result.length, starsFolderItemsAmount);
-					done();
+			/**
+			 * Tests the toRelative function.
+			 * @member toRelative
+			 * @memberof module:system~test.Loader
+			 */
+			describe(".toRelative(\"" + element.rootDir+ "\", \"" + element.rootDir + path.sep + element.dir + "\")", function(){
+				it("should be equal to " + element.dir, function(){
+					assert.equal(loader.Loader.toRelative(element.rootDir, element.rootDir + path.sep + element.dir), element.dir);
 				});
 			});
-		});
 
-		/**
-		 * Tests the toRelative function.
-		 * @member toRelative
-		 * @memberof module:system~test.Loader
-		 */
-		describe(".toRelative()", function(){
-			it("should be equal to stars", function(){
-				assert.equal(loader.Loader.toRelative("./test", "./test/stars"), "stars");
+			/**
+			 * Tests the join function.
+			 * @member join
+			 * @memberof module:system~test.Loader
+			 */
+			describe(".join()", function(){
+				it("should be equal to test/stars", function(){
+					assert.equal(loader.Loader.join("./test", "stars"), "test" + path.sep + "stars");
+				});
 			});
-		});
 
-		/**
-		 * Tests the join function.
-		 * @member join
-		 * @memberof module:system~test.Loader
-		 */
-		describe(".join()", function(){
-			it("should be equal to test/stars", function(){
-				assert.equal(loader.Loader.join("./test", "stars"), "test" + path.sep + "stars");
-			});
-		});
-
-		/**
-		 * Tests the isFile function.
-		 * @member isFile
-		 * @memberof module:system~test.Loader
-		 */
-		describe(".isFile()", function(){
-			let isFile = loader.Loader.isFile("./test","stars","stars.yml");
-			it("should be a file", function(done){
-				isFile.then(function(result){
-					assert.equal(result, true);
-					done();
+			/**
+			 * Tests the isFile function.
+			 * @member isFile
+			 * @memberof module:system~test.Loader
+			 */
+			describe(".isFile()", function(){
+				let isFile = loader.Loader.isFile("./test","stars","stars.yml");
+				it("should be a file", function(done){
+					isFile.then(function(result){
+						assert.equal(result, true);
+						done();
+					});
 				});
 			});
 		});
