@@ -45,6 +45,7 @@ describe("Loader", function() {
 			rootDir: "test",
 			dir: "stars",
 			file: "stars",
+			rawFilename: "stars.yml",
 			filesAndFoldersAmount: 3,
 			compare: [
 				{
@@ -103,7 +104,7 @@ describe("Loader", function() {
 			 * @member toRelative
 			 * @memberof module:system~test.Loader
 			 */
-			describe(".toRelative(\"" + element.rootDir+ "\", \"" + element.rootDir + path.sep + element.dir + "\")", function(){
+			describe(".toRelative(\"" + element.rootDir + "\", \"" + element.rootDir + path.sep + element.dir + "\")", function(){
 				it("should be equal to " + element.dir, function(){
 					assert.equal(loader.Loader.toRelative(element.rootDir, element.rootDir + path.sep + element.dir), element.dir);
 				});
@@ -114,9 +115,9 @@ describe("Loader", function() {
 			 * @member join
 			 * @memberof module:system~test.Loader
 			 */
-			describe(".join()", function(){
-				it("should be equal to test/stars", function(){
-					assert.equal(loader.Loader.join("./test", "stars"), "test" + path.sep + "stars");
+			describe(".join(\"" + element.rootDir + "\", \"" + element.dir + "\")", function(){
+				it("should be equal to " + element.rootDir + path.sep + element.dir, function(){
+					assert.equal(loader.Loader.join(element.rootDir, element.dir), element.rootDir + path.sep + element.dir);
 				});
 			});
 
@@ -125,8 +126,8 @@ describe("Loader", function() {
 			 * @member isFile
 			 * @memberof module:system~test.Loader
 			 */
-			describe(".isFile()", function(){
-				let isFile = loader.Loader.isFile("./test","stars","stars.yml");
+			describe(".isFile(\"" + element.rootDir + "\", \"" + element.dir + "\", \"" + element.rawFilename + "\")", function(){
+				let isFile = loader.Loader.isFile(element.rootDir, element.dir, element.rawFilename);
 				it("should be a file", function(done){
 					isFile.then(function(result){
 						assert.equal(result, true);
