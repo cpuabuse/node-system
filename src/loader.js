@@ -280,6 +280,19 @@ class Loader{
  *   file: xxx
  *   path: relative
  *   extend: true
+ * @example <caption>Usage</caption>
+ * // Input - ./settings/init.yml
+ * // settings:
+ * //   path: relative
+ *
+ * // Input - ./settings/settings.yml
+ * // apples: red
+ * // bananas: yellow
+ *
+ * // Target object to fill
+ * var targetObject = {};
+ *
+ * initRecursion("./", "settings", "init.yml", targetObject, true));
  */
 async function initRecursion(
 	rootDir,
@@ -367,6 +380,8 @@ async function initRecursion(
  * @param {string} initPath Relative directory to root.
  * @param {string} filename Filename.
  * @returns {Object} Javascript object with settings.
+ * @example <caption>Usage</caption>
+ * var settings = await initSettings("./", "settings", "settings");
  */
 async function initSettings(
 	rootDir,
@@ -391,6 +406,8 @@ async function initSettings(
  * @param {string} relativeDir Relative directory to root.
  * @param {string} filename Filename, with or without extension.
  * @returns {external:Promise} Javascript object.
+ * @example <caption>Usage</caption>
+ * var settings = await loadYaml("./", "settings", "settings");
  */
 async function loadYaml(rootDir, relativeDir, filename){
 	var fileExtension = ".yml"; // Making a variale for interpreted language like this would not even save any memory, but it feels right

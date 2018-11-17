@@ -102,6 +102,9 @@ System is intended more than anything, for centralized managment.
             * [.nextBehaviorCounter](#module_system..Behavior+nextBehaviorCounter) : <code>number</code> ℗
             * [.addBehavior(name, callback)](#module_system..Behavior+addBehavior) ⇒ <code>number</code>
             * [.behave(name)](#module_system..Behavior+behave)
+        * [~test](#module_system..test)
+            * [.Loader](#module_system..test.Loader)
+                * [.toRelative](#module_system..test.Loader.toRelative)
 
 <a name="module_system.System"></a>
 
@@ -198,8 +201,7 @@ Error could not be added, because error with same code already exists.
 
 ## *"systemLoad"*
 
-System load event.
-Fires at the end of system load, so it is safe to execute code in the then() directive of behavior associated.
+System load event. Fires at the end of system load, so it is safe to execute code in the then() directive of behavior associated.
 
 **Kind**: event emitted by [<code>events</code>](#module_system.System+events)  
 **Default**: <code>system_load</code>  
@@ -207,8 +209,7 @@ Fires at the end of system load, so it is safe to execute code in the then() dir
 
 ## *"behaviorAttach"*
 
-System load event.
-Fires at the end of system load, so it is safe to execute code in the then() directive of behavior associated.
+Behavior has been attached.
 
 **Kind**: event emitted by [<code>events</code>](#module_system.System+events)  
 **Default**: <code>behavior_attach</code>  
@@ -216,8 +217,7 @@ Fires at the end of system load, so it is safe to execute code in the then() dir
 
 ## *"behaviorAttachFail"*
 
-System load event.
-Fires at the end of system load, so it is safe to execute code in the then() directive of behavior associated.
+Behavior could not be attached.
 
 **Kind**: event emitted by [<code>events</code>](#module_system.System+events)  
 **Default**: <code>behavior_attach_fail</code>  
@@ -225,8 +225,7 @@ Fires at the end of system load, so it is safe to execute code in the then() dir
 
 ## *"behaviorAttachRequestFail"*
 
-System load event.
-Fires at the end of system load, so it is safe to execute code in the then() directive of behavior associated.
+Incorrect behavior attach request.
 
 **Kind**: event emitted by [<code>events</code>](#module_system.System+events)  
 **Default**: <code>behavior_attach_request_fail</code>  
@@ -234,8 +233,7 @@ Fires at the end of system load, so it is safe to execute code in the then() dir
 
 ## *"typeError"*
 
-System load event.
-Fires at the end of system load, so it is safe to execute code in the then() directive of behavior associated.
+Type error has been encountered.
 
 **Kind**: event emitted by [<code>events</code>](#module_system.System+events)  
 **Default**: <code>type_error</code>  
@@ -243,8 +241,7 @@ Fires at the end of system load, so it is safe to execute code in the then() dir
 
 ## *"eventFail"*
 
-System load event.
-Fires at the end of system load, so it is safe to execute code in the then() directive of behavior associated.
+Failed to fire an event.
 
 **Kind**: event emitted by [<code>events</code>](#module_system.System+events)  
 **Default**: <code>event_fail</code>  
@@ -587,6 +584,8 @@ amazing_behavior: (that) => {
 Creates an instance of AtomicLock.
 It is not intended to be actually used for parallel processing, and mutual exlusion. It is intended for abstraction of atomic logic more than anything.
 
+Note: To be eventually split into a primitive lock to objectify the functionality of a lock, and a lock with timout and a queue.
+
 **Kind**: static class of [<code>system</code>](#module_system)  
 
 * [.AtomicLock](#module_system.AtomicLock)
@@ -921,6 +920,21 @@ settings:
   path: relative
   extend: true
 ```
+**Example** *(Usage)*  
+```js
+// Input - ./settings/init.yml
+// settings:
+//   path: relative
+
+// Input - ./settings/settings.yml
+// apples: red
+// bananas: yellow
+
+// Target object to fill
+var targetObject = {};
+
+initRecursion("./", "settings", "init.yml", targetObject, true));
+```
 <a name="module_system..Loader..initSettings"></a>
 
 ## Loader~initSettings(rootDir, initPath, filename) ⇒ <code>Object</code>
@@ -937,6 +951,10 @@ Semantically this function has broader purpose than loadYaml.
 | initPath | <code>string</code> | Relative directory to root. |
 | filename | <code>string</code> | Filename. |
 
+**Example** *(Usage)*  
+```js
+var settings = await initSettings("./", "settings", "settings");
+```
 <a name="module_system..Loader..loadYaml"></a>
 
 ## Loader~loadYaml(rootDir, relativeDir, filename) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
@@ -952,6 +970,10 @@ Parses YAML file, and returns and object; Adds extension if absent.
 | relativeDir | <code>string</code> | Relative directory to root. |
 | filename | <code>string</code> | Filename, with or without extension. |
 
+**Example** *(Usage)*  
+```js
+var settings = await loadYaml("./", "settings", "settings");
+```
 <a name="module_system..SystemError"></a>
 
 ## system~SystemError ⇐ [<code>Error</code>](https://nodejs.org/api/errors.html#errors_class_error)
@@ -1129,3 +1151,29 @@ behavior.behave("hello_behavior");
 // Output:
 // "Hello World"
 ```
+<a name="module_system..test"></a>
+
+## system~test
+
+Series of tests for the system.
+
+**Kind**: inner property of [<code>system</code>](#module_system)  
+
+* [~test](#module_system..test)
+    * [.Loader](#module_system..test.Loader)
+        * [.toRelative](#module_system..test.Loader.toRelative)
+
+<a name="module_system..test.Loader"></a>
+
+## test.Loader
+
+Tests for the Loader class.
+
+**Kind**: static property of [<code>test</code>](#module_system..test)  
+<a name="module_system..test.Loader.toRelative"></a>
+
+## Loader.toRelative
+
+Tests the toRelative function.
+
+**Kind**: static property of [<code>Loader</code>](#module_system..test.Loader)  

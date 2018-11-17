@@ -5,6 +5,13 @@
 */
 "use strict";
 
+/**
+ * Series of tests for the system.
+ * @inner
+ * @member test
+ * @memberof module:system
+ */
+
 // Set eslint to ingore describe and it for assert
 /* global describe:true */
 /* global it:true */
@@ -25,6 +32,11 @@ process.on("unhandledRejection", up => {
 	throw up
 });
 
+/**
+ * Tests for the Loader class.
+ * @member Loader
+ * @memberof module:system~test
+ */
 describe("Loader", function() {
 	describe("stars", function(){
 		let stars;
@@ -42,7 +54,7 @@ describe("Loader", function() {
 					load.then(function(){
 						assert.equal(stars.sol.planet2, "Earth");
 						done();
-					})
+					});
 				});
 			});
 		});
@@ -55,9 +67,24 @@ describe("Loader", function() {
 				list.then(function(result){
 					assert.equal(result.length, starsFolderItemsAmount);
 					done();
+				});
+			});
+		});
+
+		/**
+		 * Tests the toRelative function.
+		 * @member toRelative
+		 * @memberof module:system~test.Loader
+		 */
+		describe(".toRelative()", function(){
+			let relative = loader.Loader.toRelative("./test", "./test/stars");
+			it("should be equal to stars", function(done){
+				relative.then(function(result){
+					assert.equal(result, "stars");
+					done();
 				})
 			});
-		})
+		});
 	});
 });
 
