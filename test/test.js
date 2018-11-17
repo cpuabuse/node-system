@@ -16,15 +16,12 @@
 /* global describe:true */
 /* global it:true */
 
-const system 				= require("../src/system.js");
-const systemError		= require("../src/error.js");
-const loader 	= require("../src/loader.js");
-const assert 				= require("assert");
+const system = require("../src/system.js");
+const systemError = require("../src/error.js");
+const loader = require("../src/loader.js");
+const assert = require("assert");
 const waitTime = 200;
-const flowerShopErrorCode = "all_flowers_gone";
-const flowerShopId = "flower_shop";
-const flowerShop2Id = "flower_shop2";
-const path 					= require("path");
+const path = require("path");
 
 
 // DEBUG: Devonly - promise throw
@@ -154,7 +151,7 @@ describe("System", function() {
 		},
 		{ // Flower shop
 			options: {
-				id: flowerShop2Id,
+				id: "flower_shop2",
 				rootDir: "./test",
 				relativeInitDir: "flowerShop",
 				initFilename: "init",
