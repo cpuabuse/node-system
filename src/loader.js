@@ -69,65 +69,57 @@ class Loader{
 	 * Extracts relative path from rootDir to target.
 	 * @param {string} dir Source folder.
 	 * @param {string|string[]} target File/folder name|names.
-	 * @returns {external:Promise} Relative path|paths.
+	 * @returns {string|string[]} Relative path|paths.
 	 * @example <caption>Usage</caption>
 	 * // Convert path and output the result
-	 * Loader.toRelative("c:\machines\refrigerators", "c:\machines\appliances").then(function(result){
-	 *   console.log(result);
-	 * });
+	 * console.log(Loader.toRelative("c:\machines\refrigerators", "c:\machines\appliances"));
 	 *
 	 * // Output
 	 * // ..\appliances
 	 */
 	static toRelative(dir, target){
-		return new Promise(function(resolve){
-			if (Array.isArray(target)){
-				var targets = new Array(); // Prepare the return array
+		if (Array.isArray(target)){
+			var targets = new Array(); // Prepare the return array
 
-				// Populate return array
-				target.forEach(function(_target){
-					targets.push(path.relative(dir, _target));
-				})
-				// Resolve with the array
-				resolve(targets);
-			} else {
-				// Resolve with a string
-				resolve(path.relative(dir, target));
-			}
-		});
+			// Populate return array
+			target.forEach(function(_target){
+				targets.push(path.relative(dir, _target));
+			})
+			// Return an array
+			return targets;
+		}
+
+		// Return a string if not an array
+		return path.relative(dir, target);
 	}
 
 	/**
 	 * Join a root directory with a file/folder or an array of files/folders to absolute path.
 	 * @param {string} rootDir Root folder.
 	 * @param {string|string[]} target File/folder name|names.
-	 * @returns {external:Promise} Absolute path|paths.
+	 * @returns {string|string[]} Absolute path|paths.
 	 * @example <caption>Usage</caption>
 	 * // Join and log result
-	 * Loader.join("c:\machines", "appliances").then(function(result){
-	 *   console.log(result)
-	 * });
+	 * console.log(Loader.join("c:\machines", "appliances"))
 	 *
 	 * // Output
 	 * // c:\machines\appliances
 	 */
 	static join(rootDir, target){
-		return new Promise(function(resolve){
-			if (Array.isArray(target)){
-				var targets = new Array(); // Prepare the return array
+		if (Array.isArray(target)){
+			var targets = new Array(); // Prepare the return array
 
-				// Populate return array
-				target.forEach(function(target){
-					targets.push(path.join(rootDir, target));
-				})
+			// Populate return array
+			target.forEach(function(target){
+				targets.push(path.join(rootDir, target));
+			})
 
-				// Resolve with the array
-				resolve(targets);
-			} else {
-				// Resolve with a string
-				resolve(path.join(rootDir, target));
-			}
-		});
+			// Return an array
+			return targets;
+		}
+
+		// Return a string if not an array
+		return path.join(rootDir, target);
 	}
 
 	/**

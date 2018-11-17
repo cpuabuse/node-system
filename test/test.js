@@ -25,6 +25,7 @@ const waitTime = 200;
 const flowerShopErrorCode = "all_flowers_gone";
 const flowerShopId = "flower_shop";
 const flowerShop2Id = "flower_shop2";
+const path 					= require("path");
 
 
 // DEBUG: Devonly - promise throw
@@ -77,12 +78,34 @@ describe("Loader", function() {
 		 * @memberof module:system~test.Loader
 		 */
 		describe(".toRelative()", function(){
-			let relative = loader.Loader.toRelative("./test", "./test/stars");
-			it("should be equal to stars", function(done){
-				relative.then(function(result){
-					assert.equal(result, "stars");
+			it("should be equal to stars", function(){
+				assert.equal(loader.Loader.toRelative("./test", "./test/stars"), "stars");
+			});
+		});
+
+		/**
+		 * Tests the join function.
+		 * @member join
+		 * @memberof module:system~test.Loader
+		 */
+		describe(".join()", function(){
+			it("should be equal to test/stars", function(){
+				assert.equal(loader.Loader.join("./test", "stars"), "test" + path.sep + "stars");
+			});
+		});
+
+		/**
+		 * Tests the isFile function.
+		 * @member isFile
+		 * @memberof module:system~test.Loader
+		 */
+		describe(".isFile()", function(){
+			let isFile = loader.Loader.isFile("./test","stars","stars.yml");
+			it("should be a file", function(done){
+				isFile.then(function(result){
+					assert.equal(result, true);
 					done();
-				})
+				});
 			});
 		});
 	});

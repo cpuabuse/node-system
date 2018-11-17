@@ -178,7 +178,11 @@ class System extends loader.Loader{
 			 * @param {string} target Absolute file/folder path.
 			 * @returns {external:Promise} Promise, containing string relative path.
 			*/
-			toRelative: (rootDir, target) => loader.Loader.toRelative(rootDir, target),
+			toRelative(rootDir, target){
+				return new Promise(function(resolve){
+					resolve(loader.Loader.toRelative(rootDir, target));
+				});
+			},
 			/**
 			 * Joins two paths.
 			 * @instance
@@ -190,7 +194,11 @@ class System extends loader.Loader{
 			 * @param {string} target File/folder path to rootDir.
 			 * @returns {external:Promise} Promise, containing string path.
 			*/
-			join: (rootDir, target) => loader.Loader.join(rootDir, target),
+			join(rootDir, target){
+				return new Promise(function(resolve){
+					resolve(loader.Loader.join(rootDir, target));
+				});
+			},
 			/**
 			 * Get file contents relative to system root directory.
 			 * @instance

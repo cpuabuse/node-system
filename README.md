@@ -105,6 +105,7 @@ System is intended more than anything, for centralized managment.
         * [~test](#module_system..test)
             * [.Loader](#module_system..test.Loader)
                 * [.toRelative](#module_system..test.Loader.toRelative)
+                * [.join](#module_system..test.Loader.join)
 
 <a name="module_system.System"></a>
 
@@ -1162,6 +1163,7 @@ Series of tests for the system.
 * [~test](#module_system..test)
     * [.Loader](#module_system..test.Loader)
         * [.toRelative](#module_system..test.Loader.toRelative)
+        * [.join](#module_system..test.Loader.join)
 
 <a name="module_system..test.Loader"></a>
 
@@ -1170,10 +1172,22 @@ Series of tests for the system.
 Tests for the Loader class.
 
 **Kind**: static property of [<code>test</code>](#module_system..test)  
+
+* [.Loader](#module_system..test.Loader)
+    * [.toRelative](#module_system..test.Loader.toRelative)
+    * [.join](#module_system..test.Loader.join)
+
 <a name="module_system..test.Loader.toRelative"></a>
 
 ## Loader.toRelative
 
 Tests the toRelative function.
+
+**Kind**: static property of [<code>Loader</code>](#module_system..test.Loader)  
+<a name="module_system..test.Loader.join"></a>
+
+## Loader.join
+
+Tests the join function.
 
 **Kind**: static property of [<code>Loader</code>](#module_system..test.Loader)  
