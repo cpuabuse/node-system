@@ -263,6 +263,18 @@ class System extends loader.Loader{
 	 * Checks options argument for missing incorrect property types
 	 * @param {module:system~System~options} options System options argument
 	 * @returns {boolean} Returns true if the arguments is corrupt; false if OK
+	 * @example <caption>Usage</caption>
+	 * var options = {
+	 *   id: "stars",
+	 *   rootDir: "test",
+	 *   relativeInitDir: "stars",
+	 *   initFilename: "stars.yml",
+	 *   notMute: true
+	 * };
+	 *
+	 * if (System.checkOptionsFailure(options)){
+	 *   throw new Error ("Options inconsistent.");
+	 * }
 	 */
 	static checkOptionsFailure(options){
 		let failed = false;
@@ -292,6 +304,19 @@ class System extends loader.Loader{
 	 * @param {string} code Error code
 	 * @param {string} message Error description
 	 * @fires module:system.System#events#errorExists
+	 * @example <caption>Usage</caption>
+	 * code = "no_beakers"
+	 * message = "Beakers out of stock."
+	 * var options = {
+	 *   id: "lab_inventory",
+	 *   rootDir: "labs",
+	 *   relativeInitDir: "black_mesa",
+	 *   initFilename: "inventory.yml",
+	 *   notMute: true
+	 * };
+	 * var labInventory = new System(options);
+	 *
+	 * labInventory.addError(code, message);
 	 */
 	addError(code, message){
 		if(this.system.error.hasOwnProperty(code)){
@@ -311,6 +336,25 @@ class System extends loader.Loader{
 	 * @fires module:system.System#events#behaviorAttach
 	 * @fires module:system.System#events#behaviorAttachFail
 	 * @fires module:system.System#events#behaviorAttachRequestFail
+	 * @example <caption>Usage</caption>
+	 * var options = {
+	 *   id: "lab_inventory",
+	 *   rootDir: "labs",
+	 *   relativeInitDir: "black_mesa",
+	 *   initFilename: "inventory.yml",
+	 *   notMute: true
+	 * };
+	 * var behavior = {
+	 *   "check_inventory": () => {
+	 *     // Behavior functionality
+	 *     // ...
+	 *   }
+	 * }
+	 *
+	 * var labInventory = new System(options);
+	 * labInventory.addBehaviors([behavior]).then(function(){
+	 *   console.log("Behavior added.");
+	 * });
 	 */
 	async addBehaviors(behaviors){
 		if(Array.isArray(behaviors)){ // Sanity check - is an array
@@ -365,6 +409,18 @@ class System extends loader.Loader{
 	 * @instance
 	 * @param {string} text - Message
 	 * @fires module:system.System~type_error
+	 * @example <caption>Usage</caption>
+	 * var options = {
+	 *   id: "lab_inventory",
+	 *   rootDir: "labs",
+	 *   relativeInitDir: "black_mesa",
+	 *   initFilename: "inventory.yml",
+	 *   notMute: true
+	 * };
+	 * var text = "Lab Inventory working.";
+	 *
+	 * var labInventory = new System(options);
+	 * labInventory.log(text);
 	 */
 	log(text){
 		if (typeof text === "string"){
@@ -382,6 +438,17 @@ class System extends loader.Loader{
 	 * @instance
 	 * @param {string} text - Message
 	 * @fires module:system.System~type_error
+	 * var options = {
+	 *   id: "lab_inventory",
+	 *   rootDir: "labs",
+	 *   relativeInitDir: "black_mesa",
+	 *   initFilename: "inventory.yml",
+	 *   notMute: true
+	 * };
+	 * var text = "Testing Lab Inventory error log.";
+	 *
+	 * var labInventory = new System(options);
+	 * labInventory.error(text);
 	 */
 	error(text){
 		if (typeof text === "string"){
