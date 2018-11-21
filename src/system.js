@@ -154,7 +154,7 @@ class System extends loader.Loader{
 				 * @param {string} file File or folder within root.
 				 * @returns {external:Promise} Promise, containing boolean result.
 				*/
-				isFile: (folder, file) => loader.SytemLoader.isFile(this.system.rootDir, folder, file),
+				isFile: filterContext => loader.Loader.isFile(this.system.rootDir, filterContext.dir, filterContext.itemName),
 				/**
 				 * Check if argument is a folder (relative to system root directory).
 				 * @instance
@@ -165,7 +165,7 @@ class System extends loader.Loader{
 				 * @param {string} dir Folder.
 				 * @returns {external:Promise} Promise, containing boolean result.
 				*/
-				isDir: dir => loader.Loader.isDir(this.system.rootDir, dir)
+				isDir: filterContext => loader.Loader.isDir(this.system.rootDir, filterContext.item)
 			},
 			/**
 			 * Converts absolute path to relative path.
@@ -211,6 +211,7 @@ class System extends loader.Loader{
 			 * @returns {external:Promise} Promise, containing string with file contents..
 			*/
 			getFile: (dir, file) => loader.Loader.getFile(this.system.rootDir, dir, file),
+			getYaml: (dir, file) => loader.loadYaml(this.system.rootDir, dir, file),
 			/**
 			 * List the contents of the folder, relative to system root directory.
 			 * @instance
@@ -226,8 +227,8 @@ class System extends loader.Loader{
 			 */
 			list: async(dir, filter) => {
 				let filteredItems; // Return array
-				let items = await loader.Loader.list(this.system.rootDir, dir); // Wait for folder contets
-				items = await this.system.file.join(dir, items);
+				let itemNames = await loader.Loader.list(this.system.rootDir, dir); // Wait for folder contets
+				let items = await this.system.file.join(dir, itemNames);
 
 				// Was the filter even specified?
 				if(filter !== null){
@@ -237,7 +238,13 @@ class System extends loader.Loader{
 
 					// Filter and populate promises
 					for (let i = 0; i < length; i++){
-						filterMatches[i] = filter(items[i]);
+						// Declare and populate filter context
+						var filterContext = {
+							dir,
+							itemName: itemNames[i],
+							item: items[i]
+						};
+						filterMatches[i] = filter(filterContext);
 					}
 
 					// Work on results
@@ -245,12 +252,12 @@ class System extends loader.Loader{
 						// Populate return object preserving the order
 						for (let i = 0; i < length; i++){
 							if(values[i]){
-								filteredItems.push(items[i]);
+								filteredItems.push(itemNames[i]);
 							}
 						}
 					});
 				} else { // <== if(filter !== null)
-					filteredItems = items;
+					filteredItems = itemNames;
 				}
 
 				// Finally - return filtered items
@@ -336,7 +343,7 @@ class System extends loader.Loader{
 	 * @fires module:system.System#events#behaviorAttach
 	 * @fires module:system.System#events#behaviorAttachFail
 	 * @fires module:system.System#events#behaviorAttachRequestFail
-	 * @example <caption>Usage</caption>
+* @example <caption>Usage</caption>
 	 * var options = {
 	 *   id: "lab_inventory",
 	 *   rootDir: "labs",

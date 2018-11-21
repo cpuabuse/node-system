@@ -420,4 +420,7 @@ async function loadYaml(rootDir, relativeDir, filename){
 	}
 }
 
-exports.Loader = Loader;
+module.exports = {
+	Loader,
+	loadYaml
+};
