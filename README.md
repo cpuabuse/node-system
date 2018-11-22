@@ -44,16 +44,16 @@ System is intended more than anything, for centralized managment.
                     * *["eventFail"](#module_system.System+events+event_eventFail)*
                 * *[.behaviors](#module_system.System+behaviors) : <code>Object</code>*
                 * [.system](#module_system.System+system) : [<code>options</code>](#module_system.System..options)
-                    * *[.error](#module_system.System+system+error) : <code>Object</code>*
-                        * *[.behavior_does_not_exist](#module_system.System+system+error+behavior_does_not_exist) : [<code>SystemError</code>](#module_system..SystemError)*
-                    * [.file](#module_system.System+system+file) : <code>Object</code>
-                        * [.filter](#module_system.System+system+file+filter) : <code>Object</code>
-                            * [.isFile(folder, file)](#module_system.System+system+file+filter+isFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-                            * [.isDir(dir)](#module_system.System+system+file+filter+isDir) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-                        * [.toRelative(rootDir, target)](#module_system.System+system+file+toRelative) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-                        * [.join(rootDir, target)](#module_system.System+system+file+join) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-                        * [.getFile(dir, file)](#module_system.System+system+file+getFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-                        * [.list(dir, file)](#module_system.System+system+file+list) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+                    * [.behavior](#module_system.System+system.behavior) : [<code>Behavior</code>](#module_system..Behavior)
+                    * *[.error](#module_system.System+system.error) : <code>Object</code>*
+                    * [.file](#module_system.System+system.file) : <code>Object</code>
+                        * [.filter](#module_system.System+system.file.filter) : <code>Object</code>
+                            * [.isFile(filterContext)](#module_system.System+system.file.filter.isFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+                            * [.isDir(filterContext)](#module_system.System+system.file.filter.isDir) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+                        * [.toRelative(rootDir, target)](#module_system.System+system.file.toRelative) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+                        * [.join(rootDir, target)](#module_system.System+system.file.join) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+                        * [.getFile(dir, file)](#module_system.System+system.file.getFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+                        * [.list(dir, file)](#module_system.System+system.file.list) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
                 * [.addError(code, message)](#module_system.System+addError)
                 * [.addBehaviors(behaviors)](#module_system.System+addBehaviors)
                 * [.log(text)](#module_system.System+log)
@@ -67,6 +67,7 @@ System is intended more than anything, for centralized managment.
                 * [.log(text)](#module_system.System.log)
             * _inner_
                 * [~options](#module_system.System..options) : <code>Object</code>
+                * [~filterContext](#module_system.System..filterContext) : <code>Object</code>
                 * [~behavior](#module_system.System..behavior) : <code>Object</code>
         * [.AtomicLock](#module_system.AtomicLock)
             * [new AtomicLock()](#new_module_system.AtomicLock_new)
@@ -78,8 +79,8 @@ System is intended more than anything, for centralized managment.
             * [new Loader(rootDir, relativeInitDir, initFilename, callback)](#new_module_system..Loader_new)
             * _static_
                 * [.getFile(rootDir, relativeDir, file)](#module_system..Loader.getFile) ⇒ <code>external.Promise</code>
-                * [.toRelative(dir, target)](#module_system..Loader.toRelative) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-                * [.join(rootDir, target)](#module_system..Loader.join) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+                * [.toRelative(dir, target)](#module_system..Loader.toRelative) ⇒ <code>string</code> \| <code>Array.&lt;string&gt;</code>
+                * [.join(rootDir, target)](#module_system..Loader.join) ⇒ <code>string</code> \| <code>Array.&lt;string&gt;</code>
                 * [.isFile(rootDir, relativeDir, filename)](#module_system..Loader.isFile) ⇒ <code>boolean</code>
                 * [.isDir(rootDir, relativeDir)](#module_system..Loader.isDir) ⇒ <code>boolean</code>
                 * [.list(rootDir, relativeDir)](#module_system..Loader.list) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
@@ -106,6 +107,7 @@ System is intended more than anything, for centralized managment.
             * [.Loader](#module_system..test.Loader)
                 * [.toRelative](#module_system..test.Loader.toRelative)
                 * [.join](#module_system..test.Loader.join)
+                * [.isFile](#module_system..test.Loader.isFile)
 
 <a name="module_system.System"></a>
 
@@ -131,16 +133,16 @@ Throws standard error if failed to perform basic initializations, or system fail
             * *["eventFail"](#module_system.System+events+event_eventFail)*
         * *[.behaviors](#module_system.System+behaviors) : <code>Object</code>*
         * [.system](#module_system.System+system) : [<code>options</code>](#module_system.System..options)
-            * *[.error](#module_system.System+system+error) : <code>Object</code>*
-                * *[.behavior_does_not_exist](#module_system.System+system+error+behavior_does_not_exist) : [<code>SystemError</code>](#module_system..SystemError)*
-            * [.file](#module_system.System+system+file) : <code>Object</code>
-                * [.filter](#module_system.System+system+file+filter) : <code>Object</code>
-                    * [.isFile(folder, file)](#module_system.System+system+file+filter+isFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-                    * [.isDir(dir)](#module_system.System+system+file+filter+isDir) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-                * [.toRelative(rootDir, target)](#module_system.System+system+file+toRelative) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-                * [.join(rootDir, target)](#module_system.System+system+file+join) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-                * [.getFile(dir, file)](#module_system.System+system+file+getFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-                * [.list(dir, file)](#module_system.System+system+file+list) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+            * [.behavior](#module_system.System+system.behavior) : [<code>Behavior</code>](#module_system..Behavior)
+            * *[.error](#module_system.System+system.error) : <code>Object</code>*
+            * [.file](#module_system.System+system.file) : <code>Object</code>
+                * [.filter](#module_system.System+system.file.filter) : <code>Object</code>
+                    * [.isFile(filterContext)](#module_system.System+system.file.filter.isFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+                    * [.isDir(filterContext)](#module_system.System+system.file.filter.isDir) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+                * [.toRelative(rootDir, target)](#module_system.System+system.file.toRelative) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+                * [.join(rootDir, target)](#module_system.System+system.file.join) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+                * [.getFile(dir, file)](#module_system.System+system.file.getFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+                * [.list(dir, file)](#module_system.System+system.file.list) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
         * [.addError(code, message)](#module_system.System+addError)
         * [.addBehaviors(behaviors)](#module_system.System+addBehaviors)
         * [.log(text)](#module_system.System+log)
@@ -154,6 +156,7 @@ Throws standard error if failed to perform basic initializations, or system fail
         * [.log(text)](#module_system.System.log)
     * _inner_
         * [~options](#module_system.System..options) : <code>Object</code>
+        * [~filterContext](#module_system.System..filterContext) : <code>Object</code>
         * [~behavior](#module_system.System..behavior) : <code>Object</code>
 
 <a name="new_module_system.System_new"></a>
@@ -269,90 +272,93 @@ Contains system info.
 
 
 * [.system](#module_system.System+system) : [<code>options</code>](#module_system.System..options)
-    * *[.error](#module_system.System+system+error) : <code>Object</code>*
-        * *[.behavior_does_not_exist](#module_system.System+system+error+behavior_does_not_exist) : [<code>SystemError</code>](#module_system..SystemError)*
-    * [.file](#module_system.System+system+file) : <code>Object</code>
-        * [.filter](#module_system.System+system+file+filter) : <code>Object</code>
-            * [.isFile(folder, file)](#module_system.System+system+file+filter+isFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-            * [.isDir(dir)](#module_system.System+system+file+filter+isDir) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-        * [.toRelative(rootDir, target)](#module_system.System+system+file+toRelative) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-        * [.join(rootDir, target)](#module_system.System+system+file+join) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-        * [.getFile(dir, file)](#module_system.System+system+file+getFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-        * [.list(dir, file)](#module_system.System+system+file+list) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+    * [.behavior](#module_system.System+system.behavior) : [<code>Behavior</code>](#module_system..Behavior)
+    * *[.error](#module_system.System+system.error) : <code>Object</code>*
+    * [.file](#module_system.System+system.file) : <code>Object</code>
+        * [.filter](#module_system.System+system.file.filter) : <code>Object</code>
+            * [.isFile(filterContext)](#module_system.System+system.file.filter.isFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+            * [.isDir(filterContext)](#module_system.System+system.file.filter.isDir) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+        * [.toRelative(rootDir, target)](#module_system.System+system.file.toRelative) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+        * [.join(rootDir, target)](#module_system.System+system.file.join) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+        * [.getFile(dir, file)](#module_system.System+system.file.getFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+        * [.list(dir, file)](#module_system.System+system.file.list) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 
-<a name="module_system.System+system+error"></a>
+<a name="module_system.System+system.behavior"></a>
+
+## system.behavior : [<code>Behavior</code>](#module_system..Behavior)
+
+Actual behaviors are located here.
+
+**Kind**: static property of [<code>system</code>](#module_system.System+system)  
+<a name="module_system.System+system.error"></a>
 
 ## *system.error : <code>Object</code>*
 
-**Kind**: instance abstract property of [<code>system</code>](#module_system.System+system)  
-<a name="module_system.System+system+error+behavior_does_not_exist"></a>
+Actual errors are located here.
 
-## *error.behavior_does_not_exist : [<code>SystemError</code>](#module_system..SystemError)*
-
-**Kind**: instance property of [<code>error</code>](#module_system.System+system+error)  
-<a name="module_system.System+system+file"></a>
+**Kind**: static abstract property of [<code>system</code>](#module_system.System+system)  
+<a name="module_system.System+system.file"></a>
 
 ## system.file : <code>Object</code>
 
 File system methods.
 
-**Kind**: instance property of [<code>system</code>](#module_system.System+system)  
+**Kind**: static property of [<code>system</code>](#module_system.System+system)  
 
-* [.file](#module_system.System+system+file) : <code>Object</code>
-    * [.filter](#module_system.System+system+file+filter) : <code>Object</code>
-        * [.isFile(folder, file)](#module_system.System+system+file+filter+isFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-        * [.isDir(dir)](#module_system.System+system+file+filter+isDir) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-    * [.toRelative(rootDir, target)](#module_system.System+system+file+toRelative) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-    * [.join(rootDir, target)](#module_system.System+system+file+join) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-    * [.getFile(dir, file)](#module_system.System+system+file+getFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-    * [.list(dir, file)](#module_system.System+system+file+list) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+* [.file](#module_system.System+system.file) : <code>Object</code>
+    * [.filter](#module_system.System+system.file.filter) : <code>Object</code>
+        * [.isFile(filterContext)](#module_system.System+system.file.filter.isFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+        * [.isDir(filterContext)](#module_system.System+system.file.filter.isDir) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+    * [.toRelative(rootDir, target)](#module_system.System+system.file.toRelative) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+    * [.join(rootDir, target)](#module_system.System+system.file.join) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+    * [.getFile(dir, file)](#module_system.System+system.file.getFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+    * [.list(dir, file)](#module_system.System+system.file.list) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 
-<a name="module_system.System+system+file+filter"></a>
+<a name="module_system.System+system.file.filter"></a>
 
 ## file.filter : <code>Object</code>
 
 File level filters.
 
-**Kind**: instance property of [<code>file</code>](#module_system.System+system+file)  
+**Kind**: static property of [<code>file</code>](#module_system.System+system.file)  
 
-* [.filter](#module_system.System+system+file+filter) : <code>Object</code>
-    * [.isFile(folder, file)](#module_system.System+system+file+filter+isFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-    * [.isDir(dir)](#module_system.System+system+file+filter+isDir) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+* [.filter](#module_system.System+system.file.filter) : <code>Object</code>
+    * [.isFile(filterContext)](#module_system.System+system.file.filter.isFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+    * [.isDir(filterContext)](#module_system.System+system.file.filter.isDir) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 
-<a name="module_system.System+system+file+filter+isFile"></a>
+<a name="module_system.System+system.file.filter.isFile"></a>
 
-## filter.isFile(folder, file) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+## filter.isFile(filterContext) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 
 Check if argument is a file (relative to system root directory).
 
-**Kind**: instance method of [<code>filter</code>](#module_system.System+system+file+filter)  
+**Kind**: static method of [<code>filter</code>](#module_system.System+system.file.filter)  
 **Returns**: [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) - Promise, containing boolean result.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| folder | <code>string</code> | Root folder. |
-| file | <code>string</code> | File or folder within root. |
+| filterContext | [<code>filterContext</code>](#module_system.System..filterContext) | Information on the item to be filtered. |
 
-<a name="module_system.System+system+file+filter+isDir"></a>
+<a name="module_system.System+system.file.filter.isDir"></a>
 
-## filter.isDir(dir) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+## filter.isDir(filterContext) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 
 Check if argument is a folder (relative to system root directory).
 
-**Kind**: instance method of [<code>filter</code>](#module_system.System+system+file+filter)  
+**Kind**: static method of [<code>filter</code>](#module_system.System+system.file.filter)  
 **Returns**: [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) - Promise, containing boolean result.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| dir | <code>string</code> | Folder. |
+| filterContext | [<code>filterContext</code>](#module_system.System..filterContext) | Information on the item to be filtered |
 
-<a name="module_system.System+system+file+toRelative"></a>
+<a name="module_system.System+system.file.toRelative"></a>
 
 ## file.toRelative(rootDir, target) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 
 Converts absolute path to relative path.
 
-**Kind**: instance method of [<code>file</code>](#module_system.System+system+file)  
+**Kind**: static method of [<code>file</code>](#module_system.System+system.file)  
 **Returns**: [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) - Promise, containing string relative path.  
 
 | Param | Type | Description |
@@ -360,13 +366,13 @@ Converts absolute path to relative path.
 | rootDir | <code>string</code> | Relative directory. |
 | target | <code>string</code> | Absolute file/folder path. |
 
-<a name="module_system.System+system+file+join"></a>
+<a name="module_system.System+system.file.join"></a>
 
 ## file.join(rootDir, target) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 
 Joins two paths.
 
-**Kind**: instance method of [<code>file</code>](#module_system.System+system+file)  
+**Kind**: static method of [<code>file</code>](#module_system.System+system.file)  
 **Returns**: [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) - Promise, containing string path.  
 
 | Param | Type | Description |
@@ -374,13 +380,13 @@ Joins two paths.
 | rootDir | <code>string</code> | Relative directory. |
 | target | <code>string</code> | File/folder path to rootDir. |
 
-<a name="module_system.System+system+file+getFile"></a>
+<a name="module_system.System+system.file.getFile"></a>
 
 ## file.getFile(dir, file) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 
 Get file contents relative to system root directory.
 
-**Kind**: instance method of [<code>file</code>](#module_system.System+system+file)  
+**Kind**: static method of [<code>file</code>](#module_system.System+system.file)  
 **Returns**: [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) - Promise, containing string with file contents..  
 
 | Param | Type | Description |
@@ -388,13 +394,13 @@ Get file contents relative to system root directory.
 | dir | <code>string</code> | Directory, relative to system root. |
 | file | <code>string</code> | Filename. |
 
-<a name="module_system.System+system+file+list"></a>
+<a name="module_system.System+system.file.list"></a>
 
 ## file.list(dir, file) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 
 List the contents of the folder, relative to system root directory.
 
-**Kind**: instance method of [<code>file</code>](#module_system.System+system+file)  
+**Kind**: static method of [<code>file</code>](#module_system.System+system.file)  
 **Returns**: [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) - Promise, containing an array of filtered strings - files/folders relative to system root.  
 
 | Param | Type | Description |
@@ -420,6 +426,21 @@ Adds an error to the System dynamically
 | code | <code>string</code> | Error code |
 | message | <code>string</code> | Error description |
 
+**Example** *(Usage)*  
+```js
+code = "no_beakers"
+message = "Beakers out of stock."
+var options = {
+  id: "lab_inventory",
+  rootDir: "labs",
+  relativeInitDir: "black_mesa",
+  initFilename: "inventory.yml",
+  notMute: true
+};
+var labInventory = new System(options);
+
+labInventory.addError(code, message);
+```
 <a name="module_system.System+addBehaviors"></a>
 
 ## system.addBehaviors(behaviors)
@@ -435,6 +456,27 @@ When the behavior addition has been processed, the function will attempt to fire
 | --- | --- |
 | behaviors | [<code>Array.&lt;behavior&gt;</code>](#module_system.System..behavior) | 
 
+**Example** *(Usage)*  
+```js
+var options = {
+  id: "lab_inventory",
+  rootDir: "labs",
+  relativeInitDir: "black_mesa",
+  initFilename: "inventory.yml",
+  notMute: true
+};
+var behavior = {
+  "check_inventory": () => {
+    // Behavior functionality
+    // ...
+  }
+}
+
+var labInventory = new System(options);
+labInventory.addBehaviors([behavior]).then(function(){
+  console.log("Behavior added.");
+});
+```
 <a name="module_system.System+log"></a>
 
 ## system.log(text)
@@ -448,6 +490,20 @@ Log message from the System context
 | --- | --- | --- |
 | text | <code>string</code> | Message |
 
+**Example** *(Usage)*  
+```js
+var options = {
+  id: "lab_inventory",
+  rootDir: "labs",
+  relativeInitDir: "black_mesa",
+  initFilename: "inventory.yml",
+  notMute: true
+};
+var text = "Lab Inventory working.";
+
+var labInventory = new System(options);
+labInventory.log(text);
+```
 <a name="module_system.System+error"></a>
 
 ## system.error(text)
@@ -455,7 +511,18 @@ Log message from the System context
 Log an error  message from the System context
 
 **Kind**: instance method of [<code>System</code>](#module_system.System)  
-**Emits**: <code>module:system.System~event:type_error</code>  
+**Emits**: <code>module:system.System~type_error
+var options &#x3D; {
+  id: &quot;lab_inventory&quot;,
+  rootDir: &quot;labs&quot;,
+  relativeInitDir: &quot;black_mesa&quot;,
+  initFilename: &quot;inventory.yml&quot;,
+  notMute: true
+};
+var text &#x3D; &quot;Testing Lab Inventory error log.&quot;;
+
+var labInventory &#x3D; new System(options);
+labInventory.error(text);event:</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -504,6 +571,20 @@ Checks options argument for missing incorrect property types
 | --- | --- | --- |
 | options | <code>module:system~System~options</code> | System options argument |
 
+**Example** *(Usage)*  
+```js
+var options = {
+  id: "stars",
+  rootDir: "test",
+  relativeInitDir: "stars",
+  initFilename: "stars.yml",
+  notMute: true
+};
+
+if (System.checkOptionsFailure(options)){
+  throw new Error ("Options inconsistent.");
+}
+```
 <a name="module_system.System.on"></a>
 
 ## System.on(event, callback)
@@ -556,7 +637,22 @@ System options
 | rootDir | <code>string</code> | The root directory for the System instance. |
 | relativeInitDir | <code>string</code> | The relative directory to root of the location of the initialization file. |
 | initFilename | <code>string</code> | Initialization file filename. |
-| notMute | <code>bool</code> | Whether the system logs or not. |
+| notMute | <code>boolean</code> | Whether the system logs or not. |
+
+<a name="module_system.System..filterContext"></a>
+
+## System~filterContext : <code>Object</code>
+
+System options
+
+**Kind**: inner typedef of [<code>System</code>](#module_system.System)  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| dir | <code>string</code> | Parent directory of the filtered item |
+| itemName | <code>string</code> | Name of the filtered item |
+| item | <code>string</code> | Path to the filtered item |
 
 <a name="module_system.System..behavior"></a>
 
@@ -647,8 +743,8 @@ Required by system to perform file initialization.
     * [new Loader(rootDir, relativeInitDir, initFilename, callback)](#new_module_system..Loader_new)
     * _static_
         * [.getFile(rootDir, relativeDir, file)](#module_system..Loader.getFile) ⇒ <code>external.Promise</code>
-        * [.toRelative(dir, target)](#module_system..Loader.toRelative) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-        * [.join(rootDir, target)](#module_system..Loader.join) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+        * [.toRelative(dir, target)](#module_system..Loader.toRelative) ⇒ <code>string</code> \| <code>Array.&lt;string&gt;</code>
+        * [.join(rootDir, target)](#module_system..Loader.join) ⇒ <code>string</code> \| <code>Array.&lt;string&gt;</code>
         * [.isFile(rootDir, relativeDir, filename)](#module_system..Loader.isFile) ⇒ <code>boolean</code>
         * [.isDir(rootDir, relativeDir)](#module_system..Loader.isDir) ⇒ <code>boolean</code>
         * [.list(rootDir, relativeDir)](#module_system..Loader.list) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
@@ -705,12 +801,12 @@ grapefruitJuicer.then(function(result){ // grapefruitJuicer - on resolve
 ```
 <a name="module_system..Loader.toRelative"></a>
 
-## Loader.toRelative(dir, target) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+## Loader.toRelative(dir, target) ⇒ <code>string</code> \| <code>Array.&lt;string&gt;</code>
 
 Extracts relative path from rootDir to target.
 
 **Kind**: static method of [<code>Loader</code>](#module_system..Loader)  
-**Returns**: [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) - Relative path|paths.  
+**Returns**: <code>string</code> \| <code>Array.&lt;string&gt;</code> - Relative path|paths.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -720,21 +816,19 @@ Extracts relative path from rootDir to target.
 **Example** *(Usage)*  
 ```js
 // Convert path and output the result
-Loader.toRelative("c:\machines\refrigerators", "c:\machines\appliances").then(function(result){
-  console.log(result);
-});
+console.log(Loader.toRelative("c:\machines\refrigerators", "c:\machines\appliances"));
 
 // Output
 // ..\appliances
 ```
 <a name="module_system..Loader.join"></a>
 
-## Loader.join(rootDir, target) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+## Loader.join(rootDir, target) ⇒ <code>string</code> \| <code>Array.&lt;string&gt;</code>
 
 Join a root directory with a file/folder or an array of files/folders to absolute path.
 
 **Kind**: static method of [<code>Loader</code>](#module_system..Loader)  
-**Returns**: [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) - Absolute path|paths.  
+**Returns**: <code>string</code> \| <code>Array.&lt;string&gt;</code> - Absolute path|paths.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -744,9 +838,7 @@ Join a root directory with a file/folder or an array of files/folders to absolut
 **Example** *(Usage)*  
 ```js
 // Join and log result
-Loader.join("c:\machines", "appliances").then(function(result){
-  console.log(result)
-});
+console.log(Loader.join("c:\machines", "appliances"))
 
 // Output
 // c:\machines\appliances
@@ -1164,6 +1256,7 @@ Series of tests for the system.
     * [.Loader](#module_system..test.Loader)
         * [.toRelative](#module_system..test.Loader.toRelative)
         * [.join](#module_system..test.Loader.join)
+        * [.isFile](#module_system..test.Loader.isFile)
 
 <a name="module_system..test.Loader"></a>
 
@@ -1176,6 +1269,7 @@ Tests for the Loader class.
 * [.Loader](#module_system..test.Loader)
     * [.toRelative](#module_system..test.Loader.toRelative)
     * [.join](#module_system..test.Loader.join)
+    * [.isFile](#module_system..test.Loader.isFile)
 
 <a name="module_system..test.Loader.toRelative"></a>
 
@@ -1189,5 +1283,12 @@ Tests the toRelative function.
 ## Loader.join
 
 Tests the join function.
+
+**Kind**: static property of [<code>Loader</code>](#module_system..test.Loader)  
+<a name="module_system..test.Loader.isFile"></a>
+
+## Loader.isFile
+
+Tests the isFile function.
 
 **Kind**: static property of [<code>Loader</code>](#module_system..test.Loader)  

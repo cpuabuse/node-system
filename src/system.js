@@ -28,7 +28,15 @@ class System extends loader.Loader{
    * @property {string} rootDir - The root directory for the System instance.
    * @property {string} relativeInitDir - The relative directory to root of the location of the initialization file.
    * @property {string} initFilename - Initialization file filename.
-	 * @property {bool} notMute - Whether the system logs or not.
+	 * @property {boolean} notMute - Whether the system logs or not.
+	 */
+
+	/**
+	 * System options
+	 * @typedef {Object} module:system.System~filterContext
+	 * @property {string} dir Parent directory of the filtered item
+	 * @property {string} itemName Name of the filtered item
+	 * @property {string} item Path to the filtered item
 	 */
 
 	/**
@@ -117,61 +125,48 @@ class System extends loader.Loader{
 			initFilename: options.relatoveInitFilename,
 			notMute: options.notMute
 		};
+
+		/**
+		 * Actual behaviors are located here.
+		 * @type {module:system~Behavior}
+		 */
 		this.system.behavior = new behavior.Behavior();
 		/**
+		 * Actual errors are located here.
 		 * @abstract
-		 * @instance
 		 * @type {Object}
-		 * @member error
-		 * @memberof module:system.System#system
 		 */
 		this.system.error = new Object();
 
 		/**
 		 * File system methods.
-		 * @instance
-		 * @member file
-		 * @memberof module:system.System#system
 		 * @type {Object}
 		 */
 		this.system.file = {
 			/**
 			 * File level filters.
-			 * @instance
-			 * @member filter
-			 * @memberof module:system.System#system#file
 			 * @type {Object}
 			 */
 			filter: {
 				/**
 				 * Check if argument is a file (relative to system root directory).
-				 * @instance
-				 * @member isFile
-				 * @memberof module:system.System#system#file#filter
 				 * @async
 				 * @function
-				 * @param {string} folder Root folder.
-				 * @param {string} file File or folder within root.
+				 * @param {module:system.System~filterContext} filterContext Information on the item to be filtered.
 				 * @returns {external:Promise} Promise, containing boolean result.
 				*/
 				isFile: filterContext => loader.Loader.isFile(this.system.rootDir, filterContext.dir, filterContext.itemName),
 				/**
 				 * Check if argument is a folder (relative to system root directory).
-				 * @instance
-				 * @member isDir
-				 * @memberof module:system.System#system#file#filter
 				 * @async
 				 * @function
-				 * @param {string} dir Folder.
+				 * @param {module:system.System~filterContext} filterContext Information on the item to be filtered
 				 * @returns {external:Promise} Promise, containing boolean result.
 				*/
 				isDir: filterContext => loader.Loader.isDir(this.system.rootDir, filterContext.item)
 			},
 			/**
 			 * Converts absolute path to relative path.
-			 * @instance
-			 * @member toRelative
-			 * @memberof module:system.System#system#file
 			 * @async
 			 * @function
 			 * @param {string} rootDir Relative directory.
@@ -185,9 +180,6 @@ class System extends loader.Loader{
 			},
 			/**
 			 * Joins two paths.
-			 * @instance
-			 * @member join
-			 * @memberof module:system.System#system#file
 			 * @async
 			 * @function
 			 * @param {string} rootDir Relative directory.
@@ -201,9 +193,6 @@ class System extends loader.Loader{
 			},
 			/**
 			 * Get file contents relative to system root directory.
-			 * @instance
-			 * @member getFile
-			 * @memberof module:system.System#system#file
 			 * @async
 			 * @function
 			 * @param {string} dir Directory, relative to system root.
@@ -214,9 +203,6 @@ class System extends loader.Loader{
 			getYaml: (dir, file) => loader.loadYaml(this.system.rootDir, dir, file),
 			/**
 			 * List the contents of the folder, relative to system root directory.
-			 * @instance
-			 * @member list
-			 * @memberof module:system.System#system#file
 			 * @async
 			 * @function
 			 * @param {string} dir Folder relative to system root.
