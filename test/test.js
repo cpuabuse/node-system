@@ -132,6 +132,30 @@ describe("Loader", function() {
 					});
 				});
 			});
+
+			/**
+			 * Tests the isDir function.
+			 * @member isDir
+			 * @memberof module:system~test.Loader
+			 */
+			describe(".isDir(\"" + element.rootDir + "\", \"" + element.dir + "\")" , function(){
+				let isDir = loader.Loader.isDir(element.rootDir, element.dir);
+				it("should be a directory", function(done){
+					isDir.then(function(result){
+						assert.equal(result, true);
+						done();
+					});
+				});
+
+				it("should not be a directory", function(done){
+					let relativeFileDir = loader.Loader.join(element.dir, element.rawFilename);
+					let isNotDir = loader.Loader.isDir(element.rootDir, relativeFileDir);
+					isNotDir.then(function(result){
+						assert.equal(result, false);
+						done();
+					});
+				});
+			});
 		});
 	});
 });

@@ -200,6 +200,14 @@ class System extends loader.Loader{
 			 * @returns {external:Promise} Promise, containing string with file contents..
 			*/
 			getFile: (dir, file) => loader.Loader.getFile(this.system.rootDir, dir, file),
+			/**
+			 * Get contents of yaml file relative to system root directory.
+			 * @async
+			 * @function
+			 * @param {string} dir Directory, relative to system root.
+			 * @param {string} file Filename.
+			 * @returns {external:Promise} Promise, containing string with file contents..
+			*/
 			getYaml: (dir, file) => loader.loadYaml(this.system.rootDir, dir, file),
 			/**
 			 * List the contents of the folder, relative to system root directory.
@@ -431,6 +439,7 @@ class System extends loader.Loader{
 	 * @instance
 	 * @param {string} text - Message
 	 * @fires module:system.System~type_error
+	 * @example <caption>Usage</caption>
 	 * var options = {
 	 *   id: "lab_inventory",
 	 *   rootDir: "labs",
@@ -461,6 +470,17 @@ class System extends loader.Loader{
 	 * @param {string=} message - [Optional] Message is not strictly required, but preferred. If not specified, will assume value of the name
 	 * @throws {external:Error} Will throw `error_hell`. The inability to process error - if {@link module:system.System#events#event:eventFail} event fails.
 	 * @fires module:system.System#events#eventFail
+	 * @example <caption>Usage</caption>
+	 * var options = {
+	 *   id: "lab_inventory",
+	 *   rootDir: "labs",
+	 *   relativeInitDir: "black_mesa",
+	 *   initFilename: "inventory.yml",
+	 *   notMute: true
+	 * };
+	 *
+	 * var labInventory = new System(options);
+	 * labInventory.fire("system_load_aux", "Auxiliary system loaded.");
 	 */
 	fire(name, message){
 		const eventAbsent = "event_absent";
@@ -523,6 +543,15 @@ class System extends loader.Loader{
 	 * Emit an event as a behavior.
 	 * @instance
 	 * @param {string} event Behavior name.
+	 * @example <caption>Usage</caption>
+	 * // From the lab inventory system context
+	 * {
+	 *   // ...
+	 *
+	 *   this.behave("system_load_aux");
+	 *
+	 *   // ...
+	 * }
 	 */
 	behave(event){
 		try{
@@ -535,10 +564,24 @@ class System extends loader.Loader{
 
 	/**
 	 * Adds a behavior bound to "this".
+	 * @instance
 	 * @param {string} event Behavior name.
 	 * @param {function} callback Behavior.
+	 * @example <caption>Usage</caption>
+	 * var options = {
+	 *   id: "lab_inventory",
+	 *   rootDir: "labs",
+	 *   relativeInitDir: "black_mesa",
+	 *   initFilename: "inventory.yml",
+	 *   notMute: true
+	 * };
+	 *
+	 * var labInventory = new System(options);
+	 * labInventory.on("system_load_aux", function(that){
+	 *   console.log("Auxiliary system loaded - " + that.system.id);
+	 * });
 	 */
-	static on(event, callback){
+	on(event, callback){
 		let behavior = {};
 		behavior[event] = () => callback(this);
 		this.addBehaviors(behavior);
@@ -547,6 +590,8 @@ class System extends loader.Loader{
 	/**
 	 * Access stderr
 	 * @param {string} text
+	 * @example <caption>Usage</caption>
+	 * system.System.error("Not enough resources.");
 	 */
 	static error(text){
 		console.error("[Error] " + text);
@@ -555,6 +600,8 @@ class System extends loader.Loader{
 	/**
 	 * Access stdout
 	 * @param {string} text
+	 * @example <caption>Usage</caption>
+	 * system.System.log("Resources loaded.");
 	 */
 	static log(text){
 		console.log("[OK] " + text);

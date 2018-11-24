@@ -53,6 +53,7 @@ System is intended more than anything, for centralized managment.
                         * [.toRelative(rootDir, target)](#module_system.System+system.file.toRelative) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
                         * [.join(rootDir, target)](#module_system.System+system.file.join) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
                         * [.getFile(dir, file)](#module_system.System+system.file.getFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+                        * [.getYaml(dir, file)](#module_system.System+system.file.getYaml) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
                         * [.list(dir, file)](#module_system.System+system.file.list) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
                 * [.addError(code, message)](#module_system.System+addError)
                 * [.addBehaviors(behaviors)](#module_system.System+addBehaviors)
@@ -60,9 +61,9 @@ System is intended more than anything, for centralized managment.
                 * [.error(text)](#module_system.System+error)
                 * [.fire(name, [message])](#module_system.System+fire)
                 * [.behave(event)](#module_system.System+behave)
+                * [.on(event, callback)](#module_system.System+on)
             * _static_
                 * [.checkOptionsFailure(options)](#module_system.System.checkOptionsFailure) ⇒ <code>boolean</code>
-                * [.on(event, callback)](#module_system.System.on)
                 * [.error(text)](#module_system.System.error)
                 * [.log(text)](#module_system.System.log)
             * _inner_
@@ -142,6 +143,7 @@ Throws standard error if failed to perform basic initializations, or system fail
                 * [.toRelative(rootDir, target)](#module_system.System+system.file.toRelative) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
                 * [.join(rootDir, target)](#module_system.System+system.file.join) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
                 * [.getFile(dir, file)](#module_system.System+system.file.getFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+                * [.getYaml(dir, file)](#module_system.System+system.file.getYaml) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
                 * [.list(dir, file)](#module_system.System+system.file.list) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
         * [.addError(code, message)](#module_system.System+addError)
         * [.addBehaviors(behaviors)](#module_system.System+addBehaviors)
@@ -149,9 +151,9 @@ Throws standard error if failed to perform basic initializations, or system fail
         * [.error(text)](#module_system.System+error)
         * [.fire(name, [message])](#module_system.System+fire)
         * [.behave(event)](#module_system.System+behave)
+        * [.on(event, callback)](#module_system.System+on)
     * _static_
         * [.checkOptionsFailure(options)](#module_system.System.checkOptionsFailure) ⇒ <code>boolean</code>
-        * [.on(event, callback)](#module_system.System.on)
         * [.error(text)](#module_system.System.error)
         * [.log(text)](#module_system.System.log)
     * _inner_
@@ -281,6 +283,7 @@ Contains system info.
         * [.toRelative(rootDir, target)](#module_system.System+system.file.toRelative) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
         * [.join(rootDir, target)](#module_system.System+system.file.join) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
         * [.getFile(dir, file)](#module_system.System+system.file.getFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+        * [.getYaml(dir, file)](#module_system.System+system.file.getYaml) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
         * [.list(dir, file)](#module_system.System+system.file.list) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 
 <a name="module_system.System+system.behavior"></a>
@@ -312,6 +315,7 @@ File system methods.
     * [.toRelative(rootDir, target)](#module_system.System+system.file.toRelative) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
     * [.join(rootDir, target)](#module_system.System+system.file.join) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
     * [.getFile(dir, file)](#module_system.System+system.file.getFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+    * [.getYaml(dir, file)](#module_system.System+system.file.getYaml) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
     * [.list(dir, file)](#module_system.System+system.file.list) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 
 <a name="module_system.System+system.file.filter"></a>
@@ -385,6 +389,20 @@ Joins two paths.
 ## file.getFile(dir, file) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 
 Get file contents relative to system root directory.
+
+**Kind**: static method of [<code>file</code>](#module_system.System+system.file)  
+**Returns**: [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) - Promise, containing string with file contents..  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| dir | <code>string</code> | Directory, relative to system root. |
+| file | <code>string</code> | Filename. |
+
+<a name="module_system.System+system.file.getYaml"></a>
+
+## file.getYaml(dir, file) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+
+Get contents of yaml file relative to system root directory.
 
 **Kind**: static method of [<code>file</code>](#module_system.System+system.file)  
 **Returns**: [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) - Promise, containing string with file contents..  
@@ -511,23 +529,26 @@ labInventory.log(text);
 Log an error  message from the System context
 
 **Kind**: instance method of [<code>System</code>](#module_system.System)  
-**Emits**: <code>module:system.System~type_error
-var options &#x3D; {
-  id: &quot;lab_inventory&quot;,
-  rootDir: &quot;labs&quot;,
-  relativeInitDir: &quot;black_mesa&quot;,
-  initFilename: &quot;inventory.yml&quot;,
-  notMute: true
-};
-var text &#x3D; &quot;Testing Lab Inventory error log.&quot;;
-
-var labInventory &#x3D; new System(options);
-labInventory.error(text);event:</code>  
+**Emits**: <code>module:system.System~event:type_error</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | text | <code>string</code> | Message |
 
+**Example** *(Usage)*  
+```js
+var options = {
+  id: "lab_inventory",
+  rootDir: "labs",
+  relativeInitDir: "black_mesa",
+  initFilename: "inventory.yml",
+  notMute: true
+};
+var text = "Testing Lab Inventory error log.";
+
+var labInventory = new System(options);
+labInventory.error(text);
+```
 <a name="module_system.System+fire"></a>
 
 ## system.fire(name, [message])
@@ -546,6 +567,19 @@ Fires a system event
 | name | <code>string</code> | Event name, as specified in [events](#module_system.System+events). |
 | [message] | <code>string</code> | [Optional] Message is not strictly required, but preferred. If not specified, will assume value of the name |
 
+**Example** *(Usage)*  
+```js
+var options = {
+  id: "lab_inventory",
+  rootDir: "labs",
+  relativeInitDir: "black_mesa",
+  initFilename: "inventory.yml",
+  notMute: true
+};
+
+var labInventory = new System(options);
+labInventory.fire("system_load_aux", "Auxiliary system loaded.");
+```
 <a name="module_system.System+behave"></a>
 
 ## system.behave(event)
@@ -558,6 +592,45 @@ Emit an event as a behavior.
 | --- | --- | --- |
 | event | <code>string</code> | Behavior name. |
 
+**Example** *(Usage)*  
+```js
+// From the lab inventory system context
+{
+  // ...
+
+  this.behave("system_load_aux");
+
+  // ...
+}
+```
+<a name="module_system.System+on"></a>
+
+## system.on(event, callback)
+
+Adds a behavior bound to "this".
+
+**Kind**: instance method of [<code>System</code>](#module_system.System)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| event | <code>string</code> | Behavior name. |
+| callback | <code>function</code> | Behavior. |
+
+**Example** *(Usage)*  
+```js
+var options = {
+  id: "lab_inventory",
+  rootDir: "labs",
+  relativeInitDir: "black_mesa",
+  initFilename: "inventory.yml",
+  notMute: true
+};
+
+var labInventory = new System(options);
+labInventory.on("system_load_aux", function(that){
+  console.log("Auxiliary system loaded - " + that.system.id);
+});
+```
 <a name="module_system.System.checkOptionsFailure"></a>
 
 ## System.checkOptionsFailure(options) ⇒ <code>boolean</code>
@@ -585,19 +658,6 @@ if (System.checkOptionsFailure(options)){
   throw new Error ("Options inconsistent.");
 }
 ```
-<a name="module_system.System.on"></a>
-
-## System.on(event, callback)
-
-Adds a behavior bound to "this".
-
-**Kind**: static method of [<code>System</code>](#module_system.System)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| event | <code>string</code> | Behavior name. |
-| callback | <code>function</code> | Behavior. |
-
 <a name="module_system.System.error"></a>
 
 ## System.error(text)
@@ -610,6 +670,10 @@ Access stderr
 | --- | --- |
 | text | <code>string</code> | 
 
+**Example** *(Usage)*  
+```js
+system.System.error("Not enough resources.");
+```
 <a name="module_system.System.log"></a>
 
 ## System.log(text)
@@ -622,6 +686,10 @@ Access stdout
 | --- | --- |
 | text | <code>string</code> | 
 
+**Example** *(Usage)*  
+```js
+system.System.log("Resources loaded.");
+```
 <a name="module_system.System..options"></a>
 
 ## System~options : <code>Object</code>
