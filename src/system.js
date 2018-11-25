@@ -214,7 +214,7 @@ class System extends loader.Loader{
 			 * @async
 			 * @function
 			 * @param {string} dir Folder relative to system root.
-			 * @param {string} file Filename.
+			 * @param {function} filter Filter function.
 			 * @returns {external:Promise} Promise, containing an array of filtered strings - files/folders relative to system root.
 			 * @example <caption>List folders</caption>
 			 * systemInstance.system.file.list("css", systemInstance.system.file.filter.isDir);
