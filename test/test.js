@@ -134,23 +134,34 @@ describe("Loader", function() {
 			});
 
 			/**
-			 * Tests the isDir function.
+			 * Tests the isDir function with:
+			 *
+			 * - A directory
+			 * - A file
+			 * - A non-existant directory/file
 			 * @member isDir
 			 * @memberof module:system~test.Loader
 			 */
-			describe(".isDir(\"" + element.rootDir + "\", \"" + element.dir + "\")" , function(){
-				let isDir = loader.Loader.isDir(element.rootDir, element.dir);
-				it("should be a directory", function(done){
-					isDir.then(function(result){
+			describe(".isDir" , function(){
+				let nonExistantDir = "Non-existant directory";
+				let relativeFileDir = loader.Loader.join(element.dir, element.rawFilename);
+
+				it("should be a directory with args (\"" + element.rootDir + "\", \"" + element.dir + "\")", function(done){
+					loader.Loader.isDir(element.rootDir, element.dir).then(function(result){
 						assert.equal(result, true);
 						done();
 					});
 				});
 
-				it("should not be a directory", function(done){
-					let relativeFileDir = loader.Loader.join(element.dir, element.rawFilename);
-					let isNotDir = loader.Loader.isDir(element.rootDir, relativeFileDir);
-					isNotDir.then(function(result){
+				it("should not be a directory with args (\"" + element.rootDir + "\", \"" + element.dir + path.sep + element.rawFilename + "\")", function(done){
+					loader.Loader.isDir(element.rootDir, relativeFileDir).then(function(result){
+						assert.equal(result, false);
+						done();
+					});
+				});
+
+				it("should not be a directory with args (\"" + element.rootDir + "\", \"" + nonExistantDir + "\")", function(done){
+					loader.Loader.isDir(element.rootDir, nonExistantDir).then(function(result){
 						assert.equal(result, false);
 						done();
 					});
