@@ -166,11 +166,23 @@ class System extends loader.Loader{
 				isDir: filterContext => loader.Loader.isDir(this.system.rootDir, filterContext.item)
 			},
 			/**
+			 * Converts a file path to absolute operating system path. Used for external libraries, that require absolute path.
+			 * @async
+			 * @function
+			 * @param {string} dir Relative directory to the root directory..
+			 * @param {string} file Folder/file name.
+			 * @returns {external:Promise} Promise, containing string relative path.
+			*/
+			toAbsolute: (dir, file) => new Promise(resolve => {
+				let filePath = loader.Loader.join(dir, file);
+				resolve(loader.Loader.join(this.system.rootDir, filePath));
+			}),
+			/**
 			 * Converts absolute path to relative path.
 			 * @async
 			 * @function
-			 * @param {string} rootDir Relative directory.
-			 * @param {string} target Absolute file/folder path.
+			 * @param {string} rootDir Relative (to system root) directory.
+			 * @param {string} target Absolute (to system root) file/folder path.
 			 * @returns {external:Promise} Promise, containing string relative path.
 			*/
 			toRelative(rootDir, target){
@@ -182,7 +194,7 @@ class System extends loader.Loader{
 			 * Joins two paths.
 			 * @async
 			 * @function
-			 * @param {string} rootDir Relative directory.
+			 * @param {string} rootDir Relative (to system root) directory.
 			 * @param {string} target File/folder path to rootDir.
 			 * @returns {external:Promise} Promise, containing string path.
 			*/
