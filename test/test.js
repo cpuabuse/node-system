@@ -20,8 +20,8 @@ const system = require("../src/system.js");
 const systemError = require("../src/error.js");
 const loader = require("../src/loader.js");
 const assert = require("assert");
-const waitTime = 200;
 const path = require("path");
+const waitTime = 200;
 
 
 // DEBUG: Devonly - promise throw
@@ -31,10 +31,18 @@ process.on("unhandledRejection", up => {
 
 /**
  * Tests for the Loader class.
+ * @member dummyErrorHandler
+ * @memberof module:system~test
+ */
+function dummyErrorHandler(error){} /* eslint-disable-line no-unused-vars *//* eslint-disable-line no-empty-function */// Want to emphasize the error argument without actually using it and dummy is best empty
+
+/**
+ * Tests for the Loader class.
  * @member Loader
  * @memberof module:system~test
  */
 describe("Loader", function() {
+	const nonExistentDir = "Non-existent directory";
 	var loaders = [
 		// Stars
 		{
@@ -95,6 +103,7 @@ describe("Loader", function() {
 					loader.Loader.list(element.rootDir, "bla bla bla").then(function(result){
 						assert.equal(result.length, element.filesAndFoldersAmount);
 					}).catch(function(err){
+						dummyErrorHandler(err);
 						done();
 					});
 				});
@@ -147,7 +156,6 @@ describe("Loader", function() {
 			 * @memberof module:system~test.Loader
 			 */
 			describe(".isDir" , function(){
-				let nonExistantDir = "Non-existant directory";
 				let relativeFileDir = loader.Loader.join(element.dir, element.rawFilename);
 
 				it("should be a directory with args (\"" + element.rootDir + "\", \"" + element.dir + "\")", function(done){
@@ -164,8 +172,8 @@ describe("Loader", function() {
 					});
 				});
 
-				it("should not be a directory with args (\"" + element.rootDir + "\", \"" + nonExistantDir + "\")", function(done){
-					loader.Loader.isDir(element.rootDir, nonExistantDir).then(function(result){
+				it("should not be a directory with args (\"" + element.rootDir + "\", \"" + nonExistentDir + "\")", function(done){
+					loader.Loader.isDir(element.rootDir, nonExistentDir).then(function(result){
 						assert.equal(result, false);
 						done();
 					});
