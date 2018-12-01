@@ -85,12 +85,16 @@ describe("Loader", function() {
 			}
 
 			describe(".list(\"" + element.rootDir + "\", \"" + element.dir + "\")", function(){
-				// Test
-				let list = loader.Loader.list(element.rootDir, element.dir);
-
-				it("should have a length of " + element.filesAndFoldersAmount.toString(), function(done) {
-					list.then(function(result){
+				it("should have a length of " + element.filesAndFoldersAmount.toString() + "with args", function(done) {
+					loader.Loader.list(element.rootDir, element.dir).then(function(result){
 						assert.equal(result.length, element.filesAndFoldersAmount);
+						done();
+					});
+				});
+				it("should reject with args", function(done) {
+					loader.Loader.list(element.rootDir, "bla bla bla").then(function(result){
+						assert.equal(result.length, element.filesAndFoldersAmount);
+					}).catch(function(err){
 						done();
 					});
 				});
@@ -138,7 +142,7 @@ describe("Loader", function() {
 			 *
 			 * - A directory
 			 * - A file
-			 * - A non-existant directory/file
+			 * - A non-existant directory
 			 * @member isDir
 			 * @memberof module:system~test.Loader
 			 */
