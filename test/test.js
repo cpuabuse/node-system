@@ -183,7 +183,11 @@ describe("Loader", function() {
 	});
 });
 
-// System Instances
+/**
+ * Tests of System class.
+ * @member System
+ * @memberof module:system~test
+ */
 describe("System", function() {
 	// Array of testing unit initialization data
 	var systems = [
@@ -241,7 +245,11 @@ describe("System", function() {
 						});
 					});
 
-					// System getFile test
+					/**
+					 * Tests the getFile function.
+					 * @member getFile
+					 * @memberof module:system~test.System
+					 */
 					describe(".file", function(){
 						describe(".getFile()", function(){
 							it("should get a file called something with expected contents", function(done){
