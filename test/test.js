@@ -22,6 +22,7 @@ const loader = require("../src/loader.js");
 const assert = require("assert");
 const path = require("path");
 const waitTime = 200;
+const nonExistentFileOrDir = "Non-existent file or directory";
 
 
 // DEBUG: Devonly - promise throw
@@ -42,7 +43,6 @@ function dummyErrorHandler(error){} /* eslint-disable-line no-unused-vars *//* e
  * @memberof module:system~test
  */
 describe("Loader", function() {
-	const nonExistentDir = "Non-existent directory";
 	var loaders = [
 		// Stars
 		{
@@ -172,8 +172,8 @@ describe("Loader", function() {
 					});
 				});
 
-				it("should not be a directory with args (\"" + element.rootDir + "\", \"" + nonExistentDir + "\")", function(done){
-					loader.Loader.isDir(element.rootDir, nonExistentDir).then(function(result){
+				it("should not be a directory with args (\"" + element.rootDir + "\", \"" + nonExistentFileOrDir + "\")", function(done){
+					loader.Loader.isDir(element.rootDir, nonExistentFileOrDir).then(function(result){
 						assert.equal(result, false);
 						done();
 					});
@@ -194,7 +194,8 @@ describe("System", function() {
 				relativeInitDir: "example",
 				initFilename: "init",
 				notMute: false
-			}
+			},
+			rawInitFilename: "init.yml"
 		},
 		{ // Flower shop
 			options: {
@@ -204,6 +205,7 @@ describe("System", function() {
 				initFilename: "init",
 				notMute: false
 			},
+			rawInitFilename: "init.yml",
 			error: {
 				errorInstances: ["all_flowers_gone"],
 				stringErrors: ["carShopError"]
@@ -228,40 +230,54 @@ describe("System", function() {
 					]
 				);
 			});
-
-			// System property of System instance
-			describe("#system", function(){
-				// System instance ID
-				describe("id", function(){
-					it("should be " + element.options.id, function(done) {
-						systemTestLoad.then(function(){
+			systemTestLoad.then(function(){
+				// System property of System instance
+				describe("#system", function(){
+					// System instance ID
+					describe("id", function(){
+						it("should be " + element.options.id, function(done) {
 							assert.equal(systemTest.system.id, element.options.id);
 							done();
-						})
+						});
 					});
-				});
 
-				/*
-					Perform test only on units that have the error property.
-					Iterate through "errorInstances" array, if present, and check that respective errors are indeed of type SystemError.
-					Iterate through "stringErrors" array, if present, and check that respective errors are not of type SystemError.
-				*/
-				if(element.hasOwnProperty("error")){
-					describe("error", function() {
-						if (element.error.hasOwnProperty("errorInstances")){
-							describe("errorInstances", function(){
-								element.error.errorInstances.forEach(function(error){
-									describe(error, function() {
-										// It should be a SystemError
-										it("should be SystemError", function(done){
-											systemTestLoad.then(function(){
+					// System getFile test
+					describe(".file", function(){
+						describe(".getFile()", function(){
+							it("should get a file called something with expected contents", function(done){
+								systemTest.system.file.getFile(element.options.relativeInitDir, element.rawInitFilename).then(function(result){ 
+									done();
+								});
+							});
+							try{
+								it("should produce an error with args nonexistent.", function(done){
+									systemTest.system.file.getFile(element.options.relativeInitDir, nonExistentFileOrDir).catch(function(error){ 
+										done();
+									});
+								});
+							} catch(error){}
+							
+						});
+					});
+
+					/*
+						Perform test only on units that have the error property.
+						Iterate through "errorInstances" array, if present, and check that respective errors are indeed of type SystemError.
+						Iterate through "stringErrors" array, if present, and check that respective errors are not of type SystemError.
+					*/
+					if(element.hasOwnProperty("error")){
+						describe("error", function() {
+							if (element.error.hasOwnProperty("errorInstances")){
+								describe("errorInstances", function(){
+									element.error.errorInstances.forEach(function(error){
+										describe(error, function() {
+											// It should be a SystemError
+											it("should be SystemError", function(done){
 												if (systemError.SystemError.isSystemError(systemTest.system.error[error])){
 													done();
 												}
 											});
-										});
-										it("should be " + error, function(done) {
-											systemTestLoad.then(function(){
+											it("should be " + error, function(done) {
 												try {
 													throw systemTest.system.error[error];
 												} catch(err){
@@ -272,15 +288,13 @@ describe("System", function() {
 										});
 									});
 								});
-							});
-						}
+							}
 
-						if (element.error.hasOwnProperty("stringErrors")){
-							describe("stringErrors", function(){
-								element.error.stringErrors.forEach(function(error){
-									describe(error, function(){
-										it("should not be SystemError", function(done){
-											systemTestLoad.then(function(){
+							if (element.error.hasOwnProperty("stringErrors")){
+								describe("stringErrors", function(){
+									element.error.stringErrors.forEach(function(error){
+										describe(error, function(){
+											it("should not be SystemError", function(done){
 												if(!systemError.SystemError.isSystemError(error)){
 													done();
 												}
@@ -288,10 +302,10 @@ describe("System", function() {
 										});
 									});
 								});
-							});
-						}
-					});
-				}
+							}
+						});
+					}
+				});
 			});
 		});
 	});

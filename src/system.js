@@ -211,7 +211,14 @@ class System extends loader.Loader{
 			 * @param {string} file Filename.
 			 * @returns {external:Promise} Promise, containing string with file contents..
 			*/
-			getFile: (dir, file) => loader.Loader.getFile(this.system.rootDir, dir, file),
+			getFile: (dir, file) => new Promise((resolve, reject) => {
+				loader.Loader.getFile(this.system.rootDir, dir, file).then(function(result){
+					resolve(result);
+				}).catch(error => {
+					//	this.fire("file_system_error");
+						reject("file_system_error");
+					});
+			}),
 			/**
 			 * Get contents of yaml file relative to system root directory.
 			 * @async
