@@ -1,6 +1,6 @@
 {
   "name": "cpuabuse-system",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "System module",
   "main": "src/system.js",
   "scripts": {
@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "coveralls": "^3.0.2",
-    "eslint": "^5.6.1",
+    "eslint": "^5.9.0",
     "istanbul": "^1.1.0-alpha.1",
     "jsdoc-to-markdown": "^4.0.1",
     "mocha": "^5.2.0"

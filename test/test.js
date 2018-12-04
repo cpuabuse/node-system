@@ -253,13 +253,13 @@ describe("System", function() {
 					describe(".file", function(){
 						describe(".getFile()", function(){
 							it("should get a file called something with expected contents", function(done){
-								systemTest.system.file.getFile(element.options.relativeInitDir, element.rawInitFilename).then(function(result){ 
+								systemTest.system.file.getFile(element.options.relativeInitDir, element.rawInitFilename).then(function(result){
 									done();
 								});
 							});
 							try{
 								it("should produce an error with args nonexistent.", function(done){
-									systemTest.system.file.getFile(element.options.relativeInitDir, nonExistentFileOrDir).catch(function(error){ 
+									systemTest.system.file.getFile(element.options.relativeInitDir, nonExistentFileOrDir).catch(function(error){
 										done();
 									});
 								});
