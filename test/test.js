@@ -19,6 +19,7 @@
 const system = require("../src/system.js");
 const systemError = require("../src/error.js");
 const loader = require("../src/loader.js");
+const expected = require("./expected.js");
 const assert = require("assert");
 const path = require("path");
 const waitTime = 200;
@@ -199,7 +200,8 @@ describe("System", function() {
 				initFilename: "init",
 				notMute: false
 			},
-			rawInitFilename: "init.yml"
+			rawInitFilename: "init.yml",
+			initContents: expected.exampleInit
 		},
 		{ // Flower shop
 			options: {
@@ -210,6 +212,7 @@ describe("System", function() {
 				notMute: false
 			},
 			rawInitFilename: "init.yml",
+			initContents: expected.flowerShopInit,
 			error: {
 				errorInstances: ["all_flowers_gone"],
 				stringErrors: ["carShopError"]
@@ -254,17 +257,20 @@ describe("System", function() {
 						describe(".getFile()", function(){
 							it("should get a file called something with expected contents", function(done){
 								systemTest.system.file.getFile(element.options.relativeInitDir, element.rawInitFilename).then(function(result){
+									assert.equal(result, element.initContents);
 									done();
 								});
 							});
-							try{
-								it("should produce an error with args nonexistent.", function(done){
-									systemTest.system.file.getFile(element.options.relativeInitDir, nonExistentFileOrDir).catch(function(error){
-										done();
-									});
+							it("should produce an error with args nonexistent.", function(done){
+								systemTest.system.file.getFile(element.options.relativeInitDir, nonExistentFileOrDir).catch(function(error){
+									done();
 								});
-							} catch(error){}
-							
+							});
+							it("should produce an error with folder argument", function(done){
+								systemTest.system.file.getFile("./", element.options.relativeInitDir).catch(function(error){
+									done();
+								});
+							});
 						});
 					});
 

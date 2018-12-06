@@ -1,2 +1,4 @@
+file_system_error:
+  message: "File system operation could not complete."
 all_flowers_gone:
   message: "All flowers seem to be out of stock, contact the store manager."

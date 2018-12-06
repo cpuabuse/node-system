@@ -4,8 +4,16 @@
 */
 "use strict";
 
-const flowerShopInit = "";
-const exampleInit = "";
+const flowerShopInit = `events:
+data:
+  file: flowers
+  path: relative
+  folder: data
+behaviors:
+errors:`;
+const exampleInit = `behaviors:
+errors:
+events:`;
 
 module.exports = {
 	flowerShopInit,
