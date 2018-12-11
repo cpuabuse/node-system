@@ -156,7 +156,7 @@ describe("Loader", function() {
 			 * @member isDir
 			 * @memberof module:system~test.Loader
 			 */
-			describe(".isDir" , function(){
+			describe(".isDir()" , function(){
 				let relativeFileDir = loader.Loader.join(element.dir, element.rawFilename);
 
 				it("should be a directory with args (\"" + element.rootDir + "\", \"" + element.dir + "\")", function(done){
@@ -255,19 +255,21 @@ describe("System", function() {
 					 */
 					describe(".file", function(){
 						describe(".getFile()", function(){
-							it("should get a file called something with expected contents", function(done){
+							it("should get a file called \"" + element.rawInitFilename + "\" with expected contents with args (\"" + element.options.relativeInitDir + "\", \"" + element.rawInitFilename + "\")", function(done){
 								systemTest.system.file.getFile(element.options.relativeInitDir, element.rawInitFilename).then(function(result){
 									assert.equal(result, element.initContents);
 									done();
 								});
 							});
-							it("should produce an error with args nonexistent.", function(done){
+							it("should produce an error with non-existent args (\"" + element.options.relativeInitDir + "\", \"" + nonExistentFileOrDir + "\")", function(done){
 								systemTest.system.file.getFile(element.options.relativeInitDir, nonExistentFileOrDir).catch(function(error){
+									assert.equal(error, systemTest.system.error.file_system_error);
 									done();
 								});
 							});
-							it("should produce an error with folder argument", function(done){
+							it("should produce an error with folder args (\"./\", \"" + element.options.relativeInitDir + "\")", function(done){
 								systemTest.system.file.getFile("./", element.options.relativeInitDir).catch(function(error){
+									assert.equal(error, systemTest.system.error.file_system_error);
 									done();
 								});
 							});

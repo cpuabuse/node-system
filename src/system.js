@@ -216,7 +216,7 @@ class System extends loader.Loader{
 					resolve(result);
 				}).catch(error => {
 					//	this.fire("file_system_error");
-						reject("file_system_error");
+						reject(this.system.error.file_system_error);
 					});
 			}),
 			/**
