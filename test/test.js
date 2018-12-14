@@ -119,6 +119,9 @@ describe("Loader", function() {
 				it("should be equal to " + element.dir, function(){
 					assert.equal(loader.Loader.toRelative(element.rootDir, element.rootDir + path.sep + element.dir), element.dir);
 				});
+				it("should work with array" ,function(){
+					assert.deepEqual(loader.Loader.toRelative(element.rootDir, [element.rootDir + path.sep + element.dir, element.rootDir + path.sep + element.dir]), [element.dir, element.dir]);
+				});
 			});
 
 			/**
@@ -255,7 +258,7 @@ describe("System", function() {
 					 */
 					describe(".file", function(){
 						describe(".getFile()", function(){
-							it("should get a file called \"" + element.rawInitFilename + "\" with expected contents with args (\"" + element.options.relativeInitDir + "\", \"" + element.rawInitFilename + "\")", function(done){
+							it("should get expected contents from file \"" + element.rawInitFilename + "\" with args (\"" + element.options.relativeInitDir + "\", \"" + element.rawInitFilename + "\")", function(done){
 								systemTest.system.file.getFile(element.options.relativeInitDir, element.rawInitFilename).then(function(result){
 									assert.equal(result, element.initContents);
 									done();
