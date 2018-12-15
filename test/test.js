@@ -111,27 +111,38 @@ describe("Loader", function() {
 			});
 
 			/**
-			 * Tests the toRelative function.
+			 * Tests the toRelative function with:
+			 *
+			 * - Single argument
+			 * - Array as argument
 			 * @member toRelative
 			 * @memberof module:system~test.Loader
 			 */
-			describe(".toRelative(\"" + element.rootDir + "\", \"" + element.rootDir + path.sep + element.dir + "\")", function(){
-				it("should be equal to " + element.dir, function(){
-					assert.equal(loader.Loader.toRelative(element.rootDir, element.rootDir + path.sep + element.dir), element.dir);
+			describe(".toRelative()", function(){
+				let absolutePath = element.rootDir + path.sep + element.dir; // Absolute path from root
+				it("should be equal to \"" + element.dir + "\" with args (\"" + element.rootDir + "\", \"" + absolutePath + "\")", function(){
+					assert.equal(loader.Loader.toRelative(element.rootDir, absolutePath), element.dir);
 				});
-				it("should work with array" ,function(){
-					assert.deepEqual(loader.Loader.toRelative(element.rootDir, [element.rootDir + path.sep + element.dir, element.rootDir + path.sep + element.dir]), [element.dir, element.dir]);
+				it("should work with array", function(){
+					assert.deepEqual(loader.Loader.toRelative(element.rootDir, [absolutePath, absolutePath]), [element.dir, element.dir]);
 				});
 			});
 
 			/**
-			 * Tests the join function.
+			 * Tests the join function with:
+			 *
+			 * - Single argument
+			 * - Array as argument
 			 * @member join
 			 * @memberof module:system~test.Loader
 			 */
 			describe(".join(\"" + element.rootDir + "\", \"" + element.dir + "\")", function(){
-				it("should be equal to " + element.rootDir + path.sep + element.dir, function(){
-					assert.equal(loader.Loader.join(element.rootDir, element.dir), element.rootDir + path.sep + element.dir);
+				let expectedPath = element.rootDir + path.sep + element.dir;
+				it("should be equal to " + expectedPath, function(){
+					assert.equal(loader.Loader.join(element.rootDir, element.dir), expectedPath);
+				});
+				it("should work with array", function(){
+					assert.deepEqual(loader.Loader.join(element.rootDir, [element.dir, element.dir]), [expectedPath, expectedPath]);
 				});
 			});
 
@@ -148,6 +159,18 @@ describe("Loader", function() {
 						done();
 					});
 				});
+				it("FILE should not be a directory with args (\"" + element.rootDir + "\", \"" + element.dir + path.sep + element.rawFilename + "\")", function(done){
+					loader.Loader.isFile(element.rootDir, "./" ,element.dir).then(function(result){
+						assert.equal(result, false);
+						done();
+					});
+				});
+				it("FILE should not be a directory with args (\"" + element.rootDir + "\", \"" + nonExistentFileOrDir + "\")", function(done){
+					loader.Loader.isFile(element.rootDir, "./", nonExistentFileOrDir).then(function(result){
+						assert.equal(result, false);
+						done();
+					});
+				});
 			});
 
 			/**
@@ -160,8 +183,6 @@ describe("Loader", function() {
 			 * @memberof module:system~test.Loader
 			 */
 			describe(".isDir()" , function(){
-				let relativeFileDir = loader.Loader.join(element.dir, element.rawFilename);
-
 				it("should be a directory with args (\"" + element.rootDir + "\", \"" + element.dir + "\")", function(done){
 					loader.Loader.isDir(element.rootDir, element.dir).then(function(result){
 						assert.equal(result, true);
@@ -170,7 +191,7 @@ describe("Loader", function() {
 				});
 
 				it("should not be a directory with args (\"" + element.rootDir + "\", \"" + element.dir + path.sep + element.rawFilename + "\")", function(done){
-					loader.Loader.isDir(element.rootDir, relativeFileDir).then(function(result){
+					loader.Loader.isDir(element.rootDir, loader.Loader.join(element.dir, element.rawFilename)).then(function(result){
 						assert.equal(result, false);
 						done();
 					});
