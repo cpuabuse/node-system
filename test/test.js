@@ -101,7 +101,7 @@ describe("Loader", function() {
 					});
 				});
 				it("should reject with args", function(done) {
-					loader.Loader.list(element.rootDir, "bla bla bla").then(function(result){
+					loader.Loader.list(element.rootDir, "Some text.").then(function(result){
 						assert.equal(result.length, element.filesAndFoldersAmount);
 					}).catch(function(err){
 						dummyErrorHandler(err);
