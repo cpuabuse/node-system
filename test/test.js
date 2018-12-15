@@ -68,6 +68,16 @@ describe("Loader", function() {
 		}
 	];
 	loaders.forEach(function(element){
+		describe(".yamlToObject()", function(){
+			let data = "Wine: Red";
+			let expectedResults = {
+				Wine: "Red"
+			};
+			it("should produce JSON", function(){
+				assert.deepEqual(loader.Loader.yamlToObject(data), expectedResults);
+			});
+		});
+
 		describe(element.name, function(){
 			let loaderTest;
 			let load = new Promise(function(resolve){
