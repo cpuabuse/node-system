@@ -318,9 +318,9 @@ async function initRecursion(
 			case "object": {
 				if(init[key] !== null){ // Custom properties
 					// Check if property is set or assume default
-					let checkDefaultDirective = function (property) {
+					let checkDefaultDirective = function (property, type) {
 						if (init[key].hasOwnProperty(property)){
-							if ((typeof init[key][property]) === "string"){
+							if ((typeof init[key][property]) === type){
 								if (init[key][property] != "") {
 									return true;
 								}
@@ -328,21 +328,28 @@ async function initRecursion(
 						}
 						return false;
 					}
+					let checkDefaultStringDirective = function(property){
+						return checkDefaultDirective(property, "string");
+					}
+
+					let checkDefaultBooleanDirective = function(property){
+						return checkDefaultDirective(property, "boolean");
+					}
 
 					// Set the "extension" values
-					if (checkDefaultDirective("folder")){
+					if (checkDefaultStringDirective("folder")){
 						({folder} = init[key]);
 					}
-					if (checkDefaultDirective("file")){
+					if (checkDefaultStringDirective("file")){
 						({file} = init[key]);
 					}
-					if (checkDefaultDirective("path")){
+					if (checkDefaultStringDirective("path")){
 						if(init[key].path == "relative") {
 							pathIsAbsolute = false;
 						}
 					}
-					if (checkDefaultDirective("extend")){
-						if(init[key].extend == "extend") {
+					if (checkDefaultBooleanDirective("extend")){
+						if(init[key].extend == true) {
 							extend = true;
 						}
 					}
