@@ -10,7 +10,9 @@ data:
   path: relative
   folder: data
 behaviors:
-errors:`;
+errors:
+branch:
+  extend: true`;
 const exampleInit = `behaviors:
 errors:
 events:`;
