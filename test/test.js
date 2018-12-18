@@ -53,18 +53,56 @@ describe("Loader", function() {
 			file: "stars",
 			rawFilename: "stars.yml",
 			filesAndFoldersAmount: 3,
-			compare: [
+			grandChildrenCompare: [
 				{
 					child: "sol",
-					grandchild: "planet2",
+					grandChild: "planet2",
 					value: "Earth"
 				},
 				{
 					child: "sol",
-					grandchild: "planet3",
+					grandChild: "planet3",
 					value: "Mars"
 				}
 			]
+		},
+		// Flower Shop
+		{
+			name: "Flower Shop",
+			rootDir: "test",
+			dir: "flowerShop",
+			file: "init",
+			rawFilename: "init.yml",
+			filesAndFoldersAmount: 7,
+			greatGrandChildrenCompare: [
+				{
+					child: "branch",
+					grandChild: "branch_stock",
+					greatGrandChild: "potatoes",
+					value: "17"
+				},
+				{
+					child: "branch",
+					grandChild: "branch_stock",
+					greatGrandChild: "cabbages",
+					value: "87"
+				},
+				{
+					child: "branch",
+					grandChild: "branch_stock",
+					greatGrandChild: "oranges",
+					value: "49"
+				}
+			]
+		},
+		// Example
+		{
+			name: "Example",
+			rootDir: "test",
+			dir: "example",
+			file: "init",
+			rawFilename: "init.yml",
+			filesAndFoldersAmount: 4
 		}
 	];
 	loaders.forEach(function(element){
@@ -88,13 +126,27 @@ describe("Loader", function() {
 				});
 			});
 
-			if(element.hasOwnProperty("compare")){
-				if(element.compare.length > 0){
-					element.compare.forEach(function(compare){
-						describe("#" + compare.child + "." + compare.grandchild, function() {
+			if(element.hasOwnProperty("grandChildrenCompare")){
+				if(element.grandChildrenCompare.length > 0){
+					element.grandChildrenCompare.forEach(function(compare){
+						describe("#" + compare.child + "." + compare.grandChild, function() {
 							it("should be " + compare.value, function(done) {
 								load.then(function(){
-									assert.equal(loaderTest[compare.child][compare.grandchild], compare.value);
+									assert.equal(loaderTest[compare.child][compare.grandChild], compare.value);
+									done();
+								});
+							});
+						});
+					});
+				}
+			}
+			if(element.hasOwnProperty("greatGrandChildrenCompare")){
+				if(element.greatGrandChildrenCompare.length > 0){
+					element.greatGrandChildrenCompare.forEach(function(compare){
+						describe("#" + compare.child + "." + compare.grandChild + "." + compare.greatGrandChild, function() {
+							it("should be " + compare.value, function(done) {
+								load.then(function(){
+									assert.equal(loaderTest[compare.child][compare.grandChild][compare.greatGrandChild], compare.value);
 									done();
 								});
 							});

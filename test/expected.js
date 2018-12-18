@@ -9,6 +9,7 @@ data:
   file: flowers
   path: relative
   folder: data
+  extend: false
 behaviors:
 errors:
 branch:
