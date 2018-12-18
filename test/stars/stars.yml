@@ -1,5 +1,5 @@
 sol:
 alphacentauri:
   file: alphacentauri.yml
-  path: relative
-  folder: close/veryclose
+  path: absolute
+  folder: stars/close/veryclose
