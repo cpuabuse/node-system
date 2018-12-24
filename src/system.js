@@ -54,6 +54,7 @@ class System extends loader.Loader{
 	 * The constructor will perform necessary preparations, so that failures can be processed with system events. Up until these preparations are complete, the failure will result in thrown standard Error.
 	 * @param {module:system.System~options} options System options.
 	 * @param {module:system.System~behavior[]} [behaviors] - [Optional] Behaviors to add.
+	 * @param {Function} [onError] - [Optional] Callback for error handling during delayed execution after loader has loaded. Takes error string as an argument.
 	 */
 	constructor(options, behaviors, onError){
 		// Throw an error if failure
