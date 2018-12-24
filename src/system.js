@@ -55,10 +55,10 @@ class System extends loader.Loader{
 	 * @param {module:system.System~options} options System options.
 	 * @param {module:system.System~behavior[]} [behaviors] - [Optional] Behaviors to add.
 	 */
-	constructor(options, behaviors){
+	constructor(options, behaviors, onError){
 		// Throw an error if failure
 		if (System.checkOptionsFailure(options)){
-			throw new Error("Argument options is missing a property or a property is of incorrect type.");
+			throw new Error("options_fail");
 		}
 
 		// First things first, call a loader, if loader has failed, there are no tools to report gracefully, so the errors from there will just go above
@@ -83,7 +83,10 @@ class System extends loader.Loader{
 				 * @type {Object}
 				*/
 				if(!(this.hasOwnProperty("events") && this.hasOwnProperty("behaviors"))){ // Make sure basic system carcass was initialized
-					throw new Error("loader_failed");
+					if(onError){
+						onError("loader_fail");
+					}
+					return;
 				}
 
 				// Initialize the events
