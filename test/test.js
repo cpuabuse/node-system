@@ -15,6 +15,7 @@
 // Set eslint to ingore describe and it for assert
 /* global describe:true */
 /* global it:true */
+/* global before:true */
 
 const system = require("../src/system.js");
 const systemError = require("../src/error.js");
@@ -350,92 +351,98 @@ describe("System", function() {
 					]
 				);
 			});
-			systemTestLoad.then(function(){
-				// System property of System instance
-				describe("#system", function(){
-					// System instance ID
-					describe("id", function(){
-						it("should be " + element.options.id, function(done) {
-							assert.equal(systemTest.system.id, element.options.id);
-							done();
-						});
-					});
 
-					/**
-					 * Tests the getFile function.
-					 * @member getFile
-					 * @memberof module:system~test.System
-					 */
-					describe(".file", function(){
-						describe(".getFile()", function(){
-							it("should get expected contents from file \"" + element.rawInitFilename + "\" with args (\"" + element.options.relativeInitDir + "\", \"" + element.rawInitFilename + "\")", function(done){
-								systemTest.system.file.getFile(element.options.relativeInitDir, element.rawInitFilename).then(function(result){
-									assert.equal(result, element.initContents);
-									done();
-								});
-							});
-							it("should produce an error with non-existent args (\"" + element.options.relativeInitDir + "\", \"" + nonExistentFileOrDir + "\")", function(done){
-								systemTest.system.file.getFile(element.options.relativeInitDir, nonExistentFileOrDir).catch(function(error){
-									assert.equal(error, systemTest.system.error.file_system_error);
-									done();
-								});
-							});
-							it("should produce an error with folder args (\"./\", \"" + element.options.relativeInitDir + "\")", function(done){
-								systemTest.system.file.getFile("./", element.options.relativeInitDir).catch(function(error){
-									assert.equal(error, systemTest.system.error.file_system_error);
-									done();
-								});
-							});
-						});
-					});
-
-					/*
-						Perform test only on units that have the error property.
-						Iterate through "errorInstances" array, if present, and check that respective errors are indeed of type SystemError.
-						Iterate through "stringErrors" array, if present, and check that respective errors are not of type SystemError.
-					*/
-					if(element.hasOwnProperty("error")){
-						describe("error", function() {
-							if (element.error.hasOwnProperty("errorInstances")){
-								describe("errorInstances", function(){
-									element.error.errorInstances.forEach(function(error){
-										describe(error, function() {
-											// It should be a SystemError
-											it("should be SystemError", function(done){
-												if (systemError.SystemError.isSystemError(systemTest.system.error[error])){
-													done();
-												}
-											});
-											it("should be " + error, function(done) {
-												try {
-													throw systemTest.system.error[error];
-												} catch(err){
-													assert.equal(err.code, error);
-													done();
-												}
-											});
-										});
-									});
-								});
-							}
-
-							if (element.error.hasOwnProperty("stringErrors")){
-								describe("stringErrors", function(){
-									element.error.stringErrors.forEach(function(error){
-										describe(error, function(){
-											it("should not be SystemError", function(done){
-												if(!systemError.SystemError.isSystemError(error)){
-													done();
-												}
-											});
-										});
-									});
-								});
-							}
-						});
-					}
+			before(function(done){
+				systemTestLoad.then(function(){
+					done();
 				});
 			});
+
+			// System property of System instance
+			describe("#system", function(){
+				// System instance ID
+				describe("id", function(){
+					it("should be " + element.options.id, function(done) {
+						assert.equal(systemTest.system.id, element.options.id);
+						done();
+					});
+				});
+
+				/**
+				 * Tests the getFile function.
+				 * @member getFile
+				 * @memberof module:system~test.System
+				 */
+				describe(".file", function(){
+					describe(".getFile()", function(){
+						it("should get expected contents from file \"" + element.rawInitFilename + "\" with args (\"" + element.options.relativeInitDir + "\", \"" + element.rawInitFilename + "\")", function(done){
+							systemTest.system.file.getFile(element.options.relativeInitDir, element.rawInitFilename).then(function(result){
+								assert.equal(result, element.initContents);
+								done();
+							});
+						});
+						it("should produce an error with non-existent args (\"" + element.options.relativeInitDir + "\", \"" + nonExistentFileOrDir + "\")", function(done){
+							systemTest.system.file.getFile(element.options.relativeInitDir, nonExistentFileOrDir).catch(function(error){
+								assert.equal(error, systemTest.system.error.file_system_error);
+								done();
+							});
+						});
+						it("should produce an error with folder args (\"./\", \"" + element.options.relativeInitDir + "\")", function(done){
+							systemTest.system.file.getFile("./", element.options.relativeInitDir).catch(function(error){
+								assert.equal(error, systemTest.system.error.file_system_error);
+								done();
+							});
+						});
+					});
+				});
+
+				/*
+					Perform test only on units that have the error property.
+					Iterate through "errorInstances" array, if present, and check that respective errors are indeed of type SystemError.
+					Iterate through "stringErrors" array, if present, and check that respective errors are not of type SystemError.
+				*/
+				if(element.hasOwnProperty("error")){
+					describe("error", function() {
+						if (element.error.hasOwnProperty("errorInstances")){
+							describe("errorInstances", function(){
+								element.error.errorInstances.forEach(function(error){
+									describe(error, function() {
+										// It should be a SystemError
+										it("should be SystemError", function(done){
+											if (systemError.SystemError.isSystemError(systemTest.system.error[error])){
+												done();
+											}
+										});
+										it("should be " + error, function(done) {
+											try {
+												throw systemTest.system.error[error];
+											} catch(err){
+												assert.equal(err.code, error);
+												done();
+											}
+										});
+									});
+								});
+							});
+						}
+
+						if (element.error.hasOwnProperty("stringErrors")){
+							describe("stringErrors", function(){
+								element.error.stringErrors.forEach(function(error){
+									describe(error, function(){
+										it("should not be SystemError", function(done){
+											if(!systemError.SystemError.isSystemError(error)){
+												done();
+											}
+										});
+									});
+								});
+							});
+						}
+					});
+				}
+			});
+
 		});
 	});
 	/**
