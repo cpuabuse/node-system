@@ -411,6 +411,60 @@ describe("System", function() {
 			});
 		});
 	});
+	/**
+	 * Test the checkOptionsFailure function.
+	 * @member checkOptionsFailure
+	 * @memberof module:system~test.System
+	 */
+	describe(".checkOptionsFailure()", function(){
+		let optionsArray = [
+			{
+				errorDescription: "\"notMute\" not set",
+				options: {
+					id: "chickenCoup",
+					rootDir: "./test",
+					relativeInitDir: "chicken_coup",
+					initFilename: "init",
+					notMuteNameError: false
+				}
+			},
+			{
+				errorDescription: "\"notMute\" not boolean",
+				options: {
+					id: "chickenCoup",
+					rootDir: "./test",
+					relativeInitDir: "chicken_coup",
+					initFilename: "init",
+					notMute: "stringFalse"
+				}
+			},
+			{
+				errorDescription: "\"id\" not set",
+				options: {
+					idNameError: "chickenCoup",
+					rootDir: "./test",
+					relativeInitDir: "chicken_coup",
+					initFilename: "init",
+					notMute: false
+				}
+			},
+			{
+				errorDescription: "\"id\" not string",
+				options: {
+					id: 123456789,
+					rootDir: "./test",
+					relativeInitDir: "chicken_coup",
+					initFilename: "init",
+					notMute: false
+				}
+			}
+		];
+		optionsArray.forEach(function(options){
+			it("should fail with " + options.errorDescription, function(){
+				assert.equal(system.System.checkOptionsFailure(options.options), true);
+			});
+		});
+	});
 });
 
 describe("AtomicLock", function() {
