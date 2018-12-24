@@ -299,22 +299,26 @@ class System extends loader.Loader{
 	static checkOptionsFailure(options){
 		let failed = false;
 
-		// Checks boolean
-		if(!options.hasOwnProperty("notMute")){
+		if(options === null){
 			failed = true;
-		} else if(typeof options.notMute !== "boolean"){
-			failed = true;
-		}
-
-		// Checks strings
-		let stringOptions = ["id","rootDir","relativeInitDir","initFilename"];
-		stringOptions.forEach(function(element){
-			if(!options.hasOwnProperty(element)){
+		} else {
+			// Checks boolean
+			if(!options.hasOwnProperty("notMute")){
 				failed = true;
-			} else if(typeof options[element] !== "string"){
+			} else if(typeof options.notMute !== "boolean"){
 				failed = true;
 			}
-		});
+
+			// Checks strings
+			let stringOptions = ["id","rootDir","relativeInitDir","initFilename"];
+			stringOptions.forEach(function(element){
+				if(!options.hasOwnProperty(element)){
+					failed = true;
+				} else if(typeof options[element] !== "string"){
+					failed = true;
+				}
+			});
+		}
 		return failed;
 	}
 

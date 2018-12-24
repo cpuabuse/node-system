@@ -276,6 +276,30 @@ describe("Loader", function() {
  * @memberof module:system~test
  */
 describe("System", function() {
+	describe("constructor", function(){
+		it("should fail with inappropriate options", function(){
+			try{
+				new system.System(null, null); /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
+			} catch(err) {
+				assert.equal(err.message, "Argument options is missing a property or a property is of incorrect type.");
+			}
+		});
+	});
+	// Commented out because there is no way to catch an error atm
+	// it("should fail with no events or behaviors files", function(){
+	// 	try{
+	// 		let options = {
+	// 			id: "cities",
+	// 			rootDir: "./test",
+	// 			relativeInitDir: "cities",
+	// 			initFilename: "init",
+	// 			notMute: false
+	// 		};
+	// 		new system.System(options, null); /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
+	// 	} catch(err) {
+	// 		assert.equal(err.message, "loader_failed");
+	// 	}
+	// });
 	// Array of testing unit initialization data
 	var systems = [
 		{ // Example

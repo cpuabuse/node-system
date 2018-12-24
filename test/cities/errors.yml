@@ -1,0 +1,2 @@
+file_system_error:
+  message: "File system operation could not complete."
