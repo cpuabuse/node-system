@@ -22,11 +22,29 @@ class Loader{
 	 * @throws Will rethrow errors from initRecursion
 	 */
 	constructor(rootDir, arg_relativeInitDir, arg_initFilename, callback){
-		try{
-			// Initialization recursion
-			callback(initRecursion(rootDir, arg_relativeInitDir, arg_initFilename, this, true));/* eslint-disable-line callback-return */// Unnecessary here, as there is single execution path
-		} catch(error){
-			throw error;
+		/**
+		 * A dummy constructor.
+		 */
+		function dummyConstructor(){}/* eslint-disable-line no-empty-function */// Empty because dummy
+		/**
+		 * The standard constructor.
+		 */
+		function standardConstructor(){
+			try{
+				// Initialization recursion
+				callback(initRecursion(rootDir, arg_relativeInitDir, arg_initFilename, this, true));/* eslint-disable-line callback-return */// Unnecessary here, as there is single execution path
+			} catch(error){
+				throw error;
+			}
+		}
+		// Determine which constructor to use.
+		let previousIsNull = null;
+		for (var a = 0; a < arguments.length; a++){
+			if (a === 0){
+				previousIsNull = arguments[a] === null; /* eslint-disable-line prefer-rest-params */
+			} else if (previousIsNull !== (arguments[a] === null)){ /* eslint-disable-line prefer-rest-params */
+				throw "error";
+			}
 		}
 	}
 

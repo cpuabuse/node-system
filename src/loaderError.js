@@ -5,7 +5,10 @@
 "use strict";
 
 class LoaderError extends Error{
-
+	constructor(code, message){
+		super(message);
+		this.code = code;
+	}
 }
 
 exports.LoaderError = LoaderError;
