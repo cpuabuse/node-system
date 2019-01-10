@@ -33,8 +33,8 @@ class LoaderError extends Error{
 		} else if(code === 0){
 			defaultMessage = true;
 		}
-		super(defaultMessage ? message : "default_code");
-		this.code = defaultCode ? code : "default_message";
+		super(defaultMessage ? "default_code" : message);
+		this.code = defaultCode ? "default_message" : code;
 	}
 }
 

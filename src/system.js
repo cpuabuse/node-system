@@ -9,6 +9,7 @@ const systemError = require("./error.js");
 const behavior = require("./behavior.js");
 const atomic = require("./atomic.js");
 const events = require("./events.js");
+const loaderError = require("./loaderError.js");
 
 /**
  * Provides wide range of functionality for file loading and event exchange.
@@ -59,62 +60,66 @@ class System extends loader.Loader{
 	constructor(options, behaviors, onError){
 		// Throw an error if failure
 		if (System.checkOptionsFailure(options)){
-			throw new Error("options_fail");
-		}
+			// Report an error
+			onError(new loaderError.LoaderError("system_options_failure", "The options provided to the system constructor are inconsistent."));
 
-		// First things first, call a loader, if loader has failed, there are no tools to report gracefully, so the errors from there will just go above
-		super(options.rootDir, options.relativeInitDir, options.initFilename, load => {
-			load.then(() => {
-				/**
-				 * Events to be populated by the loader.
-				 * System by itself does not deal with events, it only confirms that the events were initialized. Although, if the events are fired, and failure to fire event is set to throw, or undocumented events encountered, it would throw errors.
-				 * @abstract
-				 * @instance
-				 * @member events
-				 * @memberof module:system.System
-				 * @type {Object}
-				 */
+			// Create a dummy
+			super();
+		} else { // If no failures
+			// First things first, call a loader, if loader has failed, there are no tools to report gracefully, so the errors from there will just go above
+			super(options.rootDir, options.relativeInitDir, options.initFilename, load => {
+				load.then(() => {
+					/**
+					 * Events to be populated by the loader.
+					 * System by itself does not deal with events, it only confirms that the events were initialized. Although, if the events are fired, and failure to fire event is set to throw, or undocumented events encountered, it would throw errors.
+					 * @abstract
+					 * @instance
+					 * @member events
+					 * @memberof module:system.System
+					 * @type {Object}
+					 */
 
-				/**
-				 * Behavior describtions initialized by loader.
-				 * @abstract
-				 * @instance
-				 * @member behaviors
-				 * @memberof module:system.System
-				 * @type {Object}
-				*/
-				if(!(this.hasOwnProperty("events") && this.hasOwnProperty("behaviors"))){ // Make sure basic system carcass was initialized
-					if(onError){
-						onError("loader_fail");
+					/**
+					 * Behavior describtions initialized by loader.
+					 * @abstract
+					 * @instance
+					 * @member behaviors
+					 * @memberof module:system.System
+					 * @type {Object}
+					*/
+					if(!(this.hasOwnProperty("events") && this.hasOwnProperty("behaviors"))){ // Make sure basic system carcass was initialized
+						if(onError){
+							onError("loader_fail");
+						}
+						return;
 					}
-					return;
-				}
 
-				// Initialize the events
-				for (var error in this.errors){
-					// Will skip garbled errors
-					if (typeof this.errors[error] === "object"){
-						// Set default error message for absent message
-						let message = "Error message not set.";
-						if (error.hasOwnProperty(message)){
-							if (typeof error.message === "string"){
-								if (error.message != "") {
-									({message} = error);
+					// Initialize the events
+					for (var error in this.errors){
+						// Will skip garbled errors
+						if (typeof this.errors[error] === "object"){
+							// Set default error message for absent message
+							let message = "Error message not set.";
+							if (error.hasOwnProperty(message)){
+								if (typeof error.message === "string"){
+									if (error.message != "") {
+										({message} = error);
+									}
 								}
 							}
+							this.addError(error, message);
 						}
-						this.addError(error, message);
 					}
-				}
 
-				// Initialize the behaviors; If behaviors not provided as argument, it is OK; Not immediate, since the load.then() code will execute after the instance finish initializing.
-				if(behaviors){
-					this.addBehaviors(behaviors).then(() => this.fire(events.systemLoad));
-				} else {
-					this.fire(events.systemLoad, "System loading complete.");
-				}
+					// Initialize the behaviors; If behaviors not provided as argument, it is OK; Not immediate, since the load.then() code will execute after the instance finish initializing.
+					if(behaviors){
+						this.addBehaviors(behaviors).then(() => this.fire(events.systemLoad));
+					} else {
+						this.fire(events.systemLoad, "System loading complete.");
+					}
+				});
 			});
-		});
+		}
 
 		// System constants
 		/** Contains system info.

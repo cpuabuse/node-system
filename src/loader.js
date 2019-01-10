@@ -7,6 +7,7 @@
 const path = require("path");
 const fs   = require("fs");
 const yaml = require("js-yaml");
+const loaderError = require("./loaderError.js");
 
 /**
  * Required by system to perform file initialization.
@@ -29,23 +30,41 @@ class Loader{
 		/**
 		 * The standard constructor.
 		 */
-		function standardConstructor(){
+		var standardConstructor = () => {
 			try{
 				// Initialization recursion
 				callback(initRecursion(rootDir, arg_relativeInitDir, arg_initFilename, this, true));/* eslint-disable-line callback-return */// Unnecessary here, as there is single execution path
 			} catch(error){
 				throw error;
 			}
-		}
+		};
 		// Determine which constructor to use.
 		let previousIsNull = null;
 		for (var a = 0; a < arguments.length; a++){
 			if (a === 0){
 				previousIsNull = arguments[a] === null; /* eslint-disable-line prefer-rest-params */
 			} else if (previousIsNull !== (arguments[a] === null)){ /* eslint-disable-line prefer-rest-params */
-				throw "error";
+				throw new loaderError.LoaderError("unexpected_constructor", "Null and String arguments found while deciding the constructor method.");
 			}
 		}
+		// Call the appropriate constructor
+		switch (previousIsNull) {
+			// There are no arguments or all arguments are null
+			case true:
+			case null:
+			dummyConstructor();
+			break;
+
+			// All arguments are not null
+			case false:
+			standardConstructor();
+			break;
+
+			// Something went wrong, we shouldn't be here
+			default:
+			throw new loaderError.LoaderError("inetrnal_logic_error", "This error should not happen. Something went wrong with loader constructor arguments.");
+		}
+
 	}
 
 	/**

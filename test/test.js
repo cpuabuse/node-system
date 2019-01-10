@@ -278,12 +278,12 @@ describe("Loader", function() {
  */
 describe("System", function() {
 	describe("constructor", function(){
-		it("should fail with inappropriate options", function(){
-			try{
-				new system.System(null, null); /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
-			} catch(err) {
-				assert.equal(err.message, "options_fail");
-			}
+		it("should fail with inappropriate options", function(done){
+				new system.System(null, null, function(error){ /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
+					assert.equal(error.code, "system_options_failure");
+					assert.equal(error.message, "The options provided to the system constructor are inconsistent.");
+					done();
+				});
 		});
 	});
 	it("should fail with no events or behaviors files", function(done){
