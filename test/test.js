@@ -93,6 +93,18 @@ describe("Loader", function() {
 					grandChild: "branch_stock",
 					greatGrandChild: "oranges",
 					value: "49"
+				},
+				{
+					child: "branch",
+					grandChild: "branch_stock",
+					greatGrandChild: "pineapples",
+					value: "16"
+				},
+				{
+					child: "branch",
+					grandChild: "branch_stock",
+					greatGrandChild: "carrots",
+					value: "50"
 				}
 			]
 		},
