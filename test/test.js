@@ -20,6 +20,7 @@
 const system = require("../src/system.js");
 const systemError = require("../src/error.js");
 const loader = require("../src/loader.js");
+const loaderError = require("../src/loaderError.js");
 const expected = require("./expected.js");
 const assert = require("assert");
 const path = require("path");
@@ -307,12 +308,15 @@ describe("System", function() {
 			notMute: false
 		};
 
-		new Promise(function(resolve, reject){
-			new system.System(options, null, function(err){ /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
-				reject(err);
-			});
-		}).catch(function(error){
-			assert.equal(error.code, "loader_fail");
+		new system.System(options, null, function(err){ /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
+			assert.throws(
+				function(){
+					throw err;
+				},
+				function(error){
+					return ((err instanceof loaderError.LoaderError) && error.code === "loader_fail");
+				}
+				);
 			done();
 		});
 	});
