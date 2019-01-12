@@ -312,7 +312,7 @@ describe("System", function() {
 				reject(err);
 			});
 		}).catch(function(error){
-			assert.equal(error, "loader_fail");
+			assert.equal(error.code, "loader_fail");
 			done();
 		});
 	});

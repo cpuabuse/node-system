@@ -32,10 +32,10 @@ class Loader{
 		 */
 		var standardConstructor = () => {
 			try{
-				// Initialization recursion
+				// Initialization recursion; The error handling of the callback will happen asynchronously, so it is OK to include callback as well into the try statement and handle errors synchronously.
 				callback(initRecursion(rootDir, arg_relativeInitDir, arg_initFilename, this, true));/* eslint-disable-line callback-return */// Unnecessary here, as there is single execution path
 			} catch(error){
-				throw error;
+				throw new loaderError.LoaderError("functionality_error", "There was an error in the loader functionality in constructor subroutines.");
 			}
 		};
 		// Determine which constructor to use.

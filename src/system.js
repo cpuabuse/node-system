@@ -58,234 +58,255 @@ class System extends loader.Loader{
 	 * @param {Function} [onError] - [Optional] Callback for error handling during delayed execution after loader has loaded. Takes error string as an argument.
 	 */
 	constructor(options, behaviors, onError){
-		// Throw an error if failure
-		if (System.checkOptionsFailure(options)){
-			// Report an error
-			onError(new loaderError.LoaderError("system_options_failure", "The options provided to the system constructor are inconsistent."));
-
-			// Create a dummy
-			super();
-		} else { // If no failures
-			// First things first, call a loader, if loader has failed, there are no tools to report gracefully, so the errors from there will just go above
-			super(options.rootDir, options.relativeInitDir, options.initFilename, load => {
-				load.then(() => {
-					/**
-					 * Events to be populated by the loader.
-					 * System by itself does not deal with events, it only confirms that the events were initialized. Although, if the events are fired, and failure to fire event is set to throw, or undocumented events encountered, it would throw errors.
-					 * @abstract
-					 * @instance
-					 * @member events
-					 * @memberof module:system.System
-					 * @type {Object}
-					 */
-
-					/**
-					 * Behavior describtions initialized by loader.
-					 * @abstract
-					 * @instance
-					 * @member behaviors
-					 * @memberof module:system.System
-					 * @type {Object}
-					*/
-					if(!(this.hasOwnProperty("events") && this.hasOwnProperty("behaviors"))){ // Make sure basic system carcass was initialized
-						if(onError){
-							onError("loader_fail");
-						}
-						return;
-					}
-
-					// Initialize the events
-					for (var error in this.errors){
-						// Will skip garbled errors
-						if (typeof this.errors[error] === "object"){
-							// Set default error message for absent message
-							let message = "Error message not set.";
-							if (error.hasOwnProperty(message)){
-								if (typeof error.message === "string"){
-									if (error.message != "") {
-										({message} = error);
-									}
-								}
-							}
-							this.addError(error, message);
-						}
-					}
-
-					// Initialize the behaviors; If behaviors not provided as argument, it is OK; Not immediate, since the load.then() code will execute after the instance finish initializing.
-					if(behaviors){
-						this.addBehaviors(behaviors).then(() => this.fire(events.systemLoad));
-					} else {
-						this.fire(events.systemLoad, "System loading complete.");
-					}
-				});
-			});
+		/**
+		 * Process the loader error.
+		 * Due to the design of the System constructor, this is supposed to be called only once during the constructor execution, no matter the failure.
+		 */
+		function processLoaderError(error){
+			onError(error instanceof loaderError.LoaderError ? error : new loaderError.LoaderError("other_error", "Other error in System constructor has been rethrown as Loader Error."));
 		}
 
-		// System constants
-		/** Contains system info.
-		 * @type {module:system.System~options}
-		 * @readonly
-		 * @property {module:system~Behavior} behavior Event emitter for the behaviors. Generally should use the public system instance methods instead.
-		 */
-		this.system = {
-			id: options.id,
-			rootDir: options.rootDir,
-			relativeInitDir: options.relativeInitDir,
-			initFilename: options.relatoveInitFilename,
-			notMute: options.notMute
-		};
+		// Performs the static initialization part of the instance, post-superclass constructor
+		var staticInitialization = resolve => {
+			// System constants
+			/** Contains system info.
+			 * @type {module:system.System~options}
+			 * @readonly
+			 * @property {module:system~Behavior} behavior Event emitter for the behaviors. Generally should use the public system instance methods instead.
+			 */
+			this.system = {
+				id: options.id,
+				rootDir: options.rootDir,
+				relativeInitDir: options.relativeInitDir,
+				initFilename: options.relatoveInitFilename,
+				notMute: options.notMute
+			};
 
-		/**
-		 * Actual behaviors are located here.
-		 * @type {module:system~Behavior}
-		 */
-		this.system.behavior = new behavior.Behavior();
-		/**
-		 * Actual errors are located here.
-		 * @abstract
-		 * @type {Object}
-		 */
-		this.system.error = new Object();
-
-		/**
-		 * File system methods.
-		 * @type {Object}
-		 */
-		this.system.file = {
 			/**
-			 * File level filters.
+			 * Actual behaviors are located here.
+			 * @type {module:system~Behavior}
+			 */
+			this.system.behavior = new behavior.Behavior();
+			/**
+			 * Actual errors are located here.
+			 * @abstract
 			 * @type {Object}
 			 */
-			filter: {
-				/**
-				 * Check if argument is a file (relative to system root directory).
-				 * @async
-				 * @function
-				 * @param {module:system.System~filterContext} filterContext Information on the item to be filtered.
-				 * @returns {external:Promise} Promise, containing boolean result.
-				*/
-				isFile: filterContext => loader.Loader.isFile(this.system.rootDir, filterContext.dir, filterContext.itemName),
-				/**
-				 * Check if argument is a folder (relative to system root directory).
-				 * @async
-				 * @function
-				 * @param {module:system.System~filterContext} filterContext Information on the item to be filtered
-				 * @returns {external:Promise} Promise, containing boolean result.
-				*/
-				isDir: filterContext => loader.Loader.isDir(this.system.rootDir, filterContext.item)
-			},
+			this.system.error = new Object();
+
 			/**
-			 * Converts a file path to absolute operating system path. Used for external libraries, that require absolute path.
-			 * @async
-			 * @function
-			 * @param {string} dir Relative directory to the root directory..
-			 * @param {string} file Folder/file name.
-			 * @returns {external:Promise} Promise, containing string relative path.
-			*/
-			toAbsolute: (dir, file) => new Promise(resolve => {
-				let filePath = loader.Loader.join(dir, file);
-				resolve(loader.Loader.join(this.system.rootDir, filePath));
-			}),
-			/**
-			 * Converts absolute path to relative path.
-			 * @async
-			 * @function
-			 * @param {string} rootDir Relative (to system root) directory.
-			 * @param {string} target Absolute (to system root) file/folder path.
-			 * @returns {external:Promise} Promise, containing string relative path.
-			*/
-			toRelative(rootDir, target){
-				return new Promise(function(resolve){
-					resolve(loader.Loader.toRelative(rootDir, target));
-				});
-			},
-			/**
-			 * Joins two paths.
-			 * @async
-			 * @function
-			 * @param {string} rootDir Relative (to system root) directory.
-			 * @param {string} target File/folder path to rootDir.
-			 * @returns {external:Promise} Promise, containing string path.
-			*/
-			join(rootDir, target){
-				return new Promise(function(resolve){
-					resolve(loader.Loader.join(rootDir, target));
-				});
-			},
-			/**
-			 * Get file contents relative to system root directory.
-			 * @async
-			 * @function
-			 * @param {string} dir Directory, relative to system root.
-			 * @param {string} file Filename.
-			 * @returns {external:Promise} Promise, containing string with file contents..
-			*/
-			getFile: (dir, file) => new Promise((resolve, reject) => {
-				loader.Loader.getFile(this.system.rootDir, dir, file).then(function(result){
-					resolve(result);
-				}).catch(error => {
-					//	this.fire("file_system_error");
-						reject(this.system.error.file_system_error);
-					});
-			}),
-			/**
-			 * Get contents of yaml file relative to system root directory.
-			 * @async
-			 * @function
-			 * @param {string} dir Directory, relative to system root.
-			 * @param {string} file Filename.
-			 * @returns {external:Promise} Promise, containing string with file contents..
-			*/
-			getYaml: (dir, file) => loader.loadYaml(this.system.rootDir, dir, file),
-			/**
-			 * List the contents of the folder, relative to system root directory.
-			 * @async
-			 * @function
-			 * @param {string} dir Folder relative to system root.
-			 * @param {function} filter Filter function.
-			 * @returns {external:Promise} Promise, containing an array of filtered strings - files/folders relative to system root.
-			 * @example <caption>List folders</caption>
-			 * systemInstance.system.file.list("css", systemInstance.system.file.filter.isDir);
+			 * File system methods.
+			 * @type {Object}
 			 */
-			list: async(dir, filter) => {
-				let filteredItems; // Return array
-				let itemNames = await loader.Loader.list(this.system.rootDir, dir); // Wait for folder contets
-				let items = await this.system.file.join(dir, itemNames);
+			this.system.file = {
+				/**
+				 * File level filters.
+				 * @type {Object}
+				 */
+				filter: {
+					/**
+					 * Check if argument is a file (relative to system root directory).
+					 * @async
+					 * @function
+					 * @param {module:system.System~filterContext} filterContext Information on the item to be filtered.
+					 * @returns {external:Promise} Promise, containing boolean result.
+					*/
+					isFile: filterContext => loader.Loader.isFile(this.system.rootDir, filterContext.dir, filterContext.itemName),
+					/**
+					 * Check if argument is a folder (relative to system root directory).
+					 * @async
+					 * @function
+					 * @param {module:system.System~filterContext} filterContext Information on the item to be filtered
+					 * @returns {external:Promise} Promise, containing boolean result.
+					*/
+					isDir: filterContext => loader.Loader.isDir(this.system.rootDir, filterContext.item)
+				},
+				/**
+				 * Converts a file path to absolute operating system path. Used for external libraries, that require absolute path.
+				 * @async
+				 * @function
+				 * @param {string} dir Relative directory to the root directory..
+				 * @param {string} file Folder/file name.
+				 * @returns {external:Promise} Promise, containing string relative path.
+				*/
+				toAbsolute: (dir, file) => new Promise(resolve => {
+					let filePath = loader.Loader.join(dir, file);
+					resolve(loader.Loader.join(this.system.rootDir, filePath));
+				}),
+				/**
+				 * Converts absolute path to relative path.
+				 * @async
+				 * @function
+				 * @param {string} rootDir Relative (to system root) directory.
+				 * @param {string} target Absolute (to system root) file/folder path.
+				 * @returns {external:Promise} Promise, containing string relative path.
+				*/
+				toRelative(rootDir, target){
+					return new Promise(function(resolve){
+						resolve(loader.Loader.toRelative(rootDir, target));
+					});
+				},
+				/**
+				 * Joins two paths.
+				 * @async
+				 * @function
+				 * @param {string} rootDir Relative (to system root) directory.
+				 * @param {string} target File/folder path to rootDir.
+				 * @returns {external:Promise} Promise, containing string path.
+				*/
+				join(rootDir, target){
+					return new Promise(function(resolve){
+						resolve(loader.Loader.join(rootDir, target));
+					});
+				},
+				/**
+				 * Get file contents relative to system root directory.
+				 * @async
+				 * @function
+				 * @param {string} dir Directory, relative to system root.
+				 * @param {string} file Filename.
+				 * @returns {external:Promise} Promise, containing string with file contents..
+				*/
+				getFile: (dir, file) => new Promise((resolve, reject) => {
+					loader.Loader.getFile(this.system.rootDir, dir, file).then(function(result){
+						resolve(result);
+					}).catch(error => {
+						//	this.fire("file_system_error");
+							reject(this.system.error.file_system_error);
+						});
+				}),
+				/**
+				 * Get contents of yaml file relative to system root directory.
+				 * @async
+				 * @function
+				 * @param {string} dir Directory, relative to system root.
+				 * @param {string} file Filename.
+				 * @returns {external:Promise} Promise, containing string with file contents..
+				*/
+				getYaml: (dir, file) => loader.loadYaml(this.system.rootDir, dir, file),
+				/**
+				 * List the contents of the folder, relative to system root directory.
+				 * @async
+				 * @function
+				 * @param {string} dir Folder relative to system root.
+				 * @param {function} filter Filter function.
+				 * @returns {external:Promise} Promise, containing an array of filtered strings - files/folders relative to system root.
+				 * @example <caption>List folders</caption>
+				 * systemInstance.system.file.list("css", systemInstance.system.file.filter.isDir);
+				 */
+				list: async(dir, filter) => {
+					let filteredItems; // Return array
+					let itemNames = await loader.Loader.list(this.system.rootDir, dir); // Wait for folder contets
+					let items = await this.system.file.join(dir, itemNames);
 
-				// Was the filter even specified?
-				if(filter !== null){
-					filteredItems = new Array(); // Prepare return object
-					let {length} = items; // Cache length
-					let filterMatches = new Array(); // Operations dataholder; Contains Promises
+					// Was the filter even specified?
+					if(filter !== null){
+						filteredItems = new Array(); // Prepare return object
+						let {length} = items; // Cache length
+						let filterMatches = new Array(); // Operations dataholder; Contains Promises
 
-					// Filter and populate promises
-					for (let i = 0; i < length; i++){
-						// Declare and populate filter context
-						var filterContext = {
-							dir,
-							itemName: itemNames[i],
-							item: items[i]
-						};
-						filterMatches[i] = filter(filterContext);
+						// Filter and populate promises
+						for (let i = 0; i < length; i++){
+							// Declare and populate filter context
+							var filterContext = {
+								dir,
+								itemName: itemNames[i],
+								item: items[i]
+							};
+							filterMatches[i] = filter(filterContext);
+						}
+
+						// Work on results
+						await Promise.all(filterMatches).then(values => {
+							// Populate return object preserving the order
+							for (let i = 0; i < length; i++){
+								if(values[i]){
+									filteredItems.push(itemNames[i]);
+								}
+							}
+						});
+					} else { // <== if(filter !== null)
+						filteredItems = itemNames;
 					}
 
-					// Work on results
-					await Promise.all(filterMatches).then(values => {
-						// Populate return object preserving the order
-						for (let i = 0; i < length; i++){
-							if(values[i]){
-								filteredItems.push(itemNames[i]);
-							}
-						}
-					});
-				} else { // <== if(filter !== null)
-					filteredItems = itemNames;
-				}
+					// Finally - return filtered items
+					return filteredItems;
+				} // <== list
+			}; // <== file
+			resolve();
+		}
 
-				// Finally - return filtered items
-				return filteredItems;
-			} // <== list
-		}; // <== file
+		try{
+			// Throw an error if failure
+			if (System.checkOptionsFailure(options)){
+				// Report an error
+				throw new loaderError.LoaderError("system_options_failure", "The options provided to the system constructor are inconsistent.");
+			} else { // If no failures
+				// First things first, call a loader, if loader has failed, there are no tools to report gracefully, so the errors from there will just go above
+				super(options.rootDir, options.relativeInitDir, options.initFilename, load => {
+					Promise.all([load, staticInitializationPromise]).then(() => {
+						try {
+							/**
+							 * Events to be populated by the loader.
+							 * System by itself does not deal with events, it only confirms that the events were initialized. Although, if the events are fired, and failure to fire event is set to throw, or undocumented events encountered, it would throw errors.
+							 * @abstract
+							 * @instance
+							 * @member events
+							 * @memberof module:system.System
+							 * @type {Object}
+							 */
+
+							/**
+							 * Behavior describtions initialized by loader.
+							 * @abstract
+							 * @instance
+							 * @member behaviors
+							 * @memberof module:system.System
+							 * @type {Object}
+							*/
+							if(!(this.hasOwnProperty("events") && this.hasOwnProperty("behaviors"))){ // Make sure basic system carcass was initialized
+								if(onError){
+									throw new loaderError.LoaderError("loader_fail", "Mandatory initialization files are missing.");
+								}
+								return;
+							}
+
+							// Initialize the events
+							for (var err in this.errors){
+								// Will skip garbled errors
+								if (typeof this.errors[err] === "object"){
+									// Set default error message for absent message
+									let message = "Error message not set.";
+									if (err.hasOwnProperty(message)){
+										if (typeof err.message === "string"){
+											if (err.message != "") {
+												({message} = err);
+											}
+										}
+									}
+									this.addError(err, message);
+								}
+							}
+
+							// Initialize the behaviors; If behaviors not provided as argument, it is OK; Not immediate, since the load.then() code will execute after the instance finish initializing.
+							if(behaviors){
+								this.addBehaviors(behaviors).then(() => this.fire(events.systemLoad));
+							} else {
+								this.fire(events.systemLoad, "System loading complete.");
+							}
+						} catch (error){
+							processLoaderError(error);
+						}
+					}).catch(function(error){
+						processLoaderError(error);
+					});
+				});
+				// Promise is there to maintain full concurrency for maintainability, no functionality implied
+				var staticInitializationPromise = new Promise(staticInitialization);
+			}
+		} catch(error){
+			processLoaderError(error);
+		}
 	} // <== constructor
 
 	/**
