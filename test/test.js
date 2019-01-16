@@ -320,6 +320,29 @@ describe("System", function() {
 			done();
 		});
 	});
+	it("should not generate inappropriately defined errors, and should generate the default message", function(done){
+		let options = {
+			id: "errorInitializationCheck",
+			rootDir: "./test",
+			relativeInitDir: "error_initialization_check",
+			initFilename: "init",
+			notMute: false
+		};
+
+		let errorCheckSystem = new system.System(
+			options,
+			[
+				{
+					"system_load": () => {
+						assert.strictEqual(errorCheckSystem.system.error.hasOwnProperty("not_object"), false);
+						assert.strictEqual(errorCheckSystem.system.error.no_message.message, "Error message not set.");
+						assert.strictEqual(errorCheckSystem.system.error.empty_message.message, "Error message not set.");
+						done();
+					}
+				}
+			]
+		);
+	});
 	// Array of testing unit initialization data
 	var systems = [
 		{ // Example
