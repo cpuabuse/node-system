@@ -279,9 +279,9 @@ class System extends loader.Loader{
 								if (typeof this.errors[err] === "object"){
 									// Set default error message for absent message
 									let message = "Error message not set.";
-									if (err.hasOwnProperty(message)){
-										if (typeof err.message === "string"){
-											if (err.message != "") {
+									if (this.errors[err].hasOwnProperty(message)){
+										if (typeof this.errors[err].message === "string"){
+											if (this.errors[err].message != "") {
 												({message} = err);
 											}
 										}
