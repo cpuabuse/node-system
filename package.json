@@ -12,11 +12,11 @@
     "url": "git+https://github.com/cpuabuse/node-system.git"
   },
   "dependencies": {
-    "js-yaml": "^3.12.0"
+    "js-yaml": "^3.12.1"
   },
   "devDependencies": {
     "coveralls": "^3.0.2",
-    "eslint": "^5.9.0",
+    "eslint": "^5.12.0",
     "istanbul": "^1.1.0-alpha.1",
     "jsdoc-to-markdown": "^4.0.1",
     "mocha": "^5.2.0"

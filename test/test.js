@@ -235,13 +235,13 @@ describe("Loader", function() {
 						done();
 					});
 				});
-				it("FILE should not be a directory with args (\"" + element.rootDir + "\", \"" + element.dir + path.sep + element.rawFilename + "\")", function(done){
+				it("should not be a directory with args (\"" + element.rootDir + "\", \"" + element.dir + path.sep + element.rawFilename + "\")", function(done){
 					loader.Loader.isFile(element.rootDir, "./" ,element.dir).then(function(result){
 						assert.equal(result, false);
 						done();
 					});
 				});
-				it("FILE should not be a directory with args (\"" + element.rootDir + "\", \"" + nonExistentFileOrDir + "\")", function(done){
+				it("should not be a directory with args (\"" + element.rootDir + "\", \"" + nonExistentFileOrDir + "\")", function(done){
 					loader.Loader.isFile(element.rootDir, "./", nonExistentFileOrDir).then(function(result){
 						assert.equal(result, false);
 						done();
