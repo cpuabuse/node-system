@@ -61,9 +61,14 @@ class System extends loader.Loader{
 		/**
 		 * Process the loader error.
 		 * Due to the design of the System constructor, this is supposed to be called only once during the constructor execution, no matter the failure.
+		 * We do not want the constructor to fail no matter what, so we perform check for onError existence and type. Moreover, if there was a different error caught, a Loader Error would be generated.
 		 */
 		function processLoaderError(error){
-			onError(error instanceof loaderError.LoaderError ? error : new loaderError.LoaderError("other_error", "Other error in System constructor has been rethrown as Loader Error."));
+			if(onError){
+				if(typeof onError === "function"){
+					onError(error instanceof loaderError.LoaderError ? error : new loaderError.LoaderError("other_error", "Other error in System constructor has been rethrown as Loader Error."));
+				}
+			}
 		}
 
 		// Performs the static initialization part of the instance, post-superclass constructor
@@ -265,10 +270,7 @@ class System extends loader.Loader{
 							 * @type {Object}
 							*/
 							if(!(this.hasOwnProperty("events") && this.hasOwnProperty("behaviors"))){ // Make sure basic system carcass was initialized
-								if(onError){
-									throw new loaderError.LoaderError("loader_fail", "Mandatory initialization files are missing.");
-								}
-								return;
+								throw new loaderError.LoaderError("loader_fail", "Mandatory initialization files are missing.");
 							}
 
 							// Initialize the events
