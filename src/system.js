@@ -244,6 +244,9 @@ class System extends loader.Loader{
 		try{
 			// Throw an error if failure
 			if (System.checkOptionsFailure(options)){
+				// Call a dummy superconstructor
+				super();
+		
 				// Report an error
 				throw new loaderError.LoaderError("system_options_failure", "The options provided to the system constructor are inconsistent.");
 			} else { // If no failures

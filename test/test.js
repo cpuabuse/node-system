@@ -321,6 +321,9 @@ describe("Loader", function() {
  */
 describe("System", function() {
 	describe("constructor", function(){
+		it("should still execute with inappropriate options and no ways to report an error", function(){
+			new system.System(""); /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
+		});
 		it("should fail with inappropriate options", function(done){
 				new system.System(null, null, function(error){ /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
 					assert.equal(error.code, "system_options_failure");
@@ -387,7 +390,6 @@ describe("System", function() {
 						throw err;
 					},
 					function(error){
-						
 						return ((err instanceof loaderError.LoaderError) && error.code === "functionality_error");
 					}
 					);
@@ -592,6 +594,11 @@ describe("System", function() {
 	});
 });
 
+/**
+ * Tests of System class.
+ * @member AtomicLock
+ * @memberof module:system~test
+ */
 describe("AtomicLock", function() {
 	// Assing variables
 	let atomicLock = new system.AtomicLock();
