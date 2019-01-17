@@ -46,6 +46,18 @@ function dummyErrorHandler(error){} /* eslint-disable-line no-unused-vars *//* e
  * @memberof module:system~test
  */
 describe("Loader", function() {
+	describe("constructor", function(){
+		it("should produce unexpected_constructor error, with incoherent args", function(){
+			assert.throws(
+				function(){
+					new loader.Loader("string", null, "string", null); /* eslint-disable-line no-new */// "new Loader" is only used for side-effects of testing
+				},
+				function(error){
+					return ((error instanceof loaderError.LoaderError) && error.code === "unexpected_constructor");
+				}
+			);
+		});
+	});
 	var loaders = [
 		// Stars
 		{
@@ -313,9 +325,9 @@ describe("System", function() {
 						throw err;
 					},
 					function(error){
-						return ((err instanceof loaderError.LoaderError) && error.code === "loader_fail");
+						return ((error instanceof loaderError.LoaderError) && error.code === "loader_fail");
 					}
-					);
+				);
 				done();
 			});
 		});
