@@ -42,6 +42,21 @@ function dummyErrorHandler(error){} /* eslint-disable-line no-unused-vars *//* e
 
 /**
  * Tests for the Loader class.
+ * @member LoaderError
+ * @memberof module:system~test
+ */
+describe("LoaderError", function(){
+	describe("constructor", function(){
+		it("should initialize with default values", function(){
+			let error = new loaderError.LoaderError();
+			assert.strictEqual(error.code, "default_code");
+			assert.strictEqual(error.message, "default_message");
+		})
+	})
+});
+
+/**
+ * Tests for the Loader class.
  * @member Loader
  * @memberof module:system~test
  */
