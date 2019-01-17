@@ -300,7 +300,8 @@ class System extends loader.Loader{
 							processLoaderError(error);
 						}
 					}).catch(function(error){
-						processLoaderError(error);
+						// Errors returned from load or staticInitializationPromise
+						processLoaderError(new loaderError.LoaderError("functionality_error", "There was an error in the loader functionality in constructor subroutines."));
 					});
 				});
 				// Promise is there to maintain full concurrency for maintainability, no functionality implied

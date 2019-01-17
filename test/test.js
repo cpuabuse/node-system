@@ -298,50 +298,72 @@ describe("System", function() {
 					done();
 				});
 		});
-	});
-	it("should fail with no events or behaviors files", function(done){
-		let options = {
-			id: "cities",
-			rootDir: "./test",
-			relativeInitDir: "cities",
-			initFilename: "init",
-			notMute: false
-		};
+		it("should fail with no events or behaviors files", function(done){
+			let options = {
+				id: "cities",
+				rootDir: "./test",
+				relativeInitDir: "cities",
+				initFilename: "init",
+				notMute: false
+			};
 
-		new system.System(options, null, function(err){ /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
-			assert.throws(
-				function(){
-					throw err;
-				},
-				function(error){
-					return ((err instanceof loaderError.LoaderError) && error.code === "loader_fail");
-				}
-				);
-			done();
-		});
-	});
-	it("should not generate inappropriately defined errors, and should generate the default message", function(done){
-		let options = {
-			id: "errorInitializationCheck",
-			rootDir: "./test",
-			relativeInitDir: "error_initialization_check",
-			initFilename: "init",
-			notMute: false
-		};
-
-		let errorCheckSystem = new system.System(
-			options,
-			[
-				{
-					"system_load": () => {
-						assert.strictEqual(errorCheckSystem.system.error.hasOwnProperty("not_object"), false);
-						assert.strictEqual(errorCheckSystem.system.error.no_message.message, "Error message not set.");
-						assert.strictEqual(errorCheckSystem.system.error.empty_message.message, "Error message not set.");
-						done();
+			new system.System(options, null, function(err){ /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
+				assert.throws(
+					function(){
+						throw err;
+					},
+					function(error){
+						return ((err instanceof loaderError.LoaderError) && error.code === "loader_fail");
 					}
-				}
-			]
-		);
+					);
+				done();
+			});
+		});
+		it("should not generate inappropriately defined errors, and should generate the default message", function(done){
+			let options = {
+				id: "errorInitializationCheck",
+				rootDir: "./test",
+				relativeInitDir: "error_initialization_check",
+				initFilename: "init",
+				notMute: false
+			};
+
+			let errorCheckSystem = new system.System(
+				options,
+				[
+					{
+						"system_load": () => {
+							assert.strictEqual(errorCheckSystem.system.error.hasOwnProperty("not_object"), false);
+							assert.strictEqual(errorCheckSystem.system.error.no_message.message, "Error message not set.");
+							assert.strictEqual(errorCheckSystem.system.error.empty_message.message, "Error message not set.");
+							done();
+						}
+					}
+				]
+			);
+		});
+		it("should report functionality_error with fake options", function(done){
+			let options = {
+				id: "fakeID",
+				rootDir: "./fakeRoot",
+				relativeInitDir: "fakeDir",
+				initFilename: "fakeInit",
+				notMute: false
+			};
+
+			new system.System(options, null, function(err){ /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
+				assert.throws(
+					function(){
+						throw err;
+					},
+					function(error){
+						
+						return ((err instanceof loaderError.LoaderError) && error.code === "functionality_error");
+					}
+					);
+				done();
+			});
+		});
 	});
 	// Array of testing unit initialization data
 	var systems = [

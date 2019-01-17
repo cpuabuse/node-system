@@ -31,12 +31,8 @@ class Loader{
 		 * The standard constructor.
 		 */
 		var standardConstructor = () => {
-			try{
-				// Initialization recursion; The error handling of the callback will happen asynchronously, so it is OK to include callback as well into the try statement and handle errors synchronously.
-				callback(initRecursion(rootDir, arg_relativeInitDir, arg_initFilename, this, true));/* eslint-disable-line callback-return */// Unnecessary here, as there is single execution path
-			} catch(error){
-				throw new loaderError.LoaderError("functionality_error", "There was an error in the loader functionality in constructor subroutines.");
-			}
+			// Initialization recursion; The error handling of the callback will happen asynchronously
+			callback(initRecursion(rootDir, arg_relativeInitDir, arg_initFilename, this, true));
 		};
 		// Determine which constructor to use.
 		let previousIsNull = null;
@@ -62,7 +58,7 @@ class Loader{
 
 			// Something went wrong, we shouldn't be here
 			default:
-			throw new loaderError.LoaderError("inetrnal_logic_error", "This error should not happen. Something went wrong with loader constructor arguments.");
+			throw new loaderError.LoaderError("internal_logic_error", "This error should not happen. Something went wrong with loader constructor arguments.");
 		}
 
 	}
