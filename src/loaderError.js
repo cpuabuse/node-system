@@ -30,7 +30,7 @@ class LoaderError extends Error{
 		// Determine if to use a default message
 		if(typeof message !== "string"){
 			defaultMessage = true;
-		} else if(code === 0){
+		} else if(message.length === 0){
 			defaultMessage = true;
 		}
 		super(defaultMessage ? "default_message" : message);

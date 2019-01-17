@@ -51,6 +51,11 @@ describe("LoaderError", function(){
 			let error = new loaderError.LoaderError();
 			assert.strictEqual(error.code, "default_code");
 			assert.strictEqual(error.message, "default_message");
+
+			// Repeat with empty strings
+			error = new loaderError.LoaderError("","");
+			assert.strictEqual(error.code, "default_code");
+			assert.strictEqual(error.message, "default_message");
 		})
 	})
 });
