@@ -57,6 +57,9 @@ describe("Loader", function() {
 				}
 			);
 		});
+		it("should not fail as a dummy", function(){
+			new loader.Loader(null); /* eslint-disable-line no-new */// "new Loader" is only used for side-effects of testing
+		});
 	});
 	var loaders = [
 		// Stars
