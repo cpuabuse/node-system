@@ -61,7 +61,7 @@ class System extends loader.Loader{
 		/**
 		 * Process the loader error.
 		 * Due to the design of the System constructor, this is supposed to be called only once during the constructor execution, no matter the failure.
-		 * We do not want the constructor to fail no matter what, so we perform check for onError existence and type. Moreover, if there was a different error caught, a Loader Error would be generated.
+		 * We do not want the constructor to fail no matter what, so we perform check for onError existence and type. If failed, we ignore it. Moreover, if there was a different error caught, a Loader Error would be generated.
 		 */
 		function processLoaderError(error){
 			if(onError){
@@ -246,7 +246,7 @@ class System extends loader.Loader{
 			if (System.checkOptionsFailure(options)){
 				// Call a dummy superconstructor
 				super();
-		
+
 				// Report an error
 				throw new loaderError.LoaderError("system_options_failure", "The options provided to the system constructor are inconsistent.");
 			} else { // If no failures

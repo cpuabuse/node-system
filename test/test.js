@@ -327,8 +327,11 @@ describe("Loader", function() {
 describe("System", function() {
 	describe("constructor", function(){
 		it("should still execute with inappropriate options and no ways to report an error", function(){
-			new system.System(""); /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
+			new system.System(); /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
 		});
+		// it("should execute with inappropriate options and error reporting not being a function", function(){
+		// 	new system.System(null, null, "notFunction"); /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
+		// });
 		it("should fail with inappropriate options", function(done){
 				new system.System(null, null, function(error){ /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
 					assert.equal(error.code, "system_options_failure");
