@@ -342,7 +342,7 @@ describe("System", function() {
 				rootDir: "./test",
 				relativeInitDir: "cities",
 				initFilename: "init",
-				notMute: false
+				logging: "off"
 			};
 
 			new system.System(options, null, function(err){ /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
@@ -363,7 +363,7 @@ describe("System", function() {
 				rootDir: "./test",
 				relativeInitDir: "error_initialization_check",
 				initFilename: "init",
-				notMute: false
+				logging: "off"
 			};
 
 			let errorCheckSystem = new system.System(
@@ -386,7 +386,7 @@ describe("System", function() {
 				rootDir: "./fakeRoot",
 				relativeInitDir: "fakeDir",
 				initFilename: "fakeInit",
-				notMute: false
+				logging: "off"
 			};
 
 			new system.System(options, null, function(err){ /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
@@ -410,7 +410,7 @@ describe("System", function() {
 				rootDir: "./test",
 				relativeInitDir: "example",
 				initFilename: "init",
-				notMute: false
+				logging: "off"
 			},
 			rawInitFilename: "init.yml",
 			initContents: expected.exampleInit
@@ -421,7 +421,7 @@ describe("System", function() {
 				rootDir: "./test",
 				relativeInitDir: "flowerShop",
 				initFilename: "init",
-				notMute: false
+				logging: "off"
 			},
 			rawInitFilename: "init.yml",
 			initContents: expected.flowerShopInit,
@@ -577,7 +577,7 @@ describe("System", function() {
 					rootDir: "./test",
 					relativeInitDir: "chicken_coup",
 					initFilename: "init",
-					notMute: false
+					logging: "off"
 				}
 			},
 			{
@@ -587,7 +587,7 @@ describe("System", function() {
 					rootDir: "./test",
 					relativeInitDir: "chicken_coup",
 					initFilename: "init",
-					notMute: false
+					logging: "off"
 				}
 			}
 		];

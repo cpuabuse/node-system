@@ -29,7 +29,7 @@ class System extends loader.Loader{
    * @property {string} rootDir - The root directory for the System instance.
    * @property {string} relativeInitDir - The relative directory to root of the location of the initialization file.
    * @property {string} initFilename - Initialization file filename.
-	 * @property {boolean} notMute - Whether the system logs or not.
+	 * @property {string} logging - The way system logs
 	 */
 
 	/**
@@ -84,7 +84,7 @@ class System extends loader.Loader{
 				rootDir: options.rootDir,
 				relativeInitDir: options.relativeInitDir,
 				initFilename: options.relatoveInitFilename,
-				notMute: options.notMute
+				logging: options.logging
 			};
 
 			/**
@@ -282,7 +282,7 @@ class System extends loader.Loader{
 								if (typeof this.errors[err] === "object"){
 									// Set default error message for absent message
 									let message = "Error message not set.";
-									if (this.errors[err].hasOwnProperty(message)){
+									if (this.errors[err].hasOwnProperty("message")){
 										if (typeof this.errors[err].message === "string"){
 											if (this.errors[err].message != "") {
 												({message} = err);
@@ -325,7 +325,7 @@ class System extends loader.Loader{
 	 *   rootDir: "test",
 	 *   relativeInitDir: "stars",
 	 *   initFilename: "stars.yml",
-	 *   notMute: true
+	 *   logging: "off"
 	 * };
 	 *
 	 * if (System.checkOptionsFailure(options)){
@@ -339,9 +339,11 @@ class System extends loader.Loader{
 			failed = true;
 		} else {
 			// Checks boolean
-			if(!options.hasOwnProperty("notMute")){
+			if(!options.hasOwnProperty("logging")){
 				failed = true;
-			} else if(typeof options.notMute !== "boolean"){
+			} else if(typeof options.logging !== "string"){
+				failed = true;
+			} else if(!(["off", "console", "file", "queue"].includes(options.logging))){
 				failed = true;
 			}
 
@@ -372,7 +374,7 @@ class System extends loader.Loader{
 	 *   rootDir: "labs",
 	 *   relativeInitDir: "black_mesa",
 	 *   initFilename: "inventory.yml",
-	 *   notMute: true
+	 *   logging: "console"
 	 * };
 	 * var labInventory = new System(options);
 	 *
@@ -402,7 +404,7 @@ class System extends loader.Loader{
 	 *   rootDir: "labs",
 	 *   relativeInitDir: "black_mesa",
 	 *   initFilename: "inventory.yml",
-	 *   notMute: true
+	 *   logging: console
 	 * };
 	 * var behavior = {
 	 *   "check_inventory": () => {
@@ -475,7 +477,7 @@ class System extends loader.Loader{
 	 *   rootDir: "labs",
 	 *   relativeInitDir: "black_mesa",
 	 *   initFilename: "inventory.yml",
-	 *   notMute: true
+	 *   loggomg: console
 	 * };
 	 * var text = "Lab Inventory working.";
 	 *
@@ -484,7 +486,7 @@ class System extends loader.Loader{
 	 */
 	log(text){
 		if (typeof text === "string"){
-			if(this.system.notMute){
+			if(this.system.logging === "console"){
 				System.log(this.system.id + ": " + text);
 			}
 		} else {
@@ -504,7 +506,7 @@ class System extends loader.Loader{
 	 *   rootDir: "labs",
 	 *   relativeInitDir: "black_mesa",
 	 *   initFilename: "inventory.yml",
-	 *   notMute: true
+	 *   logging: console
 	 * };
 	 * var text = "Testing Lab Inventory error log.";
 	 *
@@ -513,7 +515,7 @@ class System extends loader.Loader{
 	 */
 	error(text){
 		if (typeof text === "string"){
-			if(this.system.notMute){
+			if(this.system.logging === "console"){
 				System.error(this.system.id + ": " + text);
 			}
 		} else {
@@ -535,7 +537,7 @@ class System extends loader.Loader{
 	 *   rootDir: "labs",
 	 *   relativeInitDir: "black_mesa",
 	 *   initFilename: "inventory.yml",
-	 *   notMute: true
+	 *   logging: "console"
 	 * };
 	 *
 	 * var labInventory = new System(options);
@@ -632,7 +634,7 @@ class System extends loader.Loader{
 	 *   rootDir: "labs",
 	 *   relativeInitDir: "black_mesa",
 	 *   initFilename: "inventory.yml",
-	 *   notMute: true
+	 *   logging: "console"
 	 * };
 	 *
 	 * var labInventory = new System(options);
