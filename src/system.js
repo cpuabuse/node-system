@@ -335,9 +335,7 @@ class System extends loader.Loader{
 	static checkOptionsFailure(options){
 		let failed = false;
 
-		if(options === null){
-			failed = true;
-		} else {
+		if(options){
 			// Checks boolean
 			if(!options.hasOwnProperty("logging")){
 				failed = true;
@@ -356,6 +354,8 @@ class System extends loader.Loader{
 					failed = true;
 				}
 			});
+		} else {
+			failed = true;
 		}
 		return failed;
 	}
