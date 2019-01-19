@@ -1,6 +1,5 @@
 unexpected_constructor: Null and String arguments found while deciding the constructor method.
 system_options_failure: The options provided to the system constructor are inconsistent.
-internal_logic_error: This error should not happen. Something went wrong with loader constructor arguments.
 other_error: Other error has been rethrown as Loader Error.
 loader_fail: Mandatory initialization files are missing.
 functionality_error: There was an error in the loader functionality in constructor subroutines.

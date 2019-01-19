@@ -43,24 +43,16 @@ class Loader{
 				throw new loaderError.LoaderError("unexpected_constructor", "Null and String arguments found while deciding the constructor method.");
 			}
 		}
-		// Call the appropriate constructor
-		switch (previousIsNull) {
-			// There are no arguments or all arguments are null
-			case true:
-			case null:
-			dummyConstructor();
-			break;
-
-			// All arguments are not null
-			case false:
+		/*
+			Call the appropriate constructor.
+			The execution path for neither true, false or null is removed, since there is no way to reach it.
+			It is important to check as "=== false", as we are dealing with null as well.
+		*/
+		if(previousIsNull === false){
 			standardConstructor();
-			break;
-
-			// Something went wrong, we shouldn't be here
-			default:
-			throw new loaderError.LoaderError("internal_logic_error", "This error should not happen. Something went wrong with loader constructor arguments.");
+		} else {
+			dummyConstructor();
 		}
-
 	}
 
 	/**
