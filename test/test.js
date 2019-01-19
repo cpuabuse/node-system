@@ -406,16 +406,16 @@ describe("System", function() {
 			};
 
 			new system.System(options, null, function(err){ /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
-			assert.throws(
-				function(){
-					throw err;
+				assert.throws(
+					function(){
+						throw err;
 					},
 					function(error){
 						return ((err instanceof loaderError.LoaderError) && error.code === "functionality_error");
 					}
-					);
-					done();
-				});
+				);
+				done();
+			});
 		});
 		describe("errorInitialization", function(){
 			let options = {
