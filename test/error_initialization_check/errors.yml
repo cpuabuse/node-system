@@ -5,3 +5,5 @@ no_message:
   not_message: "Not a message"
 empty_message:
   message: ""
+message_not_a_string:
+  message: null

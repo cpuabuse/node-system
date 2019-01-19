@@ -363,7 +363,7 @@ describe("Loader", function() {
 describe("System", function() {
 	describe("constructor", function(){
 		it("should still execute with inappropriate options and no ways to report an error", function(){
-			new system.System(); /* eslint-disable-line no-new */// "new System" is only used for side-effects of 
+			new system.System(); /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
 		});
 		it("should execute with inappropriate options and error reporting not being a function", function(){
 			new system.System(null, null, "notFunction"); /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
@@ -396,29 +396,6 @@ describe("System", function() {
 				done();
 			});
 		});
-		it("should not generate inappropriately defined errors, and should generate the default message", function(done){
-			let options = {
-				id: "errorInitializationCheck",
-				rootDir: "./test",
-				relativeInitDir: "error_initialization_check",
-				initFilename: "init",
-				logging: "off"
-			};
-
-			let errorCheckSystem = new system.System(
-				options,
-				[
-					{
-						"system_load": () => {
-							assert.strictEqual(errorCheckSystem.system.error.hasOwnProperty("not_object"), false);
-							assert.strictEqual(errorCheckSystem.system.error.no_message.message, "Error message not set.");
-							assert.strictEqual(errorCheckSystem.system.error.empty_message.message, "Error message not set.");
-							done();
-						}
-					}
-				]
-			);
-		});
 		it("should report functionality_error with fake options", function(done){
 			let options = {
 				id: "fakeID",
@@ -429,18 +406,63 @@ describe("System", function() {
 			};
 
 			new system.System(options, null, function(err){ /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
-				assert.throws(
-					function(){
-						throw err;
+			assert.throws(
+				function(){
+					throw err;
 					},
 					function(error){
 						return ((err instanceof loaderError.LoaderError) && error.code === "functionality_error");
 					}
 					);
-				done();
+					done();
+				});
+		});
+		describe("errorInitialization", function(){
+			let options = {
+				id: "errorInitializationCheck",
+				rootDir: "./test",
+				relativeInitDir: "error_initialization_check",
+				initFilename: "init",
+				logging: "off"
+			};
+			let systemErrors = [
+				{
+					error: "no_message",
+					description: "no error message"
+				},
+				{
+					error: "empty_message",
+					description: "empty message"
+				},
+				{
+					error: "message_not_a_string",
+					description: "message not a string"
+				}
+			];
+			let systemTest;
+			before(function(done){
+				systemTest = new system.System(
+					options,
+					[
+						{
+							"system_load" (){
+								done();
+							}
+						}
+					]
+				);
 			});
+			it("should not generate inappropriately defined errors", function(){
+				assert.strictEqual(systemTest.system.error.hasOwnProperty("not_object"), false);
+			});
+			for (let error of systemErrors){
+				it("should generate the default message with " + error.description, function(){
+					assert.strictEqual(systemTest.system.error[error.error].message, "Error message not set.");
+				});
+			}
 		});
 	});
+
 	// Array of testing unit initialization data
 	var systems = [
 		{ // Example

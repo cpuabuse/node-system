@@ -62,6 +62,7 @@ class System extends loader.Loader{
 		 * Process the loader error.
 		 * Due to the design of the System constructor, this is supposed to be called only once during the constructor execution, no matter the failure.
 		 * We do not want the constructor to fail no matter what, so we perform check for onError existence and type. If failed, we ignore it. Moreover, if there was a different error caught, a Loader Error would be generated.
+		 * Currently there is no way to produce "other_error"; But the functionality will remain for the possibility of such error thrown with future functionality.
 		 */
 		function processLoaderError(error){
 			if(onError){
