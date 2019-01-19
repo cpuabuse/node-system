@@ -97,6 +97,20 @@ describe("Loader", function() {
 		it("should not fail as a dummy", function(){
 			new loader.Loader(null); /* eslint-disable-line no-new */// "new Loader" is only used for side-effects of testing
 		});
+		it("should produce \"Invalid intialization entry type - average_height\", when called with respective initialization file", function(){
+			new loader.Loader("test", "trees", "init", function(load){ /* eslint-disable-line no-new */// "new Loader" is only used for side-effects of testing
+				load.catch(function(err){
+					assert.throws(
+						function(){
+							throw err;
+						},
+						function(error){
+							return ((error instanceof Error) && error.message === "Invalid intialization entry type - average_height");
+						}
+					);
+				});
+			});
+		});
 	});
 	var loaders = [
 		// Stars
@@ -117,6 +131,11 @@ describe("Loader", function() {
 					child: "sol",
 					grandChild: "planet3",
 					value: "Mars"
+				},
+				{
+					child: "barnards_star",
+					grandChild: "planet0",
+					value: "Barnard's Star b"
 				}
 			]
 		},
