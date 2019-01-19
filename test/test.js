@@ -62,6 +62,23 @@ describe("LoaderError", function(){
 
 /**
  * Tests for the Loader class.
+ * @member SystemError
+ * @memberof module:system~test
+ */
+describe("SystemError", function(){
+	describe(".isSystemError()", function(){
+		it("should return false for an empty error code", function(){
+			let error = new systemError.SystemError("", "message");
+			assert.strictEqual(systemError.SystemError.isSystemError(error), false);
+		});
+		it("should return false for non instance of SystemError", function(){
+			assert.strictEqual(systemError.SystemError.isSystemError("Not an instance of SystemError"), false);
+		});
+	})
+});
+
+/**
+ * Tests for the Loader class.
  * @member Loader
  * @memberof module:system~test
  */
