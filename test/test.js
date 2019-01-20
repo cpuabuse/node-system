@@ -536,7 +536,7 @@ describe("System", function() {
 					describe(".getFile()", function(){
 						it("should get expected contents from file \"" + element.rawInitFilename + "\" with args (\"" + element.options.relativeInitDir + "\", \"" + element.rawInitFilename + "\")", function(done){
 							systemTest.system.file.getFile(element.options.relativeInitDir, element.rawInitFilename).then(function(result){
-								assert.equal(result, element.initContents);
+								assert.equal(result.toString(), element.initContents);
 								done();
 							});
 						});
