@@ -4,11 +4,20 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/381bca0c5f71d32f23df/maintainability)](https://codeclimate.com/github/cpuabuse/node-system/maintainability)
 [![Inline docs](http://inch-ci.org/github/cpuabuse/node-system.svg?branch=master)](http://inch-ci.org/github/cpuabuse/node-system)
 
+**Project**
+![Framework Infrastructure](https://s3.ap-northeast-2.amazonaws.com/file.cpuabuse.com/public/boop/imageset/programming/site/2018-10-26/4927c8224eda0669accd97bc91766ad2.png)
+
+- [cpuabuse-framework](https://github.com/cpuabuse/node-framework)
+- [cpuabuse-app](https://github.com/cpuabuse/node-app)
+- [cpuabuse-server](https://github.com/cpuabuse/node-server)
+- [cpuabuse-system](https://github.com/cpuabuse/node-system)
+
 **Files & Data**
 
-- Default file extension is added, if missing
-- For empty value in key/value pair, value equal to key is assumed
-- In absent key/value child pairs, default values for missing keys are assumed
+- Folders are treated as children of system root, while the files are treated as grandchildren.
+- Default file extension is added, if missing.
+- For empty value in key/value pair, value equal to key is assumed.
+- In absent key/value child pairs, default values for missing keys are assumed.
 
 **JSDoc - Member Declaration**
 
@@ -32,7 +41,7 @@ System is intended more than anything, for centralized managment.
 * [system](#module_system)
     * _static_
         * [.System](#module_system.System) ⇐ [<code>Loader</code>](#module_system..Loader)
-            * [new System(options, [behaviors])](#new_module_system.System_new)
+            * [new System(options, [behaviors], [onError])](#new_module_system.System_new)
             * _instance_
                 * *[.events](#module_system.System+events) : <code>Object</code>*
                     * *["errorExists"](#module_system.System+events+event_errorExists)*
@@ -43,18 +52,6 @@ System is intended more than anything, for centralized managment.
                     * *["typeError"](#module_system.System+events+event_typeError)*
                     * *["eventFail"](#module_system.System+events+event_eventFail)*
                 * *[.behaviors](#module_system.System+behaviors) : <code>Object</code>*
-                * [.system](#module_system.System+system) : [<code>options</code>](#module_system.System..options)
-                    * [.behavior](#module_system.System+system.behavior) : [<code>Behavior</code>](#module_system..Behavior)
-                    * *[.error](#module_system.System+system.error) : <code>Object</code>*
-                    * [.file](#module_system.System+system.file) : <code>Object</code>
-                        * [.filter](#module_system.System+system.file.filter) : <code>Object</code>
-                            * [.isFile(filterContext)](#module_system.System+system.file.filter.isFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-                            * [.isDir(filterContext)](#module_system.System+system.file.filter.isDir) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-                        * [.toRelative(rootDir, target)](#module_system.System+system.file.toRelative) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-                        * [.join(rootDir, target)](#module_system.System+system.file.join) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-                        * [.getFile(dir, file)](#module_system.System+system.file.getFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-                        * [.getYaml(dir, file)](#module_system.System+system.file.getYaml) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-                        * [.list(dir, file)](#module_system.System+system.file.list) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
                 * [.addError(code, message)](#module_system.System+addError)
                 * [.addBehaviors(behaviors)](#module_system.System+addBehaviors)
                 * [.log(text)](#module_system.System+log)
@@ -104,11 +101,21 @@ System is intended more than anything, for centralized managment.
             * [.nextBehaviorCounter](#module_system..Behavior+nextBehaviorCounter) : <code>number</code> ℗
             * [.addBehavior(name, callback)](#module_system..Behavior+addBehavior) ⇒ <code>number</code>
             * [.behave(name)](#module_system..Behavior+behave)
+        * [~LoaderError](#module_system..LoaderError) ⇐ [<code>Error</code>](https://nodejs.org/api/errors.html#errors_class_error)
+            * [new LoaderError([code], [message])](#new_module_system..LoaderError_new)
         * [~test](#module_system..test)
+            * [.dummyErrorHandler](#module_system..test.dummyErrorHandler)
+            * [.LoaderError](#module_system..test.LoaderError)
+            * [.SystemError](#module_system..test.SystemError)
             * [.Loader](#module_system..test.Loader)
                 * [.toRelative](#module_system..test.Loader.toRelative)
                 * [.join](#module_system..test.Loader.join)
                 * [.isFile](#module_system..test.Loader.isFile)
+                * [.isDir](#module_system..test.Loader.isDir)
+            * [.System](#module_system..test.System)
+                * [.getFile](#module_system..test.System.getFile)
+                * [.checkOptionsFailure](#module_system..test.System.checkOptionsFailure)
+            * [.AtomicLock](#module_system..test.AtomicLock)
 
 <a name="module_system.System"></a>
 
@@ -122,7 +129,7 @@ Throws standard error if failed to perform basic initializations, or system fail
 **Emits**: [<code>systemLoad</code>](#module_system.System+events+event_systemLoad)  
 
 * [.System](#module_system.System) ⇐ [<code>Loader</code>](#module_system..Loader)
-    * [new System(options, [behaviors])](#new_module_system.System_new)
+    * [new System(options, [behaviors], [onError])](#new_module_system.System_new)
     * _instance_
         * *[.events](#module_system.System+events) : <code>Object</code>*
             * *["errorExists"](#module_system.System+events+event_errorExists)*
@@ -133,18 +140,6 @@ Throws standard error if failed to perform basic initializations, or system fail
             * *["typeError"](#module_system.System+events+event_typeError)*
             * *["eventFail"](#module_system.System+events+event_eventFail)*
         * *[.behaviors](#module_system.System+behaviors) : <code>Object</code>*
-        * [.system](#module_system.System+system) : [<code>options</code>](#module_system.System..options)
-            * [.behavior](#module_system.System+system.behavior) : [<code>Behavior</code>](#module_system..Behavior)
-            * *[.error](#module_system.System+system.error) : <code>Object</code>*
-            * [.file](#module_system.System+system.file) : <code>Object</code>
-                * [.filter](#module_system.System+system.file.filter) : <code>Object</code>
-                    * [.isFile(filterContext)](#module_system.System+system.file.filter.isFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-                    * [.isDir(filterContext)](#module_system.System+system.file.filter.isDir) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-                * [.toRelative(rootDir, target)](#module_system.System+system.file.toRelative) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-                * [.join(rootDir, target)](#module_system.System+system.file.join) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-                * [.getFile(dir, file)](#module_system.System+system.file.getFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-                * [.getYaml(dir, file)](#module_system.System+system.file.getYaml) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-                * [.list(dir, file)](#module_system.System+system.file.list) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
         * [.addError(code, message)](#module_system.System+addError)
         * [.addBehaviors(behaviors)](#module_system.System+addBehaviors)
         * [.log(text)](#module_system.System+log)
@@ -163,7 +158,7 @@ Throws standard error if failed to perform basic initializations, or system fail
 
 <a name="new_module_system.System_new"></a>
 
-## new System(options, [behaviors])
+## new System(options, [behaviors], [onError])
 
 The constructor will perform necessary preparations, so that failures can be processed with system events. Up until these preparations are complete, the failure will result in thrown standard Error.
 
@@ -176,6 +171,7 @@ The constructor will perform necessary preparations, so that failures can be pro
 | --- | --- | --- |
 | options | [<code>options</code>](#module_system.System..options) | System options. |
 | [behaviors] | [<code>Array.&lt;behavior&gt;</code>](#module_system.System..behavior) | [Optional] Behaviors to add. |
+| [onError] | <code>function</code> | [Optional] Callback for error handling during delayed execution after loader has loaded. Takes error string as an argument. |
 
 <a name="module_system.System+events"></a>
 
@@ -258,178 +254,6 @@ Failed to fire an event.
 Behavior describtions initialized by loader.
 
 **Kind**: instance abstract property of [<code>System</code>](#module_system.System)  
-<a name="module_system.System+system"></a>
-
-## system.system : [<code>options</code>](#module_system.System..options)
-
-Contains system info.
-
-**Kind**: instance property of [<code>System</code>](#module_system.System)  
-**Read only**: true  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| behavior | [<code>Behavior</code>](#module_system..Behavior) | Event emitter for the behaviors. Generally should use the public system instance methods instead. |
-
-
-* [.system](#module_system.System+system) : [<code>options</code>](#module_system.System..options)
-    * [.behavior](#module_system.System+system.behavior) : [<code>Behavior</code>](#module_system..Behavior)
-    * *[.error](#module_system.System+system.error) : <code>Object</code>*
-    * [.file](#module_system.System+system.file) : <code>Object</code>
-        * [.filter](#module_system.System+system.file.filter) : <code>Object</code>
-            * [.isFile(filterContext)](#module_system.System+system.file.filter.isFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-            * [.isDir(filterContext)](#module_system.System+system.file.filter.isDir) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-        * [.toRelative(rootDir, target)](#module_system.System+system.file.toRelative) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-        * [.join(rootDir, target)](#module_system.System+system.file.join) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-        * [.getFile(dir, file)](#module_system.System+system.file.getFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-        * [.getYaml(dir, file)](#module_system.System+system.file.getYaml) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-        * [.list(dir, file)](#module_system.System+system.file.list) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-
-<a name="module_system.System+system.behavior"></a>
-
-## system.behavior : [<code>Behavior</code>](#module_system..Behavior)
-
-Actual behaviors are located here.
-
-**Kind**: static property of [<code>system</code>](#module_system.System+system)  
-<a name="module_system.System+system.error"></a>
-
-## *system.error : <code>Object</code>*
-
-Actual errors are located here.
-
-**Kind**: static abstract property of [<code>system</code>](#module_system.System+system)  
-<a name="module_system.System+system.file"></a>
-
-## system.file : <code>Object</code>
-
-File system methods.
-
-**Kind**: static property of [<code>system</code>](#module_system.System+system)  
-
-* [.file](#module_system.System+system.file) : <code>Object</code>
-    * [.filter](#module_system.System+system.file.filter) : <code>Object</code>
-        * [.isFile(filterContext)](#module_system.System+system.file.filter.isFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-        * [.isDir(filterContext)](#module_system.System+system.file.filter.isDir) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-    * [.toRelative(rootDir, target)](#module_system.System+system.file.toRelative) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-    * [.join(rootDir, target)](#module_system.System+system.file.join) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-    * [.getFile(dir, file)](#module_system.System+system.file.getFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-    * [.getYaml(dir, file)](#module_system.System+system.file.getYaml) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-    * [.list(dir, file)](#module_system.System+system.file.list) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-
-<a name="module_system.System+system.file.filter"></a>
-
-## file.filter : <code>Object</code>
-
-File level filters.
-
-**Kind**: static property of [<code>file</code>](#module_system.System+system.file)  
-
-* [.filter](#module_system.System+system.file.filter) : <code>Object</code>
-    * [.isFile(filterContext)](#module_system.System+system.file.filter.isFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-    * [.isDir(filterContext)](#module_system.System+system.file.filter.isDir) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-
-<a name="module_system.System+system.file.filter.isFile"></a>
-
-## filter.isFile(filterContext) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-
-Check if argument is a file (relative to system root directory).
-
-**Kind**: static method of [<code>filter</code>](#module_system.System+system.file.filter)  
-**Returns**: [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) - Promise, containing boolean result.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| filterContext | [<code>filterContext</code>](#module_system.System..filterContext) | Information on the item to be filtered. |
-
-<a name="module_system.System+system.file.filter.isDir"></a>
-
-## filter.isDir(filterContext) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-
-Check if argument is a folder (relative to system root directory).
-
-**Kind**: static method of [<code>filter</code>](#module_system.System+system.file.filter)  
-**Returns**: [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) - Promise, containing boolean result.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| filterContext | [<code>filterContext</code>](#module_system.System..filterContext) | Information on the item to be filtered |
-
-<a name="module_system.System+system.file.toRelative"></a>
-
-## file.toRelative(rootDir, target) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-
-Converts absolute path to relative path.
-
-**Kind**: static method of [<code>file</code>](#module_system.System+system.file)  
-**Returns**: [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) - Promise, containing string relative path.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| rootDir | <code>string</code> | Relative directory. |
-| target | <code>string</code> | Absolute file/folder path. |
-
-<a name="module_system.System+system.file.join"></a>
-
-## file.join(rootDir, target) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-
-Joins two paths.
-
-**Kind**: static method of [<code>file</code>](#module_system.System+system.file)  
-**Returns**: [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) - Promise, containing string path.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| rootDir | <code>string</code> | Relative directory. |
-| target | <code>string</code> | File/folder path to rootDir. |
-
-<a name="module_system.System+system.file.getFile"></a>
-
-## file.getFile(dir, file) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-
-Get file contents relative to system root directory.
-
-**Kind**: static method of [<code>file</code>](#module_system.System+system.file)  
-**Returns**: [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) - Promise, containing string with file contents..  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| dir | <code>string</code> | Directory, relative to system root. |
-| file | <code>string</code> | Filename. |
-
-<a name="module_system.System+system.file.getYaml"></a>
-
-## file.getYaml(dir, file) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-
-Get contents of yaml file relative to system root directory.
-
-**Kind**: static method of [<code>file</code>](#module_system.System+system.file)  
-**Returns**: [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) - Promise, containing string with file contents..  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| dir | <code>string</code> | Directory, relative to system root. |
-| file | <code>string</code> | Filename. |
-
-<a name="module_system.System+system.file.list"></a>
-
-## file.list(dir, file) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-
-List the contents of the folder, relative to system root directory.
-
-**Kind**: static method of [<code>file</code>](#module_system.System+system.file)  
-**Returns**: [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) - Promise, containing an array of filtered strings - files/folders relative to system root.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| dir | <code>string</code> | Folder relative to system root. |
-| file | <code>string</code> | Filename. |
-
-**Example** *(List folders)*  
-```js
-systemInstance.system.file.list("css", systemInstance.system.file.filter.isDir);
-```
 <a name="module_system.System+addError"></a>
 
 ## system.addError(code, message)
@@ -453,7 +277,7 @@ var options = {
   rootDir: "labs",
   relativeInitDir: "black_mesa",
   initFilename: "inventory.yml",
-  notMute: true
+  logging: "console"
 };
 var labInventory = new System(options);
 
@@ -481,7 +305,7 @@ var options = {
   rootDir: "labs",
   relativeInitDir: "black_mesa",
   initFilename: "inventory.yml",
-  notMute: true
+  logging: console
 };
 var behavior = {
   "check_inventory": () => {
@@ -515,7 +339,7 @@ var options = {
   rootDir: "labs",
   relativeInitDir: "black_mesa",
   initFilename: "inventory.yml",
-  notMute: true
+  loggomg: console
 };
 var text = "Lab Inventory working.";
 
@@ -542,7 +366,7 @@ var options = {
   rootDir: "labs",
   relativeInitDir: "black_mesa",
   initFilename: "inventory.yml",
-  notMute: true
+  logging: console
 };
 var text = "Testing Lab Inventory error log.";
 
@@ -574,7 +398,7 @@ var options = {
   rootDir: "labs",
   relativeInitDir: "black_mesa",
   initFilename: "inventory.yml",
-  notMute: true
+  logging: "console"
 };
 
 var labInventory = new System(options);
@@ -623,7 +447,7 @@ var options = {
   rootDir: "labs",
   relativeInitDir: "black_mesa",
   initFilename: "inventory.yml",
-  notMute: true
+  logging: "console"
 };
 
 var labInventory = new System(options);
@@ -651,7 +475,7 @@ var options = {
   rootDir: "test",
   relativeInitDir: "stars",
   initFilename: "stars.yml",
-  notMute: true
+  logging: "off"
 };
 
 if (System.checkOptionsFailure(options)){
@@ -705,7 +529,7 @@ System options
 | rootDir | <code>string</code> | The root directory for the System instance. |
 | relativeInitDir | <code>string</code> | The relative directory to root of the location of the initialization file. |
 | initFilename | <code>string</code> | Initialization file filename. |
-| notMute | <code>boolean</code> | Whether the system logs or not. |
+| logging | <code>string</code> | The way system logs |
 
 <a name="module_system.System..filterContext"></a>
 
@@ -1312,6 +1136,26 @@ behavior.behave("hello_behavior");
 // Output:
 // "Hello World"
 ```
+<a name="module_system..LoaderError"></a>
+
+## system~LoaderError ⇐ [<code>Error</code>](https://nodejs.org/api/errors.html#errors_class_error)
+
+Extended error class for system loading errors.
+
+**Kind**: inner class of [<code>system</code>](#module_system)  
+**Extends**: [<code>Error</code>](https://nodejs.org/api/errors.html#errors_class_error)  
+<a name="new_module_system..LoaderError_new"></a>
+
+## new LoaderError([code], [message])
+
+Creates an instance of LoaderError.
+
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [code] | <code>string</code> | <code>&quot;default_code&quot;</code> | Error code |
+| [message] | <code>string</code> | <code>&quot;default_message&quot;</code> | Error message |
+
 <a name="module_system..test"></a>
 
 ## system~test
@@ -1321,11 +1165,40 @@ Series of tests for the system.
 **Kind**: inner property of [<code>system</code>](#module_system)  
 
 * [~test](#module_system..test)
+    * [.dummyErrorHandler](#module_system..test.dummyErrorHandler)
+    * [.LoaderError](#module_system..test.LoaderError)
+    * [.SystemError](#module_system..test.SystemError)
     * [.Loader](#module_system..test.Loader)
         * [.toRelative](#module_system..test.Loader.toRelative)
         * [.join](#module_system..test.Loader.join)
         * [.isFile](#module_system..test.Loader.isFile)
+        * [.isDir](#module_system..test.Loader.isDir)
+    * [.System](#module_system..test.System)
+        * [.getFile](#module_system..test.System.getFile)
+        * [.checkOptionsFailure](#module_system..test.System.checkOptionsFailure)
+    * [.AtomicLock](#module_system..test.AtomicLock)
 
+<a name="module_system..test.dummyErrorHandler"></a>
+
+## test.dummyErrorHandler
+
+Tests for the Loader class.
+
+**Kind**: static property of [<code>test</code>](#module_system..test)  
+<a name="module_system..test.LoaderError"></a>
+
+## test.LoaderError
+
+Tests for the Loader class.
+
+**Kind**: static property of [<code>test</code>](#module_system..test)  
+<a name="module_system..test.SystemError"></a>
+
+## test.SystemError
+
+Tests for the Loader class.
+
+**Kind**: static property of [<code>test</code>](#module_system..test)  
 <a name="module_system..test.Loader"></a>
 
 ## test.Loader
@@ -1338,19 +1211,26 @@ Tests for the Loader class.
     * [.toRelative](#module_system..test.Loader.toRelative)
     * [.join](#module_system..test.Loader.join)
     * [.isFile](#module_system..test.Loader.isFile)
+    * [.isDir](#module_system..test.Loader.isDir)
 
 <a name="module_system..test.Loader.toRelative"></a>
 
 ## Loader.toRelative
 
-Tests the toRelative function.
+Tests the toRelative function with:
+
+- Single argument
+- Array as argument
 
 **Kind**: static property of [<code>Loader</code>](#module_system..test.Loader)  
 <a name="module_system..test.Loader.join"></a>
 
 ## Loader.join
 
-Tests the join function.
+Tests the join function with:
+
+- Single argument
+- Array as argument
 
 **Kind**: static property of [<code>Loader</code>](#module_system..test.Loader)  
 <a name="module_system..test.Loader.isFile"></a>
@@ -1360,3 +1240,47 @@ Tests the join function.
 Tests the isFile function.
 
 **Kind**: static property of [<code>Loader</code>](#module_system..test.Loader)  
+<a name="module_system..test.Loader.isDir"></a>
+
+## Loader.isDir
+
+Tests the isDir function with:
+
+- A directory
+- A file
+- A non-existant directory
+
+**Kind**: static property of [<code>Loader</code>](#module_system..test.Loader)  
+<a name="module_system..test.System"></a>
+
+## test.System
+
+Tests of System class.
+
+**Kind**: static property of [<code>test</code>](#module_system..test)  
+
+* [.System](#module_system..test.System)
+    * [.getFile](#module_system..test.System.getFile)
+    * [.checkOptionsFailure](#module_system..test.System.checkOptionsFailure)
+
+<a name="module_system..test.System.getFile"></a>
+
+## System.getFile
+
+Tests the getFile function.
+
+**Kind**: static property of [<code>System</code>](#module_system..test.System)  
+<a name="module_system..test.System.checkOptionsFailure"></a>
+
+## System.checkOptionsFailure
+
+Test the checkOptionsFailure function.
+
+**Kind**: static property of [<code>System</code>](#module_system..test.System)  
+<a name="module_system..test.AtomicLock"></a>
+
+## test.AtomicLock
+
+Tests of System class.
+
+**Kind**: static property of [<code>test</code>](#module_system..test)  
