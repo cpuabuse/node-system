@@ -489,7 +489,8 @@ describe("System", function() {
 			error: {
 				errorInstances: ["all_flowers_gone"],
 				stringErrors: ["carShopError"]
-			}
+			},
+			behaviorTest: true
 		}
 	]
 
@@ -608,18 +609,49 @@ describe("System", function() {
 				 */
 				describe(".fire()", function(){
 					it("should not produce an error, if fired with a name that does not exist", function(){
-						systemTest.fire("name_does_not_exist", "An event that does not exist has been fired.");	
+						systemTest.fire("name_does_not_exist", "An event that does not exist has been fired.");
 					});
 				});
-				describe(".addBehaviors()", function(){
-					it("should not disrupt system functioning if not provided with an array as an argument", function(){
-						systemTest.addBehaviors("not_a_behavior");
-					});
-				});
-			});
 
+				if(element.hasOwnProperty("behaviorTest")){
+					if(element.behaviorTest){
+						/**
+						 * Tests the addBehaviors function.
+						 * @member addBehaviors
+						 * @memberof module:system~test.System
+						 */
+						describe(".addBehaviors()", function(){
+							before(function(done){
+								systemTest.addBehaviors([
+									{
+										"behavior_attach_request_fail"() {
+											systemTest.done();
+										}
+									}
+								]).then(function(){
+									done();
+								});
+							});
+
+							it("should fire behavior_attach_request_fail if not provided with an array as an argument", function(done){
+								systemTest.done = function(){
+									done();
+								}
+								systemTest.addBehaviors("not_a_behavior");
+							});
+							it("should fire behavior_attach_request_fail with an empty array as an argument", function(done){
+								systemTest.done = function(){
+									done();
+								}
+								systemTest.addBehaviors([]);
+							});
+						});
+					}
+				}
+			});
 		});
 	});
+
 	/**
 	 * Test the checkOptionsFailure function.
 	 * @member checkOptionsFailure

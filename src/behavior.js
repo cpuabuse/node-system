@@ -116,9 +116,13 @@ class Behavior extends events.EventEmitter{
 	 */
 	behave(name){
 		if(typeof name === "string"){
-			this.behaviorId[name].forEach(event => {
-				this.emit(event);
-			});
+			if(this.behaviorId.hasOwnProperty(name)){
+				this.behaviorId[name].forEach(event => {
+					this.emit(event);
+				});
+			}
+		} else {
+			// Fire here
 		}
 	}
 }
