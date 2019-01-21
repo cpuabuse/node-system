@@ -623,23 +623,33 @@ describe("System", function() {
 	describe(".checkOptionsFailure()", function(){
 		let optionsArray = [
 			{
-				errorDescription: "\"notMute\" not set",
+				errorDescription: "\"logging\" not set",
 				options: {
 					id: "chickenCoup",
 					rootDir: "./test",
 					relativeInitDir: "chicken_coup",
 					initFilename: "init",
-					notMuteNameError: false
+					loggingNameError: false
 				}
 			},
 			{
-				errorDescription: "\"notMute\" not boolean",
+				errorDescription: "\"logging\" not a string",
 				options: {
 					id: "chickenCoup",
 					rootDir: "./test",
 					relativeInitDir: "chicken_coup",
 					initFilename: "init",
-					notMute: "stringFalse"
+					logging: false
+				}
+			},
+			{
+				errorDescription: "\"logging\" not a permitted string",
+				options: {
+					id: "chickenCoup",
+					rootDir: "./test",
+					relativeInitDir: "chicken_coup",
+					initFilename: "init",
+					logging: "not_included_string",
 				}
 			},
 			{
