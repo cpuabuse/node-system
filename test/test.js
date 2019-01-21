@@ -600,6 +600,17 @@ describe("System", function() {
 						}
 					});
 				}
+
+				/**
+				 * Tests the fire function.
+				 * @member fire
+				 * @memberof module:system~test.System
+				 */
+				describe(".fire()", function(){
+					it("should not produce an error, if fired with a name that does not exist", function(){
+						systemTest.fire("name_does_not_exist", "An event that does not exist has been fired.");	
+					});
+				});
 			});
 
 		});

@@ -581,7 +581,6 @@ class System extends loader.Loader{
 			}
 			// Callback
 		} catch (error) {
-			console.log(error)
 			let noFail = true;
 			if(name == events.eventFail){
 				noFail = false;
