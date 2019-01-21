@@ -611,6 +611,11 @@ describe("System", function() {
 						systemTest.fire("name_does_not_exist", "An event that does not exist has been fired.");	
 					});
 				});
+				describe(".addBehaviors()", function(){
+					it("should not disrupt system functioning if not provided with an array as an argument", function(){
+						systemTest.addBehaviors("not_a_behavior");
+					});
+				});
 			});
 
 		});
