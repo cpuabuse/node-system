@@ -573,13 +573,15 @@ describe("System", function() {
 												done();
 											}
 										});
-										it("should be " + error, function(done) {
-											try {
-												throw systemTest.system.error[error];
-											} catch(err){
-												assert.strictEqual(err.code, error);
-												done();
-											}
+										it("should have code equal to \"" + error + "\"", function() {
+											assert.throws(
+												function(){
+													throw systemTest.system.error[error];
+												},
+												{
+													code: error
+												}
+											);
 										});
 									});
 								});
