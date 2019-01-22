@@ -553,6 +553,17 @@ describe("System", function() {
 								done();
 							});
 						});
+					
+					
+					
+					});
+					describe(".list()", function(){
+						it("should produce a numeric result", function(done){
+							systemTest.system.file.list("./", systemTest.system.file.filter.isFile).then(function(result){
+								console.log(result);
+								done();
+							});
+						});
 					});
 				});
 
