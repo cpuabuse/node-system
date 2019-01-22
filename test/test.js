@@ -474,7 +474,9 @@ describe("System", function() {
 				logging: "off"
 			},
 			rawInitFilename: "init.yml",
-			initContents: expected.exampleInit
+			initContents: expected.exampleInit,
+			rootDirFileAmount: 2,
+			rootDirFolderAmount: 6
 		},
 		{ // Flower shop
 			options: {
@@ -486,6 +488,8 @@ describe("System", function() {
 			},
 			rawInitFilename: "init.yml",
 			initContents: expected.flowerShopInit,
+			rootDirFileAmount: 2,
+			rootDirFolderAmount: 6,
 			error: {
 				errorInstances: ["all_flowers_gone"],
 				stringErrors: ["carShopError"]
@@ -553,14 +557,19 @@ describe("System", function() {
 								done();
 							});
 						});
-					
-					
-					
 					});
 					describe(".list()", function(){
-						it("should produce a numeric result", function(done){
+						it("should be " + element.rootDirFileAmount + " with args (\"./\", isFile())", function(done){
 							systemTest.system.file.list("./", systemTest.system.file.filter.isFile).then(function(result){
-								console.log(result);
+								assert.strictEqual(result.length, element.rootDirFileAmount);
+								done();
+							});
+						});
+					});
+					describe(".list()", function(){
+						it("should be " + element.rootDirFolderAmount + " with args (\"./\", isDir())", function(done){
+							systemTest.system.file.list("./", systemTest.system.file.filter.isDir).then(function(result){
+								assert.strictEqual(result.length, element.rootDirFolderAmount);
 								done();
 							});
 						});
@@ -699,7 +708,7 @@ describe("System", function() {
 					rootDir: "./test",
 					relativeInitDir: "chicken_coup",
 					initFilename: "init",
-					logging: "not_included_string",
+					logging: "not_included_string"
 				}
 			},
 			{
