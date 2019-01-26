@@ -307,13 +307,13 @@ describe("Loader", function() {
 					});
 				});
 				it("should not be a directory with args (\"" + element.rootDir + "\", \"" + element.dir + path.sep + element.rawFilename + "\")", function(done){
-					loader.Loader.isFile(element.rootDir, "./" ,element.dir).then(function(result){
+					loader.Loader.isFile(element.rootDir, "." + path.sep ,element.dir).then(function(result){
 						assert.strictEqual(result, false);
 						done();
 					});
 				});
 				it("should not be a directory with args (\"" + element.rootDir + "\", \"" + nonExistentFileOrDir + "\")", function(done){
-					loader.Loader.isFile(element.rootDir, "./", nonExistentFileOrDir).then(function(result){
+					loader.Loader.isFile(element.rootDir, "." + path.sep, nonExistentFileOrDir).then(function(result){
 						assert.strictEqual(result, false);
 						done();
 					});
@@ -378,7 +378,7 @@ describe("System", function() {
 		it("should fail with no events or behaviors files", function(done){
 			let options = {
 				id: "cities",
-				rootDir: "./test",
+				rootDir: "test",
 				relativeInitDir: "cities",
 				initFilename: "init",
 				logging: "off"
@@ -399,7 +399,7 @@ describe("System", function() {
 		it("should report functionality_error with fake options", function(done){
 			let options = {
 				id: "fakeID",
-				rootDir: "./fakeRoot",
+				rootDir: "fakeRoot",
 				relativeInitDir: "fakeDir",
 				initFilename: "fakeInit",
 				logging: "off"
@@ -420,7 +420,7 @@ describe("System", function() {
 		describe("errorInitialization", function(){
 			let options = {
 				id: "errorInitializationCheck",
-				rootDir: "./test",
+				rootDir: "test",
 				relativeInitDir: "error_initialization_check",
 				initFilename: "init",
 				logging: "off"
@@ -468,7 +468,7 @@ describe("System", function() {
 		{ // Example
 			options: {
 				id: "example",
-				rootDir: "./test",
+				rootDir: "test",
 				relativeInitDir: "example",
 				initFilename: "init",
 				logging: "off"
@@ -481,7 +481,7 @@ describe("System", function() {
 		{ // Flower shop
 			options: {
 				id: "flower_shop2",
-				rootDir: "./test",
+				rootDir: "test",
 				relativeInitDir: "flowerShop",
 				initFilename: "init",
 				logging: "off"
@@ -551,25 +551,38 @@ describe("System", function() {
 								done();
 							});
 						});
-						it("should produce an error with folder args (\"./\", \"" + element.options.relativeInitDir + "\")", function(done){
-							systemTest.system.file.getFile("./", element.options.relativeInitDir).catch(function(error){
+						it("should produce an error with folder args (\"." + path.sep + "\", \"" + element.options.relativeInitDir + "\")", function(done){
+							systemTest.system.file.getFile("." + path.sep, element.options.relativeInitDir).catch(function(error){
 								assert.strictEqual(error, systemTest.system.error.file_system_error);
 								done();
 							});
 						});
 					});
 					describe(".list()", function(){
-						it("should be " + element.rootDirFileAmount + " with args (\"./\", isFile())", function(done){
-							systemTest.system.file.list("./", systemTest.system.file.filter.isFile).then(function(result){
+						let both = element.rootDirFileAmount + element.rootDirFolderAmount; // Expected amount of files and folders
+						it("should be " + element.rootDirFileAmount + " with args (\"" + path.sep + "\", isFile())", function(done){
+							systemTest.system.file.list("." + path.sep, systemTest.system.file.filter.isFile).then(function(result){
 								assert.strictEqual(result.length, element.rootDirFileAmount);
 								done();
 							});
 						});
-					});
-					describe(".list()", function(){
-						it("should be " + element.rootDirFolderAmount + " with args (\"./\", isDir())", function(done){
-							systemTest.system.file.list("./", systemTest.system.file.filter.isDir).then(function(result){
+						it("should be " + element.rootDirFolderAmount + " with args (\"." + path.sep + "\", isDir())", function(done){
+							systemTest.system.file.list("." + path.sep, systemTest.system.file.filter.isDir).then(function(result){
 								assert.strictEqual(result.length, element.rootDirFolderAmount);
+								done();
+							});
+						});
+						it("should be " + both + " with args (\"." + path.sep + "\", null)", function(done){
+							systemTest.system.file.list("." + path.sep, null).then(function(result){
+								assert.strictEqual(result.length, both);
+								done();
+							});
+						});
+					});
+					describe(".toAbsolute()", function(){
+						it("should be equal to \"" + element.options.rootDir + path.sep + element.options.relativeInitDir + "\" with args (\"." + path.sep + "\", \"" + element.options.relativeInitDir + "\")", function(done){
+							systemTest.system.file.toAbsolute("." + path.sep, element.options.relativeInitDir).then(function(result){
+								assert.strictEqual(result, element.options.rootDir + path.sep + element.options.relativeInitDir);
 								done();
 							});
 						});
@@ -685,7 +698,7 @@ describe("System", function() {
 				errorDescription: "\"logging\" not set",
 				options: {
 					id: "chickenCoup",
-					rootDir: "./test",
+					rootDir: "test",
 					relativeInitDir: "chicken_coup",
 					initFilename: "init",
 					loggingNameError: false
@@ -695,7 +708,7 @@ describe("System", function() {
 				errorDescription: "\"logging\" not a string",
 				options: {
 					id: "chickenCoup",
-					rootDir: "./test",
+					rootDir: "test",
 					relativeInitDir: "chicken_coup",
 					initFilename: "init",
 					logging: false
@@ -705,7 +718,7 @@ describe("System", function() {
 				errorDescription: "\"logging\" not a permitted string",
 				options: {
 					id: "chickenCoup",
-					rootDir: "./test",
+					rootDir: "test",
 					relativeInitDir: "chicken_coup",
 					initFilename: "init",
 					logging: "not_included_string"
@@ -715,7 +728,7 @@ describe("System", function() {
 				errorDescription: "\"id\" not set",
 				options: {
 					idNameError: "chickenCoup",
-					rootDir: "./test",
+					rootDir: "test",
 					relativeInitDir: "chicken_coup",
 					initFilename: "init",
 					logging: "off"
@@ -725,7 +738,7 @@ describe("System", function() {
 				errorDescription: "\"id\" not string",
 				options: {
 					id: 123456789,
-					rootDir: "./test",
+					rootDir: "test",
 					relativeInitDir: "chicken_coup",
 					initFilename: "init",
 					logging: "off"
