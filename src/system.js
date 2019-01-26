@@ -106,6 +106,14 @@ class System extends loader.Loader{
 			 */
 			this.system.file = {
 				/**
+				 * File cache.
+				 * @type {Object}
+				 */
+				cache: {
+					index: {}, // Index pointing to files
+					files: [] // Array of actual files and reverse indices pointing from files to index
+				},
+				/**
 				 * File level filters.
 				 * @type {Object}
 				 */
@@ -173,7 +181,64 @@ class System extends loader.Loader{
 				 * @param {string} file Filename.
 				 * @returns {external:Promise} Promise, containing string with file contents..
 				*/
-				getFile: (dir, file) => new Promise((resolve, reject) => {
+				getFile: (dir, file, cacheTtl) => new Promise((resolve, reject) => {
+					// const maxFiles = 100;
+					// var index = this.system.cache.index;
+					// var files = this.system.cache.files;
+					// // If requested file is not cached, then read the file and cache it.
+					// // If cache is full, pop the first entry, shift the array and then cache it. FIFO = 1 (limit of 5) [1,2,3,4,5]; [2,3,4,5,6]
+					// // Find if file is cached
+					// let cached = false;
+					// if(index.hasOwnProperty(dir)){
+					// 	if(index[dir].hasOwnProperty(file)){
+					// 		cached = true;
+					// 	}
+					// }
+					// if(!cached){
+					// 	if (files.length >= maxFiles){
+					// 		// Update indices
+					// 		delete index[files[0].rIndex.dir][files[0].rIndex.file];
+					// 		/*
+					// 		files = [
+					// 			{
+					// 				file: actual_file,
+					// 				rIndex: {
+					// 					dir: "dirA",
+					// 					file: "FileA"
+					// 				}
+					// 			}
+					// 		]
+					// 		index = {
+					// 			"dirA": {
+					// 				"FileA": file_entry_linkA
+					// 			},
+					// 			"dirB": {
+					// 				"FileB": file_entry_linkB
+					// 			}
+					// 		}
+					// 		*/
+					// 		if(Object.keys(index[files[0].rIndex.dir]).length == 0){
+					// 			delete index[files[0].rIndex.dir];
+					// 		}
+					// 		// Shift the array
+					// 		files.shift();
+
+					// 		// Unshift the array
+					// 		files.unshift({file: loaderTheFile, rIndex: {}});
+
+					// 		// Add indices
+					// 		if(!index.hasOwnProperty(dir)){
+					// 			index[dir] = new Object();
+					// 		}
+					// 		index[dir][file] = files[maxFiles - 1];
+					// 		files[maxFiles - 1].rIndex = {
+					// 			dir,
+					// 			file
+					// 		};
+					// 	}
+					// 	//read file(){cache it}
+					// }
+					// //resolve(index[dir][file].file);
 					loader.Loader.getFile(this.system.rootDir, dir, file).then(function(result){
 						resolve(result);
 					}).catch(error => {
