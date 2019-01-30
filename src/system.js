@@ -175,77 +175,133 @@ class System extends loader.Loader{
 				},
 				/**
 				 * Get file contents relative to system root directory.
+				 * files = [
+				 *   {
+				 *     file: actual_file,
+				 *     rIndex: {
+				 *       dir: "dirA",
+				 *       file: "fileA"
+				 *     }
+				 *   },
+				 *   {
+				 *     file: actual_file_b,
+				 *     rIndex: {
+				 *       dir: "dirB",
+				 *       file: "fileB"
+				 *     }
+				 *   }
+				 * ]
+				 * index = {
+				 *   "dirA": {
+				 *     "FileA": file_entry_link_a
+				 *   },
+				 *   "dirB": {
+				 *     "FileB": file_entry_link_b
+				 *   }
+				 * }
+				 *
 				 * @async
 				 * @function
 				 * @param {string} dir Directory, relative to system root.
 				 * @param {string} file Filename.
 				 * @returns {external:Promise} Promise, containing string with file contents..
 				*/
-				getFile: (dir, file, cacheTtl) => new Promise((resolve, reject) => {
-					// const maxFiles = 100;
-					// var index = this.system.cache.index;
-					// var files = this.system.cache.files;
-					// // If requested file is not cached, then read the file and cache it.
-					// // If cache is full, pop the first entry, shift the array and then cache it. FIFO = 1 (limit of 5) [1,2,3,4,5]; [2,3,4,5,6]
-					// // Find if file is cached
-					// let cached = false;
-					// if(index.hasOwnProperty(dir)){
-					// 	if(index[dir].hasOwnProperty(file)){
-					// 		cached = true;
-					// 	}
-					// }
-					// if(!cached){
-					// 	if (files.length >= maxFiles){
-					// 		// Update indices
-					// 		delete index[files[0].rIndex.dir][files[0].rIndex.file];
-					// 		/*
-					// 		files = [
-					// 			{
-					// 				file: actual_file,
-					// 				rIndex: {
-					// 					dir: "dirA",
-					// 					file: "FileA"
-					// 				}
-					// 			}
-					// 		]
-					// 		index = {
-					// 			"dirA": {
-					// 				"FileA": file_entry_linkA
-					// 			},
-					// 			"dirB": {
-					// 				"FileB": file_entry_linkB
-					// 			}
-					// 		}
-					// 		*/
-					// 		if(Object.keys(index[files[0].rIndex.dir]).length == 0){
-					// 			delete index[files[0].rIndex.dir];
-					// 		}
-					// 		// Shift the array
-					// 		files.shift();
-
-					// 		// Unshift the array
-					// 		files.unshift({file: loaderTheFile, rIndex: {}});
-
-					// 		// Add indices
-					// 		if(!index.hasOwnProperty(dir)){
-					// 			index[dir] = new Object();
-					// 		}
-					// 		index[dir][file] = files[maxFiles - 1];
-					// 		files[maxFiles - 1].rIndex = {
-					// 			dir,
-					// 			file
-					// 		};
-					// 	}
-					// 	//read file(){cache it}
-					// }
-					// //resolve(index[dir][file].file);
-					loader.Loader.getFile(this.system.rootDir, dir, file).then(function(result){
-						resolve(result);
-					}).catch(error => {
-						//	this.fire("file_system_error");
+				getFile: async (dir, file, cacheTtl, force) => {
+					// Physically getting the file
+					var pGetFile = () => new Promise((resolve, reject) => {
+						loader.Loader.getFile(this.system.rootDir, dir, file).then(function(result){
+							resolve(result);
+						}).catch(error => {
+							//	this.fire("file_system_error");
 							reject(this.system.error.file_system_error);
 						});
-				}),
+					});
+
+					const maxFiles = 100;
+					const defaultCacheTtl = 86400;
+					const milliSecondsInSeconds = 1000;
+
+					// Set cache to default if not provided
+					if(cacheTtl === null){
+						cacheTtl = defaultCacheTtl;
+					}
+					var {index, files} = this.system.file.cache;
+					if(maxFiles > 0){
+						// Find expiration time and current time
+						var currentTimeStamp = Math.trunc(new Date().getTime() / milliSecondsInSeconds);
+						var expirationTimeStamp = currentTimeStamp + cacheTtl;
+
+						// Find if file is cached
+						let cached = false;
+						if(index.hasOwnProperty(dir)){
+							if(index[dir].hasOwnProperty(file)){
+								cached = true;
+							}
+						}
+
+						// Process for cached
+						if(cached){
+							if (index[dir][file].cacheTtl === cacheTtl){
+								// If expired; Not expired is anticipated to be the most used path
+								if(currentTimeStamp > index[dir][file].expires){
+									index[dir][file].file = await pGetFile();
+									index[dir][file].expires = expirationTimeStamp;
+								} else if (force){
+									index[dir][file].file = await pGetFile();
+								}
+							} else { // New ttl
+								if(index[dir][file].expires > expirationTimeStamp){
+									index[dir][file].expires = expirationTimeStamp;
+								}
+								index[dir][file].cacheTtl = cacheTtl;
+								if (force){
+									index[dir][file].file = await pGetFile();
+								}
+							}
+						} else { // <== if(cached)
+							let nextFile;
+							let filesLength = files.length;
+
+							// Determine index and prepare space
+							if (filesLength >= maxFiles){
+								// Update indices
+								delete index[files[0].rIndex.dir][files[0].rIndex.file];
+								if(Object.keys(index[files[0].rIndex.dir]).length == 0){
+									delete index[files[0].rIndex.dir];
+								}
+
+								// Shift the array
+								files.shift();
+
+								// Assign next file index
+								nextFile = maxFiles - 1;
+							} else {
+								nextFile = filesLength;
+							}
+
+							// Unshift the array
+							files.unshift({
+								file: await pGetFile(),
+								rIndex: {},
+								expires: expirationTimeStamp,
+								cacheTtl
+							});
+
+							// Add indices
+							if(!index.hasOwnProperty(dir)){
+								index[dir] = new Object();
+							}
+							index[dir][file] = files[nextFile];
+							files[nextFile].rIndex = {
+								dir,
+								file
+							};
+						} // <== if(cached) {} else {...}
+						return index[dir][file].file;
+					} else { // <== if(maxFiles > 0)
+						return await pGetFile();
+					}
+				},
 				/**
 				 * Get contents of yaml file relative to system root directory.
 				 * @async
@@ -373,6 +429,7 @@ class System extends loader.Loader{
 						processLoaderError(new loaderError.LoaderError("functionality_error", "There was an error in the loader functionality in constructor subroutines."));
 					});
 				});
+
 				// Promise is there to maintain full concurrency for maintainability, no functionality implied
 				var staticInitializationPromise = new Promise(staticInitialization);
 			}
