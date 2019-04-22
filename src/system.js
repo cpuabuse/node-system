@@ -777,7 +777,7 @@ class System extends loader.Loader{
 	 * system.System.error("Not enough resources.");
 	 */
 	static error(text){
-		console.error("[Error] " + text);
+		console.error("\x1b[31m[Error]\x1b[0m " + text);
 	}
 
 	/**
@@ -787,7 +787,7 @@ class System extends loader.Loader{
 	 * system.System.log("Resources loaded.");
 	 */
 	static log(text){
-		console.log("[OK] " + text);
+		console.log("\x1b[32m[OK]\x1b[0m " + text);
 	}
 }
 

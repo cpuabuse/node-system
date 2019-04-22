@@ -1,4 +1,4 @@
-sol: "solar_system"
+sol: "" # Tests for an empty string in init[key]
 alphacentauri:
   file: alphacentauri.yml
   path: absolute
