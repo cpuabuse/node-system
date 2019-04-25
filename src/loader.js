@@ -120,7 +120,7 @@ class Loader{
 
 	/**
 	 * Join a root directory with a file/folder or an array of files/folders to absolute path.
-	 * @param {string} rootDir Root folder.
+	 * @param {string} source Root folder.
 	 * @param {string|string[]} target File/folder name|names.
 	 * @returns {string|string[]} Absolute path|paths.
 	 * @example <caption>Usage</caption>
@@ -130,13 +130,13 @@ class Loader{
 	 * // Output
 	 * // c:\machines\appliances
 	 */
-	static join(rootDir, target){
+	static join(source, target){
 		if (Array.isArray(target)){
 			var targets = new Array(); // Prepare the return array
 
 			// Populate return array
 			target.forEach(function(target){
-				targets.push(path.join(rootDir, target));
+				targets.push(path.join(source, target));
 			})
 
 			// Return an array
@@ -144,18 +144,16 @@ class Loader{
 		}
 
 		// Return a string if not an array
-		return path.join(rootDir, target);
+		return path.join(source, target);
 	}
 
 	/**
 	 * Checks if is a file
-	 * @param {string} rootDir Absolute root directory.
-	 * @param {string} relativeDir Relative directory to root.
-	 * @param {string} filename Full filename.
+	 * @param {string} rawPath Full filepath.
 	 * @returns {boolean} Returns `true` if a file, `false` if not.
 	 * @example <caption>Usage</caption>
 	 * // Verify file
-	 * Loader.isFile("c:\machines","appliances","grapefruitJuicer.txt").then(function(result){
+	 * Loader.isFile("c:\machines\appliances\grapefruitJuicer.txt").then(function(result){
 	 *   console.log(result);
 	 * });
 	 *
@@ -165,9 +163,9 @@ class Loader{
 	 * // Output
 	 * // true
 	 */
-	static isFile(rootDir, relativeDir, filename){
+	static isFile(rawPath){
 		return new Promise(function(resolve){
-			fs.stat(path.join(rootDir, relativeDir, filename), function(err, stats){
+			fs.stat(rawPath, function(err, stats){
 				if (err){
 					resolve(false);
 				} else {

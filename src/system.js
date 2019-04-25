@@ -125,7 +125,7 @@ class System extends loader.Loader{
 					 * @param {module:system.System~filterContext} filterContext Information on the item to be filtered.
 					 * @returns {external:Promise} Promise, containing boolean result.
 					*/
-					isFile: filterContext => loader.Loader.isFile(this.system.rootDir, filterContext.dir, filterContext.itemName),
+					isFile: filterContext => loader.Loader.isFile(loader.Loader.join(this.system.rootDir, loader.Loader.join(filterContext.dir, filterContext.itemName))),
 					/**
 					 * Check if argument is a folder (relative to system root directory).
 					 * @async

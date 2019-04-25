@@ -258,7 +258,7 @@ function testLoader(){
 				 * @memberof module:system~test.Loader
 				 */
 				describe(".isFile(\"" + element.rootDir + "\", \"" + element.dir + "\", \"" + element.rawFilename + "\")", function(){
-					let isFile = loader.Loader.isFile(element.rootDir, element.dir, element.rawFilename);
+					let isFile = loader.Loader.isFile(element.rootDir + path.sep + element.dir + path.sep + element.rawFilename);
 					it("should be a file", function(done){
 						isFile.then(function(result){
 							assert.strictEqual(result, true);
