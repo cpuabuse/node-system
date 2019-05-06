@@ -5,13 +5,6 @@
 */
 "use strict";
 
-/**
- * Series of tests for the system.
- * @inner
- * @member test
- * @memberof module:system
- */
-
 // Set eslint to ingore describe and it for assert
 /* global describe:true */
 /* global it:true */

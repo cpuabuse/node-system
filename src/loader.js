@@ -60,7 +60,7 @@ class Loader{
 	 * @param {string} rootDir Absolute root directory.
 	 * @param {string} relativeDir Directory relative to root.
 	 * @param {string} file Full file name.
-	 * @returns {external.Promise} File contents.
+	 * @returns {external:Promise} File contents.
 	 * @example <caption>Usage</caption>
 	 * // Load files
 	 * var grapefruitJuicer = Loader.getFile("c:\machines", "appliances", "grapefruitJuicer.txt");
@@ -150,7 +150,7 @@ class Loader{
 	/**
 	 * Checks if is a file
 	 * @param {string} rawPath Full filepath.
-	 * @returns {boolean} Returns `true` if a file, `false` if not.
+	 * @returns {external:Promise} Returns `true` if a file, `false` if not.
 	 * @example <caption>Usage</caption>
 	 * // Verify file
 	 * Loader.isFile("c:\machines\appliances\grapefruitJuicer.txt").then(function(result){
@@ -179,7 +179,7 @@ class Loader{
 	 * Checks if is a directory.
 	 * @param {string} rootDir Absolute root directory.
 	 * @param {string} relativeDir Relative directory to root.
-	 * @returns {boolean} Returns `true` if a directory, `false` if not.
+	 * @returns {external:Promise} Returns `true` if a directory, `false` if not.
 	 * @example <caption>Usage</caption>
 	 * // Verify directory
 	 * Loader.isDir("c:\machines\appliances","grapefruitJuicer.txt").then(function(result){

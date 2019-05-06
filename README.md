@@ -76,11 +76,11 @@ System is intended more than anything, for centralized managment.
         * [~Loader](#module_system..Loader)
             * [new Loader(rootDir, relativeInitDir, initFilename, callback)](#new_module_system..Loader_new)
             * _static_
-                * [.getFile(rootDir, relativeDir, file)](#module_system..Loader.getFile) ⇒ <code>external.Promise</code>
+                * [.getFile(rootDir, relativeDir, file)](#module_system..Loader.getFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
                 * [.toRelative(dir, target)](#module_system..Loader.toRelative) ⇒ <code>string</code> \| <code>Array.&lt;string&gt;</code>
-                * [.join(rootDir, target)](#module_system..Loader.join) ⇒ <code>string</code> \| <code>Array.&lt;string&gt;</code>
-                * [.isFile(rootDir, relativeDir, filename)](#module_system..Loader.isFile) ⇒ <code>boolean</code>
-                * [.isDir(rootDir, relativeDir)](#module_system..Loader.isDir) ⇒ <code>boolean</code>
+                * [.join(source, target)](#module_system..Loader.join) ⇒ <code>string</code> \| <code>Array.&lt;string&gt;</code>
+                * [.isFile(rawPath)](#module_system..Loader.isFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+                * [.isDir(rootDir, relativeDir)](#module_system..Loader.isDir) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
                 * [.list(rootDir, relativeDir)](#module_system..Loader.list) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
                 * [.yamlToObject(string)](#module_system..Loader.yamlToObject) ⇒ <code>Object</code>
             * _inner_
@@ -104,18 +104,8 @@ System is intended more than anything, for centralized managment.
         * [~LoaderError](#module_system..LoaderError) ⇐ [<code>Error</code>](https://nodejs.org/api/errors.html#errors_class_error)
             * [new LoaderError([code], [message])](#new_module_system..LoaderError_new)
         * [~test](#module_system..test)
-            * [.dummyErrorHandler](#module_system..test.dummyErrorHandler)
             * [.LoaderError](#module_system..test.LoaderError)
             * [.SystemError](#module_system..test.SystemError)
-            * [.Loader](#module_system..test.Loader)
-                * [.toRelative](#module_system..test.Loader.toRelative)
-                * [.join](#module_system..test.Loader.join)
-                * [.isFile](#module_system..test.Loader.isFile)
-                * [.isDir](#module_system..test.Loader.isDir)
-            * [.System](#module_system..test.System)
-                * [.getFile](#module_system..test.System.getFile)
-                * [.checkOptionsFailure](#module_system..test.System.checkOptionsFailure)
-            * [.AtomicLock](#module_system..test.AtomicLock)
 
 <a name="module_system.System"></a>
 
@@ -326,7 +316,7 @@ labInventory.addBehaviors([behavior]).then(function(){
 Log message from the System context
 
 **Kind**: instance method of [<code>System</code>](#module_system.System)  
-**Emits**: <code>module:system.System~event:type_error</code>  
+**Emits**: <code>module:system.System~event:type\_error</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -353,7 +343,7 @@ labInventory.log(text);
 Log an error  message from the System context
 
 **Kind**: instance method of [<code>System</code>](#module_system.System)  
-**Emits**: <code>module:system.System~event:type_error</code>  
+**Emits**: <code>module:system.System~event:type\_error</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -634,11 +624,11 @@ Required by system to perform file initialization.
 * [~Loader](#module_system..Loader)
     * [new Loader(rootDir, relativeInitDir, initFilename, callback)](#new_module_system..Loader_new)
     * _static_
-        * [.getFile(rootDir, relativeDir, file)](#module_system..Loader.getFile) ⇒ <code>external.Promise</code>
+        * [.getFile(rootDir, relativeDir, file)](#module_system..Loader.getFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
         * [.toRelative(dir, target)](#module_system..Loader.toRelative) ⇒ <code>string</code> \| <code>Array.&lt;string&gt;</code>
-        * [.join(rootDir, target)](#module_system..Loader.join) ⇒ <code>string</code> \| <code>Array.&lt;string&gt;</code>
-        * [.isFile(rootDir, relativeDir, filename)](#module_system..Loader.isFile) ⇒ <code>boolean</code>
-        * [.isDir(rootDir, relativeDir)](#module_system..Loader.isDir) ⇒ <code>boolean</code>
+        * [.join(source, target)](#module_system..Loader.join) ⇒ <code>string</code> \| <code>Array.&lt;string&gt;</code>
+        * [.isFile(rawPath)](#module_system..Loader.isFile) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+        * [.isDir(rootDir, relativeDir)](#module_system..Loader.isDir) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
         * [.list(rootDir, relativeDir)](#module_system..Loader.list) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
         * [.yamlToObject(string)](#module_system..Loader.yamlToObject) ⇒ <code>Object</code>
     * _inner_
@@ -660,12 +650,12 @@ Required by system to perform file initialization.
 
 <a name="module_system..Loader.getFile"></a>
 
-## Loader.getFile(rootDir, relativeDir, file) ⇒ <code>external.Promise</code>
+## Loader.getFile(rootDir, relativeDir, file) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 
 Gets file contents.
 
 **Kind**: static method of [<code>Loader</code>](#module_system..Loader)  
-**Returns**: <code>external.Promise</code> - File contents.  
+**Returns**: [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) - File contents.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -715,7 +705,7 @@ console.log(Loader.toRelative("c:\machines\refrigerators", "c:\machines\applianc
 ```
 <a name="module_system..Loader.join"></a>
 
-## Loader.join(rootDir, target) ⇒ <code>string</code> \| <code>Array.&lt;string&gt;</code>
+## Loader.join(source, target) ⇒ <code>string</code> \| <code>Array.&lt;string&gt;</code>
 
 Join a root directory with a file/folder or an array of files/folders to absolute path.
 
@@ -724,7 +714,7 @@ Join a root directory with a file/folder or an array of files/folders to absolut
 
 | Param | Type | Description |
 | --- | --- | --- |
-| rootDir | <code>string</code> | Root folder. |
+| source | <code>string</code> | Root folder. |
 | target | <code>string</code> \| <code>Array.&lt;string&gt;</code> | File/folder name|names. |
 
 **Example** *(Usage)*  
@@ -737,23 +727,21 @@ console.log(Loader.join("c:\machines", "appliances"))
 ```
 <a name="module_system..Loader.isFile"></a>
 
-## Loader.isFile(rootDir, relativeDir, filename) ⇒ <code>boolean</code>
+## Loader.isFile(rawPath) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 
 Checks if is a file
 
 **Kind**: static method of [<code>Loader</code>](#module_system..Loader)  
-**Returns**: <code>boolean</code> - Returns `true` if a file, `false` if not.  
+**Returns**: [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) - Returns `true` if a file, `false` if not.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| rootDir | <code>string</code> | Absolute root directory. |
-| relativeDir | <code>string</code> | Relative directory to root. |
-| filename | <code>string</code> | Full filename. |
+| rawPath | <code>string</code> | Full filepath. |
 
 **Example** *(Usage)*  
 ```js
 // Verify file
-Loader.isFile("c:\machines","appliances","grapefruitJuicer.txt").then(function(result){
+Loader.isFile("c:\machines\appliances\grapefruitJuicer.txt").then(function(result){
   console.log(result);
 });
 
@@ -765,12 +753,12 @@ Loader.isFile("c:\machines","appliances","grapefruitJuicer.txt").then(function(r
 ```
 <a name="module_system..Loader.isDir"></a>
 
-## Loader.isDir(rootDir, relativeDir) ⇒ <code>boolean</code>
+## Loader.isDir(rootDir, relativeDir) ⇒ [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 
 Checks if is a directory.
 
 **Kind**: static method of [<code>Loader</code>](#module_system..Loader)  
-**Returns**: <code>boolean</code> - Returns `true` if a directory, `false` if not.  
+**Returns**: [<code>Promise</code>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) - Returns `true` if a directory, `false` if not.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1165,26 +1153,9 @@ Series of tests for the system.
 **Kind**: inner property of [<code>system</code>](#module_system)  
 
 * [~test](#module_system..test)
-    * [.dummyErrorHandler](#module_system..test.dummyErrorHandler)
     * [.LoaderError](#module_system..test.LoaderError)
     * [.SystemError](#module_system..test.SystemError)
-    * [.Loader](#module_system..test.Loader)
-        * [.toRelative](#module_system..test.Loader.toRelative)
-        * [.join](#module_system..test.Loader.join)
-        * [.isFile](#module_system..test.Loader.isFile)
-        * [.isDir](#module_system..test.Loader.isDir)
-    * [.System](#module_system..test.System)
-        * [.getFile](#module_system..test.System.getFile)
-        * [.checkOptionsFailure](#module_system..test.System.checkOptionsFailure)
-    * [.AtomicLock](#module_system..test.AtomicLock)
 
-<a name="module_system..test.dummyErrorHandler"></a>
-
-## test.dummyErrorHandler
-
-Tests for the Loader class.
-
-**Kind**: static property of [<code>test</code>](#module_system..test)  
 <a name="module_system..test.LoaderError"></a>
 
 ## test.LoaderError
@@ -1197,90 +1168,5 @@ Tests for the Loader class.
 ## test.SystemError
 
 Tests for the Loader class.
-
-**Kind**: static property of [<code>test</code>](#module_system..test)  
-<a name="module_system..test.Loader"></a>
-
-## test.Loader
-
-Tests for the Loader class.
-
-**Kind**: static property of [<code>test</code>](#module_system..test)  
-
-* [.Loader](#module_system..test.Loader)
-    * [.toRelative](#module_system..test.Loader.toRelative)
-    * [.join](#module_system..test.Loader.join)
-    * [.isFile](#module_system..test.Loader.isFile)
-    * [.isDir](#module_system..test.Loader.isDir)
-
-<a name="module_system..test.Loader.toRelative"></a>
-
-## Loader.toRelative
-
-Tests the toRelative function with:
-
-- Single argument
-- Array as argument
-
-**Kind**: static property of [<code>Loader</code>](#module_system..test.Loader)  
-<a name="module_system..test.Loader.join"></a>
-
-## Loader.join
-
-Tests the join function with:
-
-- Single argument
-- Array as argument
-
-**Kind**: static property of [<code>Loader</code>](#module_system..test.Loader)  
-<a name="module_system..test.Loader.isFile"></a>
-
-## Loader.isFile
-
-Tests the isFile function.
-
-**Kind**: static property of [<code>Loader</code>](#module_system..test.Loader)  
-<a name="module_system..test.Loader.isDir"></a>
-
-## Loader.isDir
-
-Tests the isDir function with:
-
-- A directory
-- A file
-- A non-existant directory
-
-**Kind**: static property of [<code>Loader</code>](#module_system..test.Loader)  
-<a name="module_system..test.System"></a>
-
-## test.System
-
-Tests of System class.
-
-**Kind**: static property of [<code>test</code>](#module_system..test)  
-
-* [.System](#module_system..test.System)
-    * [.getFile](#module_system..test.System.getFile)
-    * [.checkOptionsFailure](#module_system..test.System.checkOptionsFailure)
-
-<a name="module_system..test.System.getFile"></a>
-
-## System.getFile
-
-Tests the getFile function.
-
-**Kind**: static property of [<code>System</code>](#module_system..test.System)  
-<a name="module_system..test.System.checkOptionsFailure"></a>
-
-## System.checkOptionsFailure
-
-Test the checkOptionsFailure function.
-
-**Kind**: static property of [<code>System</code>](#module_system..test.System)  
-<a name="module_system..test.AtomicLock"></a>
-
-## test.AtomicLock
-
-Tests of System class.
 
 **Kind**: static property of [<code>test</code>](#module_system..test)  

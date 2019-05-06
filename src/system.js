@@ -120,7 +120,6 @@ class System extends loader.Loader{
 				filter: {
 					/**
 					 * Check if argument is a file (relative to system root directory).
-					 * @async
 					 * @function
 					 * @param {module:system.System~filterContext} filterContext Information on the item to be filtered.
 					 * @returns {external:Promise} Promise, containing boolean result.
@@ -128,7 +127,6 @@ class System extends loader.Loader{
 					isFile: filterContext => loader.Loader.isFile(loader.Loader.join(this.system.rootDir, loader.Loader.join(filterContext.dir, filterContext.itemName))),
 					/**
 					 * Check if argument is a folder (relative to system root directory).
-					 * @async
 					 * @function
 					 * @param {module:system.System~filterContext} filterContext Information on the item to be filtered
 					 * @returns {external:Promise} Promise, containing boolean result.
