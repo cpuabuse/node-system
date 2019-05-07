@@ -5,13 +5,6 @@
 */
 "use strict";
 
-/**
- * Series of tests for the system.
- * @inner
- * @member test
- * @memberof module:system
- */
-
 // Set eslint to ingore describe and it for assert
 /* global describe:true */
 /* global it:true */
@@ -30,6 +23,15 @@ const nonExistentFileOrDir = "Non-existent file or directory";
  */
 function testLoader(){
 	describe("Loader", function() {
+		/**
+		 * Tests the constructor for:
+		 *
+		 * - "unexpected_constructor" error
+		 * - Non-failure with dummy
+		 * - "Invalid intialization entry type" error
+		 * @member constructor
+		 * @memberof module:system~test.Loader
+		 */
 		describe("constructor", function(){
 			it("should produce unexpected_constructor error, with incoherent args", function(){
 				assert.throws(
@@ -59,6 +61,22 @@ function testLoader(){
 				});
 			});
 		});
+
+		/**
+		 * Tests that function produces appropriate object from YAML string.
+		 * @function yamlToObject
+		 * @memberof module:system~test.Loader
+		 */
+		describe(".yamlToObject()", function(){
+			let data = "Wine: Red";
+			let expectedResults = {
+				Wine: "Red"
+			};
+			it("should produce JSON", function(){
+				assert.deepEqual(loader.Loader.yamlToObject(data), expectedResults);
+			});
+		});
+
 		const loaders = [
 			// Stars
 			{
@@ -147,16 +165,6 @@ function testLoader(){
 			}
 		];
 		loaders.forEach(function(element){
-			describe(".yamlToObject()", function(){
-				let data = "Wine: Red";
-				let expectedResults = {
-					Wine: "Red"
-				};
-				it("should produce JSON", function(){
-					assert.deepEqual(loader.Loader.yamlToObject(data), expectedResults);
-				});
-			});
-
 			describe(element.name, function(){
 				let loaderTest;
 				let constructorErrorOk;
@@ -173,12 +181,24 @@ function testLoader(){
 					});
 				});
 
+				/**
+				 * Constructor should either reject or not.
+				 * @instance
+				 * @member constructor
+				 * @memberof module:system~test.Loader
+				 */
 				describe("constructor", function(){
 					it("should " + (element.hasOwnProperty("constructorError") ? "reject with" + element.hasOwnProperty("constructorError") : "not reject"), function(){
 						return assert.doesNotReject(constructorErrorOk);
 					});
 				});
 
+				/**
+				 * Checks for instance grandchildren values.
+				 * @instance
+				 * @member grandChildrenCompare
+				 * @memberof module:system~test.Loader
+				 */
 				if(element.hasOwnProperty("grandChildrenCompare")){
 					if(element.grandChildrenCompare.length > 0){
 						element.grandChildrenCompare.forEach(function(compare){
@@ -191,6 +211,13 @@ function testLoader(){
 						});
 					}
 				}
+
+				/**
+				 * Checks for instance greatgrandchildren values.
+				 * @instance
+				 * @member greatGrandChildrenCompare
+				 * @memberof module:system~test.Loader
+				 */
 				if(element.hasOwnProperty("greatGrandChildrenCompare")){
 					if(element.greatGrandChildrenCompare.length > 0){
 						element.greatGrandChildrenCompare.forEach(function(compare){
@@ -204,6 +231,15 @@ function testLoader(){
 					}
 				}
 
+				/**
+				 * Tests the list function for:
+				 *
+				 * - List length consistency
+				 * - Rejection with inconsistent args
+				 * @instance
+				 * @function list
+				 * @memberof module:system~test.Loader
+				 */
 				describe(".list(\"" + element.rootDir + "\", \"" + element.dir + "\")", function(){
 					it("should have a length of " + element.filesAndFoldersAmount.toString() + "with args", function(done) {
 						loader.Loader.list(element.rootDir, element.dir).then(function(result){
@@ -221,7 +257,8 @@ function testLoader(){
 				 *
 				 * - Single argument
 				 * - Array as argument
-				 * @member toRelative
+				 * @instance
+				 * @function toRelative
 				 * @memberof module:system~test.Loader
 				 */
 				describe(".toRelative()", function(){
@@ -239,7 +276,8 @@ function testLoader(){
 				 *
 				 * - Single argument
 				 * - Array as argument
-				 * @member join
+				 * @instance
+				 * @function join
 				 * @memberof module:system~test.Loader
 				 */
 				describe(".join(\"" + element.rootDir + "\", \"" + element.dir + "\")", function(){
@@ -253,26 +291,31 @@ function testLoader(){
 				});
 
 				/**
-				 * Tests the isFile function.
-				 * @member isFile
+				 * Tests the isFile for:
+				 *
+				 * - Being a file
+				 * - Not being a file for a directory
+				 * - Not being a file for non-existant file
+				 * @instance
+				 * @function isFile
 				 * @memberof module:system~test.Loader
 				 */
 				describe(".isFile(\"" + element.rootDir + "\", \"" + element.dir + "\", \"" + element.rawFilename + "\")", function(){
 					let isFile = loader.Loader.isFile(element.rootDir + path.sep + element.dir + path.sep + element.rawFilename);
-					it("should be a file", function(done){
+					it("should be a file with args(\"" + element.rootDir + path.sep + element.dir + path.sep + element.rawFilename + "\")", function(done){
 						isFile.then(function(result){
 							assert.strictEqual(result, true);
 							done();
 						});
 					});
-					it("should not be a directory with args (\"" + element.rootDir + "\", \"" + element.dir + path.sep + element.rawFilename + "\")", function(done){
-						loader.Loader.isFile(element.rootDir, "." + path.sep ,element.dir).then(function(result){
+					it("should not be a directory with args (\"" + element.rootDir + path.sep + element.dir + "\")", function(done){
+						loader.Loader.isFile(element.rootDir + path.sep + element.dir).then(function(result){
 							assert.strictEqual(result, false);
 							done();
 						});
 					});
-					it("should not be a directory with args (\"" + element.rootDir + "\", \"" + nonExistentFileOrDir + "\")", function(done){
-						loader.Loader.isFile(element.rootDir, "." + path.sep, nonExistentFileOrDir).then(function(result){
+					it("should not be a directory with args (\"" + element.rootDir + path.sep + nonExistentFileOrDir + "\")", function(done){
+						loader.Loader.isFile(element.rootDir + path.sep + nonExistentFileOrDir).then(function(result){
 							assert.strictEqual(result, false);
 							done();
 						});
@@ -285,7 +328,8 @@ function testLoader(){
 				 * - A directory
 				 * - A file
 				 * - A non-existant directory
-				 * @member isDir
+				 * @instance
+				 * @function isDir
 				 * @memberof module:system~test.Loader
 				 */
 				describe(".isDir()" , function(){

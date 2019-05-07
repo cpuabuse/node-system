@@ -106,6 +106,19 @@ System is intended more than anything, for centralized managment.
         * [~test](#module_system..test)
             * [.LoaderError](#module_system..test.LoaderError)
             * [.SystemError](#module_system..test.SystemError)
+            * [.Loader](#module_system..test.Loader)
+                * _instance_
+                    * [.constructor](#module_system..test.Loader+constructor)
+                    * [.grandChildrenCompare](#module_system..test.Loader+grandChildrenCompare)
+                    * [.greatGrandChildrenCompare](#module_system..test.Loader+greatGrandChildrenCompare)
+                    * [.list()](#module_system..test.Loader+list)
+                    * [.toRelative()](#module_system..test.Loader+toRelative)
+                    * [.join()](#module_system..test.Loader+join)
+                    * [.isFile()](#module_system..test.Loader+isFile)
+                    * [.isDir()](#module_system..test.Loader+isDir)
+                * _static_
+                    * [.constructor](#module_system..test.Loader.constructor)
+                    * [.yamlToObject()](#module_system..test.Loader.yamlToObject)
 
 <a name="module_system.System"></a>
 
@@ -1155,6 +1168,19 @@ Series of tests for the system.
 * [~test](#module_system..test)
     * [.LoaderError](#module_system..test.LoaderError)
     * [.SystemError](#module_system..test.SystemError)
+    * [.Loader](#module_system..test.Loader)
+        * _instance_
+            * [.constructor](#module_system..test.Loader+constructor)
+            * [.grandChildrenCompare](#module_system..test.Loader+grandChildrenCompare)
+            * [.greatGrandChildrenCompare](#module_system..test.Loader+greatGrandChildrenCompare)
+            * [.list()](#module_system..test.Loader+list)
+            * [.toRelative()](#module_system..test.Loader+toRelative)
+            * [.join()](#module_system..test.Loader+join)
+            * [.isFile()](#module_system..test.Loader+isFile)
+            * [.isDir()](#module_system..test.Loader+isDir)
+        * _static_
+            * [.constructor](#module_system..test.Loader.constructor)
+            * [.yamlToObject()](#module_system..test.Loader.yamlToObject)
 
 <a name="module_system..test.LoaderError"></a>
 
@@ -1170,3 +1196,116 @@ Tests for the Loader class.
 Tests for the Loader class.
 
 **Kind**: static property of [<code>test</code>](#module_system..test)  
+<a name="module_system..test.Loader"></a>
+
+## test.Loader
+
+Tests for the Loader class.
+
+**Kind**: static property of [<code>test</code>](#module_system..test)  
+
+* [.Loader](#module_system..test.Loader)
+    * _instance_
+        * [.constructor](#module_system..test.Loader+constructor)
+        * [.grandChildrenCompare](#module_system..test.Loader+grandChildrenCompare)
+        * [.greatGrandChildrenCompare](#module_system..test.Loader+greatGrandChildrenCompare)
+        * [.list()](#module_system..test.Loader+list)
+        * [.toRelative()](#module_system..test.Loader+toRelative)
+        * [.join()](#module_system..test.Loader+join)
+        * [.isFile()](#module_system..test.Loader+isFile)
+        * [.isDir()](#module_system..test.Loader+isDir)
+    * _static_
+        * [.constructor](#module_system..test.Loader.constructor)
+        * [.yamlToObject()](#module_system..test.Loader.yamlToObject)
+
+<a name="module_system..test.Loader+constructor"></a>
+
+## loader.constructor
+
+Constructor should either reject or not.
+
+**Kind**: instance property of [<code>Loader</code>](#module_system..test.Loader)  
+<a name="module_system..test.Loader+grandChildrenCompare"></a>
+
+## loader.grandChildrenCompare
+
+Checks for instance grandchildren values.
+
+**Kind**: instance property of [<code>Loader</code>](#module_system..test.Loader)  
+<a name="module_system..test.Loader+greatGrandChildrenCompare"></a>
+
+## loader.greatGrandChildrenCompare
+
+Checks for instance greatgrandchildren values.
+
+**Kind**: instance property of [<code>Loader</code>](#module_system..test.Loader)  
+<a name="module_system..test.Loader+list"></a>
+
+## loader.list()
+
+Tests the list function for:
+
+- List length consistency
+- Rejection with inconsistent args
+
+**Kind**: instance method of [<code>Loader</code>](#module_system..test.Loader)  
+<a name="module_system..test.Loader+toRelative"></a>
+
+## loader.toRelative()
+
+Tests the toRelative function with:
+
+- Single argument
+- Array as argument
+
+**Kind**: instance method of [<code>Loader</code>](#module_system..test.Loader)  
+<a name="module_system..test.Loader+join"></a>
+
+## loader.join()
+
+Tests the join function with:
+
+- Single argument
+- Array as argument
+
+**Kind**: instance method of [<code>Loader</code>](#module_system..test.Loader)  
+<a name="module_system..test.Loader+isFile"></a>
+
+## loader.isFile()
+
+Tests the isFile for:
+
+- Being a file
+- Not being a file for a directory
+- Not being a file for non-existant file
+
+**Kind**: instance method of [<code>Loader</code>](#module_system..test.Loader)  
+<a name="module_system..test.Loader+isDir"></a>
+
+## loader.isDir()
+
+Tests the isDir function with:
+
+- A directory
+- A file
+- A non-existant directory
+
+**Kind**: instance method of [<code>Loader</code>](#module_system..test.Loader)  
+<a name="module_system..test.Loader.constructor"></a>
+
+## Loader.constructor
+
+Tests the constructor for:
+
+- "unexpected_constructor" error
+- Non-failure with dummy
+- "Invalid intialization entry type" error
+
+**Kind**: static property of [<code>Loader</code>](#module_system..test.Loader)  
+<a name="module_system..test.Loader.yamlToObject"></a>
+
+## Loader.yamlToObject()
+
+Tests that function produces appropriate object from YAML string.
+
+**Kind**: static method of [<code>Loader</code>](#module_system..test.Loader)  
