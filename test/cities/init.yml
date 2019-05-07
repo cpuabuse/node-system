@@ -1,4 +1,4 @@
 ---
-# Tests init value being an empty string
+# Tests init value being a string
 
-errors: ""
+errors: "errors"
