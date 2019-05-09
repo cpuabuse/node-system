@@ -5,13 +5,6 @@
 */
 "use strict";
 
-/**
- * Series of tests for the system.
- * @inner
- * @member test
- * @memberof module:system
- */
-
 // Set eslint to ingore describe and it for assert
 /* global describe:true */
 /* global it:true */
@@ -32,6 +25,17 @@ const nonExistentFileOrDir = "Non-existent file or directory";
  */
 function testSystem(){
 	describe("System", function() {
+		/**
+		 * Tests constructor for the following.
+		 *
+		 * - Should still execute with inappropriate options and no ways to report an error
+		 * - Should execute with inappropriate options and error reporting not being a function
+		 * - Should fail with inappropriate options
+		 * - Should fail with no events or behaviors files
+		 * - Should report functionality_error with fake options
+		 * @function constructor
+		 * @memberof module:system~test.System
+		 */
 		describe("constructor", function(){
 			it("should still execute with inappropriate options and no ways to report an error", function(){
 				new system.System(); /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
@@ -88,6 +92,14 @@ function testSystem(){
 					done();
 				});
 			});
+			/**
+			 * Post-instance initialization error tests.
+			 *
+			 * - Should not generate inappropriately defined errors
+			 * - Should generate the default message
+			 * @function errorInitialization
+			 * @memberof module:system~test.System.constructor
+			 */
 			describe("errorInitialization", function(){
 				let options = {
 					id: "errorInitializationCheck",
@@ -375,7 +387,7 @@ function testSystem(){
 
 		/**
 		 * Test the checkOptionsFailure function.
-		 * @member checkOptionsFailure
+		 * @function checkOptionsFailure
 		 * @memberof module:system~test.System
 		 */
 		describe(".checkOptionsFailure()", function(){
@@ -438,12 +450,24 @@ function testSystem(){
 			});
 		});
 
+		/**
+		 * Tests static log function.
+		 * Inevitably produces console output.
+		 * @function log
+		 * @memberof module:system~test.System
+		 */
 		describe(".log()", function(){
 			it("should print a test message to console", function(){
 				system.System.log("Test");
 			});
 		});
 
+		/**
+		 * Tests static error function.
+		 * Inevitably produces console output.
+		 * @function error
+		 * @memberof module:system~test.System
+		 */
 		describe(".error()", function(){
 			it("should print a test error message to console", function(){
 				system.System.error("Test");

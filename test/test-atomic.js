@@ -21,7 +21,7 @@ const assert = require("assert");
 const waitTime = 200;
 
 /**
- * Tests of System class.
+ * Tests of AtomicLock class.
  * @member AtomicLock
  * @memberof module:system~test
  */
