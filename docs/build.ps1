@@ -4,7 +4,7 @@ if([console]::InputEncoding.CodePage -ne 65001) {[console]::InputEncoding = [con
 # Run from repo root
 node_modules\.bin\jsdoc2md `
 --heading-depth 1 `
---private docs\externals.js `
+--private meta\externals.js `
 --template docs\README.hbs `
 src\system.js `
 src\system-file.js `
