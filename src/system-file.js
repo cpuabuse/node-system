@@ -1,43 +1,69 @@
 // system/system-file.js
-/**
- * @module system
- */
 "use strict";
 const loader = require("loader.js");
 const path = require("path");
 
+/**
+ * System-lvel abstraction of a file.
+ * FsObject stands for "File System Object".
+ * @inner
+ * @memberof module:system
+ */
 class FsObject{
-	constructor(system, relativeDir, callback){
-		let error = null;
-		let done = new Promise(resolve => {
-			let rootDir = system.system.rootDir;
-			let relativeDir = path.parse(relativeDir).dir;
-			let filename = path.parse(relativeDir).name;
-			loader.isFile(rootDir, relativeDir, filename);
-			
+	/**
+	 * Creates an instance of FsObject.
+	 * @param {module:system.System} system Parent system reference.
+	 * @param {string} relativePath Path, relative to the system root.
+	 * @param {promiseCallback} callback Will call back with a promise.
+	 */
+	constructor(system, relativePath, callback){
+		// Set system for instance
+		this.system = system;
+
+		// Initialize instance with what can be set
+		let parsed = path.parse(relativePath);
+		this.name = parsed.name;
+		this.dir = parsed.dir;
+		this.type = "undefined";
+
+		// A promise to be passed to the callback
+		var done = async () => {
+			let {rootDir} = system.system;
+			let fullPath = loader.join(rootDir, this.dir, this.name);
+			let isFile, isDir;
+
+			// Determine if it is a file or folder
+			let isFilePromise = loader.isFile(fullPath).then(function(result){
+				isFile = result;
+			});
+			let isDirPromise = loader.isDir(fullPath).then(function(result){
+				isDir = result;
+			});
+
+			// Wait for the file or folder results
+			await Promise.all([isFilePromise, isDirPromise]);
+
 			// If this is file
-			if(_this_is_file_){
+			if(isFile && !isDir){
 				this.type = "file";
-				this.folder = something;
-				this.name = something;
-				this.ext = something;
-			} else if(_this_is_folder_) { // If this is folder
-				this.type = "folder"
-			} else {
-				this.type = "undefined"
 			}
-		});
+
+			// If this is a dir
+			if(isDir && !isFile){
+				this.type = "dir";
+			}
+		}
 
 		// Perform an error-first callback
-		callback(error, ready);
+		callback(done());
 	}
 
-	get rawFilename(){
-		return this.name + this.ext;
+	get base(){
+		return this.type === "file" ? this.name + this.ext : this.name;
 	}
 
-	get rawPath(){
-		return this.folder + this.rawFilename;
+	get path(){
+		return loader.join(this.dir, this.base);
 	}
 }
 

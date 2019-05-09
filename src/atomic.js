@@ -19,6 +19,7 @@ const waitTime = 10;
  * It is not intended to be actually used for parallel processing, and mutual exlusion. It is intended for abstraction of atomic logic more than anything.
  *
  * Note: To be eventually split into a primitive lock to objectify the functionality of a lock, and a lock with timout and a queue.
+ * @inner
  * @memberof module:system
  */
 class AtomicLock {
