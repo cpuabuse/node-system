@@ -120,8 +120,7 @@ class Loader{
 
 	/**
 	 * Join a root directory with a file/folder or an array of files/folders to absolute path.
-	 * @param {string} source Root folder.
-	 * @param {string|string[]} target File/folder name|names.
+	 * @param {...string|string[]} pathArrays File/folder name|names.
 	 * @returns {string|string[]} Absolute path|paths.
 	 * @example <caption>Usage</caption>
 	 * // Join and log result
@@ -130,21 +129,64 @@ class Loader{
 	 * // Output
 	 * // c:\machines\appliances
 	 */
-	static join(source, target){
-		if (Array.isArray(target)){
-			var targets = new Array(); // Prepare the return array
+	static join(...pathArrays){
+		// Determine maximum pathArray length & construct metadata
+		var maxLength = 0;
+		var arraysMeta = new Array();
+		pathArrays.forEach(function(pathArray){
+			let isArray = Array.isArray(pathArray);
+			let length = isArray ? pathArray.length : 1;
 
-			// Populate return array
-			target.forEach(function(target){
-				targets.push(path.join(source, target));
-			})
+			// Populate arrays array
+			arraysMeta.push({
+				isArray,
+				length
+			});
 
-			// Return an array
-			return targets;
+			// Compare maxLength
+			if(length > maxLength){
+				maxLength = length;
+			}
+		});
+
+		// Special case, when args provided were exclusively empty arrays
+		if(maxLength === 0) {
+			return "";
 		}
 
-		// Return a string if not an array
-		return path.join(source, target);
+		// Loop
+		let filter = arraysMeta.filter(function(array){
+			return array.isArray;
+		});
+		if(filter.length === 0){
+			// Return a string if no arrays
+			return path.join(...pathArrays);
+		} else { // In case of arrays present
+			var results = new Array(); // Prepare the return array
+			for(let i = 0; i < maxLength; i++){
+				let joinData = new Array();
+				pathArrays.forEach(function(pathArray, index){
+					let toPush = null;
+					let {length} = arraysMeta[index];
+					if(arraysMeta[index].isArray){
+						if(length < i + 1){
+							if(length > 0){
+								toPush = pathArray[length];
+							}
+						} else {
+							toPush = pathArray[i];
+						}
+					} else {
+						toPush = pathArray;
+					}
+					if(toPush !== null){
+						joinData.push(toPush);
+					}
+				});
+				results.push(path.join(...joinData));
+			}
+			return results;
+		}
 	}
 
 	/**
