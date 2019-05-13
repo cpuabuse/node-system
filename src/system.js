@@ -213,7 +213,7 @@ class System extends loader.Loader{
 						loader.Loader.getFile(this.system.rootDir, dir, file).then(function(result){
 							resolve(result);
 						}).catch(error => {
-							//	this.fire("file_system_error");
+							// this.fire("file_system_error");
 							reject(this.system.error.file_system_error);
 						});
 					});
