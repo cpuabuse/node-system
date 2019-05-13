@@ -205,6 +205,9 @@ class System extends loader.Loader{
 				 * @returns {external:Promise} Promise, containing string with file contents..
 				*/
 				getFile: async (dir, file, cacheTtl, force) => {
+					// Construct a path
+					var pathToFile = loader.Loader.join(dir, file);
+
 					// Physically getting the file
 					var pGetFile = () => new Promise((resolve, reject) => {
 						loader.Loader.getFile(this.system.rootDir, dir, file).then(function(result){
@@ -231,29 +234,27 @@ class System extends loader.Loader{
 
 						// Find if file is cached
 						let cached = false;
-						if(index.hasOwnProperty(dir)){
-							if(index[dir].hasOwnProperty(file)){
+						if(index.hasOwnProperty(pathToFile)){
 								cached = true;
-							}
 						}
 
 						// Process for cached
 						if(cached){
-							if (index[dir][file].cacheTtl === cacheTtl){
+							if (index[pathToFile].cacheTtl === cacheTtl){
 								// If expired; Not expired is anticipated to be the most used path
-								if(currentTimeStamp > index[dir][file].expires){
-									index[dir][file].file = await pGetFile();
-									index[dir][file].expires = expirationTimeStamp;
+								if(currentTimeStamp > index[pathToFile].expires){
+									index[pathToFile].file = await pGetFile();
+									index[pathToFile].expires = expirationTimeStamp;
 								} else if (force){
-									index[dir][file].file = await pGetFile();
+									index[pathToFile].file = await pGetFile();
 								}
 							} else { // New ttl
-								if(index[dir][file].expires > expirationTimeStamp){
-									index[dir][file].expires = expirationTimeStamp;
+								if(index[pathToFile].expires > expirationTimeStamp){
+									index[pathToFile].expires = expirationTimeStamp;
 								}
-								index[dir][file].cacheTtl = cacheTtl;
+								index[pathToFile].cacheTtl = cacheTtl;
 								if (force){
-									index[dir][file].file = await pGetFile();
+									index[pathToFile].file = await pGetFile();
 								}
 							}
 						} else { // <== if(cached)
@@ -263,9 +264,9 @@ class System extends loader.Loader{
 							// Determine index and prepare space
 							if (filesLength >= maxFiles){
 								// Update indices
-								delete index[files[0].rIndex.dir][files[0].rIndex.file];
-								if(Object.keys(index[files[0].rIndex.dir]).length == 0){
-									delete index[files[0].rIndex.dir];
+								delete index[files[0].rIndex];
+								if(Object.keys(index[files[0].rIndex]).length == 0){
+									delete index[files[0].rIndex];
 								}
 
 								// Shift the array
@@ -286,16 +287,10 @@ class System extends loader.Loader{
 							});
 
 							// Add indices
-							if(!index.hasOwnProperty(dir)){
-								index[dir] = new Object();
-							}
-							index[dir][file] = files[nextFile];
-							files[nextFile].rIndex = {
-								dir,
-								file
-							};
+							index[pathToFile] = files[nextFile];
+							files[nextFile].rIndex = pathToFile;
 						} // <== if(cached) {} else {...}
-						return index[dir][file].file;
+						return index[pathToFile].file;
 					} else { // <== if(maxFiles > 0)
 						return await pGetFile();
 					}
