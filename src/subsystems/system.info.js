@@ -6,7 +6,7 @@
 const path = require("path");
 const subsystem = require(".." + path.sep + "subsystem.js");
 
-class Info extends subsystem.Subsystem(){
+class Info extends subsystem.Subsystem{
 	constructor(systemArgs, constructorArgs, ...subsystemArgs){
 		super(...subsystemArgs);
 	}

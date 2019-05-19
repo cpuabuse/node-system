@@ -14,9 +14,13 @@ class Subsystem{
 		this.vars = subsystemContext.hasOwnProperty("vars") ? subsystemContext.vars : new Object();
 
 		// Bind methods
-		for(bindFn of subsystemConstructor(this)){
+		for(let bindFn of subsystemConstructor(this)){
 			// Bind fn to object; Using parent-child access not to create and overwrite an object wastefully
 			this.methods[bindFn.name] = bindFn.fn.bind(subsystemContext);
 		}
 	}
 }
+
+module.exports = {
+	Subsystem
+};

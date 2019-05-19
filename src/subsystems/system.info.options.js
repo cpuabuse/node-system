@@ -2,6 +2,7 @@
 /*
 	Used for storing system options.
 */
+"use strict";
 const Info = require("system.info.js");
 
 class Options extends Info{
