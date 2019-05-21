@@ -1,6 +1,6 @@
 {
   "name": "cpuabuse-system",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "System module",
   "main": "src/system.js",
   "license": "UNLICENSED",
