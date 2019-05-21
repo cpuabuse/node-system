@@ -29,7 +29,7 @@ class System extends loader.Loader{
    * @property {string} rootDir - The root directory for the System instance.
    * @property {string} relativeInitDir - The relative directory to root of the location of the initialization file.
    * @property {string} initFilename - Initialization file filename.
-	 * @property {boolean} notMute - Whether the system logs or not.
+	 * @property {string} logging - The way system logs
 	 */
 
 	/**
@@ -61,9 +61,15 @@ class System extends loader.Loader{
 		/**
 		 * Process the loader error.
 		 * Due to the design of the System constructor, this is supposed to be called only once during the constructor execution, no matter the failure.
+		 * We do not want the constructor to fail no matter what, so we perform check for onError existence and type. If failed, we ignore it. Moreover, if there was a different error caught, a Loader Error would be generated.
+		 * Currently there is no way to produce "other_error"; But the functionality will remain for the possibility of such error thrown with future functionality.
 		 */
 		function processLoaderError(error){
-			onError(error instanceof loaderError.LoaderError ? error : new loaderError.LoaderError("other_error", "Other error in System constructor has been rethrown as Loader Error."));
+			if(onError){
+				if(typeof onError === "function"){
+					onError(error instanceof loaderError.LoaderError ? error : new loaderError.LoaderError("other_error", "Other error in System constructor has been rethrown as Loader Error."));
+				}
+			}
 		}
 
 		// Performs the static initialization part of the instance, post-superclass constructor
@@ -79,7 +85,7 @@ class System extends loader.Loader{
 				rootDir: options.rootDir,
 				relativeInitDir: options.relativeInitDir,
 				initFilename: options.relatoveInitFilename,
-				notMute: options.notMute
+				logging: options.logging
 			};
 
 			/**
@@ -100,21 +106,27 @@ class System extends loader.Loader{
 			 */
 			this.system.file = {
 				/**
+				 * File cache.
+				 * @type {Object}
+				 */
+				cache: {
+					index: {}, // Index pointing to files
+					files: [] // Array of actual files and reverse indices pointing from files to index
+				},
+				/**
 				 * File level filters.
 				 * @type {Object}
 				 */
 				filter: {
 					/**
 					 * Check if argument is a file (relative to system root directory).
-					 * @async
 					 * @function
 					 * @param {module:system.System~filterContext} filterContext Information on the item to be filtered.
 					 * @returns {external:Promise} Promise, containing boolean result.
 					*/
-					isFile: filterContext => loader.Loader.isFile(this.system.rootDir, filterContext.dir, filterContext.itemName),
+					isFile: filterContext => loader.Loader.isFile(loader.Loader.join(this.system.rootDir, loader.Loader.join(filterContext.dir, filterContext.itemName))),
 					/**
 					 * Check if argument is a folder (relative to system root directory).
-					 * @async
 					 * @function
 					 * @param {module:system.System~filterContext} filterContext Information on the item to be filtered
 					 * @returns {external:Promise} Promise, containing boolean result.
@@ -161,20 +173,128 @@ class System extends loader.Loader{
 				},
 				/**
 				 * Get file contents relative to system root directory.
+				 * files = [
+				 *   {
+				 *     file: actual_file,
+				 *     rIndex: {
+				 *       dir: "dirA",
+				 *       file: "fileA"
+				 *     }
+				 *   },
+				 *   {
+				 *     file: actual_file_b,
+				 *     rIndex: {
+				 *       dir: "dirB",
+				 *       file: "fileB"
+				 *     }
+				 *   }
+				 * ]
+				 * index = {
+				 *   "dirA": {
+				 *     "FileA": file_entry_link_a
+				 *   },
+				 *   "dirB": {
+				 *     "FileB": file_entry_link_b
+				 *   }
+				 * }
+				 *
 				 * @async
 				 * @function
 				 * @param {string} dir Directory, relative to system root.
 				 * @param {string} file Filename.
 				 * @returns {external:Promise} Promise, containing string with file contents..
 				*/
-				getFile: (dir, file) => new Promise((resolve, reject) => {
-					loader.Loader.getFile(this.system.rootDir, dir, file).then(function(result){
-						resolve(result);
-					}).catch(error => {
-						//	this.fire("file_system_error");
+				getFile: async (dir, file, cacheTtl, force) => {
+					// Construct a path
+					var pathToFile = loader.Loader.join(dir, file);
+
+					// Physically getting the file
+					var pGetFile = () => new Promise((resolve, reject) => {
+						loader.Loader.getFile(this.system.rootDir, dir, file).then(function(result){
+							resolve(result);
+						}).catch(error => {
+							// this.fire("file_system_error");
 							reject(this.system.error.file_system_error);
 						});
-				}),
+					});
+
+					const maxFiles = 100;
+					const defaultCacheTtl = 86400;
+					const milliSecondsInSeconds = 1000;
+
+					// Set cache to default if not provided
+					if(cacheTtl === null){
+						cacheTtl = defaultCacheTtl;
+					}
+					var {index, files} = this.system.file.cache;
+					if(maxFiles > 0){
+						// Find expiration time and current time
+						var currentTimeStamp = Math.trunc(new Date().getTime() / milliSecondsInSeconds);
+						var expirationTimeStamp = currentTimeStamp + cacheTtl;
+
+						// Find if file is cached
+						let cached = false;
+						if(index.hasOwnProperty(pathToFile)){
+								cached = true;
+						}
+
+						// Process for cached
+						if(cached){
+							if (index[pathToFile].cacheTtl === cacheTtl){
+								// If expired; Not expired is anticipated to be the most used path
+								if(currentTimeStamp > index[pathToFile].expires){
+									index[pathToFile].file = await pGetFile();
+									index[pathToFile].expires = expirationTimeStamp;
+								} else if (force){
+									index[pathToFile].file = await pGetFile();
+								}
+							} else { // New ttl
+								if(index[pathToFile].expires > expirationTimeStamp){
+									index[pathToFile].expires = expirationTimeStamp;
+								}
+								index[pathToFile].cacheTtl = cacheTtl;
+								if (force){
+									index[pathToFile].file = await pGetFile();
+								}
+							}
+						} else { // <== if(cached)
+							let nextFile;
+							let filesLength = files.length;
+
+							// Determine index and prepare space
+							if (filesLength >= maxFiles){
+								// Update indices
+								delete index[files[0].rIndex];
+								if(Object.keys(index[files[0].rIndex]).length == 0){
+									delete index[files[0].rIndex];
+								}
+
+								// Shift the array
+								files.shift();
+
+								// Assign next file index
+								nextFile = maxFiles - 1;
+							} else {
+								nextFile = filesLength;
+							}
+
+							// Unshift the array
+							files.unshift({
+								file: await pGetFile(),
+								rIndex: {},
+								expires: expirationTimeStamp,
+								cacheTtl
+							});
+
+							// Add indices
+							index[pathToFile] = files[nextFile];
+							files[nextFile].rIndex = pathToFile;
+						} // <== if(cached) {} else {...}
+						return index[pathToFile].file;
+					} else { // <== if(maxFiles > 0)
+						return await pGetFile();
+					}
+				},
 				/**
 				 * Get contents of yaml file relative to system root directory.
 				 * @async
@@ -239,6 +359,9 @@ class System extends loader.Loader{
 		try{
 			// Throw an error if failure
 			if (System.checkOptionsFailure(options)){
+				// Call a dummy superconstructor
+				super();
+
 				// Report an error
 				throw new loaderError.LoaderError("system_options_failure", "The options provided to the system constructor are inconsistent.");
 			} else { // If no failures
@@ -265,10 +388,7 @@ class System extends loader.Loader{
 							 * @type {Object}
 							*/
 							if(!(this.hasOwnProperty("events") && this.hasOwnProperty("behaviors"))){ // Make sure basic system carcass was initialized
-								if(onError){
-									throw new loaderError.LoaderError("loader_fail", "Mandatory initialization files are missing.");
-								}
-								return;
+								throw new loaderError.LoaderError("loader_fail", "Mandatory initialization files are missing.");
 							}
 
 							// Initialize the events
@@ -277,9 +397,9 @@ class System extends loader.Loader{
 								if (typeof this.errors[err] === "object"){
 									// Set default error message for absent message
 									let message = "Error message not set.";
-									if (err.hasOwnProperty(message)){
-										if (typeof err.message === "string"){
-											if (err.message != "") {
+									if (this.errors[err].hasOwnProperty("message")){
+										if (typeof this.errors[err].message === "string"){
+											if (this.errors[err].message != "") {
 												({message} = err);
 											}
 										}
@@ -298,9 +418,11 @@ class System extends loader.Loader{
 							processLoaderError(error);
 						}
 					}).catch(function(error){
-						processLoaderError(error);
+						// Errors returned from load or staticInitializationPromise
+						processLoaderError(new loaderError.LoaderError("functionality_error", "There was an error in the loader functionality in constructor subroutines."));
 					});
 				});
+
 				// Promise is there to maintain full concurrency for maintainability, no functionality implied
 				var staticInitializationPromise = new Promise(staticInitialization);
 			}
@@ -319,7 +441,7 @@ class System extends loader.Loader{
 	 *   rootDir: "test",
 	 *   relativeInitDir: "stars",
 	 *   initFilename: "stars.yml",
-	 *   notMute: true
+	 *   logging: "off"
 	 * };
 	 *
 	 * if (System.checkOptionsFailure(options)){
@@ -329,13 +451,13 @@ class System extends loader.Loader{
 	static checkOptionsFailure(options){
 		let failed = false;
 
-		if(options === null){
-			failed = true;
-		} else {
+		if(options){
 			// Checks boolean
-			if(!options.hasOwnProperty("notMute")){
+			if(!options.hasOwnProperty("logging")){
 				failed = true;
-			} else if(typeof options.notMute !== "boolean"){
+			} else if(typeof options.logging !== "string"){
+				failed = true;
+			} else if(!(["off", "console", "file", "queue"].includes(options.logging))){
 				failed = true;
 			}
 
@@ -348,6 +470,8 @@ class System extends loader.Loader{
 					failed = true;
 				}
 			});
+		} else {
+			failed = true;
 		}
 		return failed;
 	}
@@ -366,7 +490,7 @@ class System extends loader.Loader{
 	 *   rootDir: "labs",
 	 *   relativeInitDir: "black_mesa",
 	 *   initFilename: "inventory.yml",
-	 *   notMute: true
+	 *   logging: "console"
 	 * };
 	 * var labInventory = new System(options);
 	 *
@@ -396,7 +520,7 @@ class System extends loader.Loader{
 	 *   rootDir: "labs",
 	 *   relativeInitDir: "black_mesa",
 	 *   initFilename: "inventory.yml",
-	 *   notMute: true
+	 *   logging: console
 	 * };
 	 * var behavior = {
 	 *   "check_inventory": () => {
@@ -469,7 +593,7 @@ class System extends loader.Loader{
 	 *   rootDir: "labs",
 	 *   relativeInitDir: "black_mesa",
 	 *   initFilename: "inventory.yml",
-	 *   notMute: true
+	 *   loggomg: console
 	 * };
 	 * var text = "Lab Inventory working.";
 	 *
@@ -478,7 +602,7 @@ class System extends loader.Loader{
 	 */
 	log(text){
 		if (typeof text === "string"){
-			if(this.system.notMute){
+			if(this.system.logging === "console"){
 				System.log(this.system.id + ": " + text);
 			}
 		} else {
@@ -498,7 +622,7 @@ class System extends loader.Loader{
 	 *   rootDir: "labs",
 	 *   relativeInitDir: "black_mesa",
 	 *   initFilename: "inventory.yml",
-	 *   notMute: true
+	 *   logging: console
 	 * };
 	 * var text = "Testing Lab Inventory error log.";
 	 *
@@ -507,7 +631,7 @@ class System extends loader.Loader{
 	 */
 	error(text){
 		if (typeof text === "string"){
-			if(this.system.notMute){
+			if(this.system.logging === "console"){
 				System.error(this.system.id + ": " + text);
 			}
 		} else {
@@ -529,7 +653,7 @@ class System extends loader.Loader{
 	 *   rootDir: "labs",
 	 *   relativeInitDir: "black_mesa",
 	 *   initFilename: "inventory.yml",
-	 *   notMute: true
+	 *   logging: "console"
 	 * };
 	 *
 	 * var labInventory = new System(options);
@@ -572,7 +696,6 @@ class System extends loader.Loader{
 			}
 			// Callback
 		} catch (error) {
-			console.log(error)
 			let noFail = true;
 			if(name == events.eventFail){
 				noFail = false;
@@ -626,7 +749,7 @@ class System extends loader.Loader{
 	 *   rootDir: "labs",
 	 *   relativeInitDir: "black_mesa",
 	 *   initFilename: "inventory.yml",
-	 *   notMute: true
+	 *   logging: "console"
 	 * };
 	 *
 	 * var labInventory = new System(options);
@@ -647,7 +770,7 @@ class System extends loader.Loader{
 	 * system.System.error("Not enough resources.");
 	 */
 	static error(text){
-		console.error("[Error] " + text);
+		console.error("\x1b[31m[Error]\x1b[0m " + text);
 	}
 
 	/**
@@ -657,7 +780,7 @@ class System extends loader.Loader{
 	 * system.System.log("Resources loaded.");
 	 */
 	static log(text){
-		console.log("[OK] " + text);
+		console.log("\x1b[32m[OK]\x1b[0m " + text);
 	}
 }
 

@@ -1,0 +1,9 @@
+file_system_error:
+  message: "File system operation could not complete."
+not_object: "string"
+no_message:
+  not_message: "Not a message"
+empty_message:
+  message: ""
+message_not_a_string:
+  message: null

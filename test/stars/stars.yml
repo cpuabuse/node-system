@@ -1,5 +1,11 @@
-sol:
+sol: "" # Tests for an empty string in init[key]
 alphacentauri:
   file: alphacentauri.yml
   path: absolute
   folder: stars/close/veryclose
+barnards_star:
+  file: ""
+  path:
+    path_not_a_string: true
+  folder: stars/close/veryclose
+  extend: "Not a boolean"

@@ -5,20 +5,9 @@
 "use strict";
 
 /**
- * Specifies the time to wait between lock checks.
- * @private
- * @readonly
- * @default
- * @type {string}
- * @memberof module:system~AtomicLock
- */
-const waitTime = 10;
-
-/**
  * Creates an instance of AtomicLock.
- * It is not intended to be actually used for parallel processing, and mutual exlusion. It is intended for abstraction of atomic logic more than anything.
  *
- * Note: To be eventually split into a primitive lock to objectify the functionality of a lock, and a lock with timout and a queue.
+ * Single thread only.
  * @memberof module:system
  */
 class AtomicLock {
@@ -33,6 +22,8 @@ class AtomicLock {
 		 * @type {boolean}
 		 */
 		this.locked = false;
+		this.maxCount = 0;
+		this.count = 0;
 	}
 
 	/**
@@ -43,17 +34,35 @@ class AtomicLock {
 	 * exampleAtomicLock.lock();
 	 */
 	lock(){
+		/**
+		 * Function to increment the counters in an unnecessary safe manner
+		 */
+		function increment(counter){
+			return counter === Number.MAX_SAFE_INTEGER ? 0 : counter + 1;
+		}
+
+		// Assign current queue counter
+		var count = this.maxCount;
+
+		// Increment max counter
+		this.maxCount = increment(this.maxCount);
+
 		return (async () => {
 			while(true){ /* eslint-disable-line no-constant-condition */// <== Necessary to achieve the exclusive functionality
 				if(this.locked){
 					let timeout = new Promise(function(resolve){
-						setTimeout(function(){
+						setImmediate(function(){
 							resolve();
-						}, waitTime);
+						});
 					});
 					await timeout;
-				} else {
+				} else if (count === this.count){
+					// Lock
 					this.locked = true;
+
+					// Increment next unlock counter
+					this.count = increment(this.count);
+
 					return;
 				}
 			}

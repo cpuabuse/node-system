@@ -31,12 +31,8 @@ class Loader{
 		 * The standard constructor.
 		 */
 		var standardConstructor = () => {
-			try{
-				// Initialization recursion; The error handling of the callback will happen asynchronously, so it is OK to include callback as well into the try statement and handle errors synchronously.
-				callback(initRecursion(rootDir, arg_relativeInitDir, arg_initFilename, this, true));/* eslint-disable-line callback-return */// Unnecessary here, as there is single execution path
-			} catch(error){
-				throw new loaderError.LoaderError("functionality_error", "There was an error in the loader functionality in constructor subroutines.");
-			}
+			// Initialization recursion; The error handling of the callback will happen asynchronously
+			callback(initRecursion(rootDir, arg_relativeInitDir, arg_initFilename, this, true));
 		};
 		// Determine which constructor to use.
 		let previousIsNull = null;
@@ -47,24 +43,16 @@ class Loader{
 				throw new loaderError.LoaderError("unexpected_constructor", "Null and String arguments found while deciding the constructor method.");
 			}
 		}
-		// Call the appropriate constructor
-		switch (previousIsNull) {
-			// There are no arguments or all arguments are null
-			case true:
-			case null:
-			dummyConstructor();
-			break;
-
-			// All arguments are not null
-			case false:
+		/*
+			Call the appropriate constructor.
+			The execution path for neither true, false or null is removed, since there is no way to reach it.
+			It is important to check as "=== false", as we are dealing with null as well.
+		*/
+		if(previousIsNull === false){
 			standardConstructor();
-			break;
-
-			// Something went wrong, we shouldn't be here
-			default:
-			throw new loaderError.LoaderError("inetrnal_logic_error", "This error should not happen. Something went wrong with loader constructor arguments.");
+		} else {
+			dummyConstructor();
 		}
-
 	}
 
 	/**
@@ -72,7 +60,7 @@ class Loader{
 	 * @param {string} rootDir Absolute root directory.
 	 * @param {string} relativeDir Directory relative to root.
 	 * @param {string} file Full file name.
-	 * @returns {external.Promise} File contents.
+	 * @returns {external:Promise} File contents.
 	 * @example <caption>Usage</caption>
 	 * // Load files
 	 * var grapefruitJuicer = Loader.getFile("c:\machines", "appliances", "grapefruitJuicer.txt");
@@ -132,8 +120,7 @@ class Loader{
 
 	/**
 	 * Join a root directory with a file/folder or an array of files/folders to absolute path.
-	 * @param {string} rootDir Root folder.
-	 * @param {string|string[]} target File/folder name|names.
+	 * @param {...string|string[]} pathArrays File/folder name|names.
 	 * @returns {string|string[]} Absolute path|paths.
 	 * @example <caption>Usage</caption>
 	 * // Join and log result
@@ -142,32 +129,73 @@ class Loader{
 	 * // Output
 	 * // c:\machines\appliances
 	 */
-	static join(rootDir, target){
-		if (Array.isArray(target)){
-			var targets = new Array(); // Prepare the return array
+	static join(...pathArrays){
+		// Determine maximum pathArray length & construct metadata
+		var maxLength = 0;
+		var arraysMeta = new Array();
+		pathArrays.forEach(function(pathArray){
+			let isArray = Array.isArray(pathArray);
+			let length = isArray ? pathArray.length : 1;
 
-			// Populate return array
-			target.forEach(function(target){
-				targets.push(path.join(rootDir, target));
-			})
+			// Populate arrays array
+			arraysMeta.push({
+				isArray,
+				length
+			});
 
-			// Return an array
-			return targets;
+			// Compare maxLength
+			if(length > maxLength){
+				maxLength = length;
+			}
+		});
+
+		// Special case, when args provided were exclusively empty arrays
+		if(maxLength === 0) {
+			return "";
 		}
 
-		// Return a string if not an array
-		return path.join(rootDir, target);
+		// Loop
+		let filter = arraysMeta.filter(function(array){
+			return array.isArray;
+		});
+		if(filter.length === 0){
+			// Return a string if no arrays
+			return path.join(...pathArrays);
+		} else { // In case of arrays present
+			var results = new Array(); // Prepare the return array
+			for(let i = 0; i < maxLength; i++){
+				let joinData = new Array();
+				pathArrays.forEach(function(pathArray, index){
+					let toPush = null;
+					let {length} = arraysMeta[index];
+					if(arraysMeta[index].isArray){
+						if(length < i + 1){
+							if(length > 0){
+								toPush = pathArray[length];
+							}
+						} else {
+							toPush = pathArray[i];
+						}
+					} else {
+						toPush = pathArray;
+					}
+					if(toPush !== null){
+						joinData.push(toPush);
+					}
+				});
+				results.push(path.join(...joinData));
+			}
+			return results;
+		}
 	}
 
 	/**
 	 * Checks if is a file
-	 * @param {string} rootDir Absolute root directory.
-	 * @param {string} relativeDir Relative directory to root.
-	 * @param {string} filename Full filename.
-	 * @returns {boolean} Returns `true` if a file, `false` if not.
+	 * @param {string} rawPath Full filepath.
+	 * @returns {external:Promise} Returns `true` if a file, `false` if not.
 	 * @example <caption>Usage</caption>
 	 * // Verify file
-	 * Loader.isFile("c:\machines","appliances","grapefruitJuicer.txt").then(function(result){
+	 * Loader.isFile("c:\machines\appliances\grapefruitJuicer.txt").then(function(result){
 	 *   console.log(result);
 	 * });
 	 *
@@ -177,9 +205,9 @@ class Loader{
 	 * // Output
 	 * // true
 	 */
-	static isFile(rootDir, relativeDir, filename){
+	static isFile(rawPath){
 		return new Promise(function(resolve){
-			fs.stat(path.join(rootDir, relativeDir, filename), function(err, stats){
+			fs.stat(rawPath, function(err, stats){
 				if (err){
 					resolve(false);
 				} else {
@@ -193,7 +221,7 @@ class Loader{
 	 * Checks if is a directory.
 	 * @param {string} rootDir Absolute root directory.
 	 * @param {string} relativeDir Relative directory to root.
-	 * @returns {boolean} Returns `true` if a directory, `false` if not.
+	 * @returns {external:Promise} Returns `true` if a directory, `false` if not.
 	 * @example <caption>Usage</caption>
 	 * // Verify directory
 	 * Loader.isDir("c:\machines\appliances","grapefruitJuicer.txt").then(function(result){
