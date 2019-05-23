@@ -13,6 +13,8 @@ data:
 behaviors:
 errors:
 branch:
+  extend: true
+subsystem:
   extend: true`;
 const exampleInit = `behaviors:
 errors:

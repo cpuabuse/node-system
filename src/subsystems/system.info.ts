@@ -3,12 +3,12 @@
 	Subsystem info.
 */
 "use strict";
-const path = require("path");
-const subsystem = require(".." + path.sep + "subsystem.js");
+import {Subsystem, ConstructorArgs} from "../subsystem";
+import {System} from "../system";
 
-class Info extends subsystem.Subsystem{
-	constructor(systemArgs, constructorArgs, ...subsystemArgs){
-		super(...subsystemArgs);
+class Info extends Subsystem{
+	constructor(args:ConstructorArgs){
+		super(args.systemContext, null);
 	}
 }
 

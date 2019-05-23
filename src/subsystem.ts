@@ -4,25 +4,47 @@
 */
 "use strict";
 import {System} from "./system";
+/**
+ * Interface for subsystem constructor data exchange.
+ * @typedef ConstructorArgs
+ * @property {module:system.System} systemContext Context of a parent system.
+ * @property {Object} args Arbitrary arguments.
+ */
+export interface ConstructorArgs{
+	systemContext:System;
+	args:any;
+};
+/**
+ * A way methods are transfered to a subsystem.
+ * @typedef SubsystemMethod
+ * @property {string} name Name of a function.
+ * @property {Function} fn Function body, taking arbitrary arguments.
+ */
+export type SubsystemMethod = {
+	name:string;
+	fn:Function;
+};
+/**
+ * @typedef Method
+ */
+type Method = {
+	[key:string]:Function
+};
 
 export class Subsystem{
 	system:System;
-	fn:object;
-	vars:object;
-	methods:Array<object>;
-	constructor(systemContext:System, subsystemConstructor:Function, subsystemContext:object){
+	method:Method;
+	constructor(systemContext:System, subsystemMethods:Array<SubsystemMethod>){
 		// Set reference to system
 		this.system = systemContext;
 
 		// Set subsystem objects
-		this.fn = new Object();
-		this.vars = subsystemContext.hasOwnProperty("vars") ? subsystemContext.vars : new Object();
-		this.methods = new Array();
+		this.method = <Method>new Object();
 
 		// Bind methods
-		for(let bindFn of subsystemConstructor(this)){
+		for(let bindFn of subsystemMethods){
 			// Bind fn to object; Using parent-child access not to create and overwrite an object wastefully
-			this.methods[bindFn.name] = bindFn.fn.bind(subsystemContext);
+			this.method[bindFn.name] = bindFn.fn.bind(this);
 		}
 	}
 }

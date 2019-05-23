@@ -158,7 +158,7 @@ function testSystem(){
 				},
 				rawInitFilename: "init.yml",
 				initContents: expected.exampleInit,
-				rootDirFileAmount: 7,
+				rootDirFileAmount: 21,
 				rootDirFolderAmount: 7
 			},
 			{ // Flower shop
@@ -171,7 +171,7 @@ function testSystem(){
 				},
 				rawInitFilename: "init.yml",
 				initContents: expected.flowerShopInit,
-				rootDirFileAmount: 7,
+				rootDirFileAmount: 21,
 				rootDirFolderAmount: 7,
 				error: {
 					errorInstances: ["all_flowers_gone"],

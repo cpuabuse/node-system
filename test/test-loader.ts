@@ -111,7 +111,7 @@ function testLoader(){
 				dir: "flowerShop",
 				file: "init",
 				rawFilename: "init.yml",
-				filesAndFoldersAmount: 7,
+				filesAndFoldersAmount: 9,
 				greatGrandChildrenCompare: [
 					{
 						child: "branch",
