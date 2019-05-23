@@ -7,8 +7,7 @@
     "declaration": true
   },
   "include":[
-    "src/*",
-    "src/**/*"
+    "**/*"
   ],
   "exclude":[
     "src/meta/*"

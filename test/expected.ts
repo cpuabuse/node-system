@@ -1,4 +1,4 @@
-// expected.js
+// test/expected.ts
 /*
 	Contains constants for comparing against in testing.
 */
