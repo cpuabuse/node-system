@@ -5,6 +5,8 @@
   "main": "src/system.js",
   "license": "UNLICENSED",
   "scripts": {
+    "build": "tsc",
+    "pretest": "npm build",
     "test": "node ./node_modules/mocha/bin/mocha && exit $?",
     "coverage": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly"
   },

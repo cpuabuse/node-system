@@ -1,30 +1,17 @@
-// src/error.ts
-/*
-    Provides errors for the system.
-*/
-"use strict";
 /**
  * Extended system error class.
  * @inner
  * @memberof module:system
  * @extends external:Error
  */
-class SystemError extends Error {
+declare class SystemError extends Error {
     /**
      * Creates an instance of SystemError.
      * @param {string} code Error code
      * @param {string} message Error message
      * @throws {external:Error} Throwing error if the code already defined
      */
-    constructor(code, message) {
-        super(message);
-        /**
-         * Error code.
-         * @private
-         * @type {string}
-         */
-        this.code = code;
-    }
+    constructor(code: any, message: any);
     /**
      * Check if an object is indeed a functional SystemError.
      *
@@ -48,13 +35,5 @@ class SystemError extends Error {
      *   }
      * }
      */
-    static isSystemError(error) {
-        if ((error instanceof SystemError)) {
-            if (error.code != "") {
-                return true;
-            }
-        }
-        return false;
-    }
+    static isSystemError(error: any): boolean;
 }
-exports.SystemError = SystemError;

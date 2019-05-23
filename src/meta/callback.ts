@@ -1,4 +1,4 @@
-// meta/callback.js
+// meta/callback.ts
 
 /**
  * Callback for asynchronous constructors.

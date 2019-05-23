@@ -1,8 +1,3 @@
-"use strict";
-// src/errors.ts
-/*
-    Contains list of errors used in system.
-*/
 /**
  * @instance
  * @type {module:system~SystemError}
