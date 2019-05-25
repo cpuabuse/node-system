@@ -10,7 +10,11 @@
  * Single thread only.
  * @memberof module:system
  */
-class AtomicLock {
+export class AtomicLock {
+	locked:boolean;
+	maxCount:number;
+	count:number;
+	
 	/**
 	 * Creates an instance of AtomicLock.
 	 * Does not take any arguments or return any values.
@@ -33,21 +37,21 @@ class AtomicLock {
 	 * // Lock
 	 * exampleAtomicLock.lock();
 	 */
-	lock(){
+	lock():Promise<void>{
 		/**
 		 * Function to increment the counters in an unnecessary safe manner
 		 */
-		function increment(counter){
+		function increment(counter:number):number{
 			return counter === Number.MAX_SAFE_INTEGER ? 0 : counter + 1;
 		}
 
 		// Assign current queue counter
-		var count = this.maxCount;
+		var count:number = this.maxCount;
 
 		// Increment max counter
 		this.maxCount = increment(this.maxCount);
 
-		return (async () => {
+		return (async ():Promise<void> => {
 			while(true){ /* eslint-disable-line no-constant-condition */// <== Necessary to achieve the exclusive functionality
 				if(this.locked){
 					let timeout = new Promise(function(resolve){
@@ -75,9 +79,7 @@ class AtomicLock {
 	 * // Release
 	 * exampleAtomicLock.release();
 	 */
-	release(){
+	release():void{
 		this.locked = false;
 	}
 }
-
-exports.AtomicLock = AtomicLock;

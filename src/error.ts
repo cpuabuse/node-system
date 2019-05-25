@@ -10,14 +10,16 @@
  * @memberof module:system
  * @extends external:Error
  */
-class SystemError extends Error{
+export class SystemError extends Error{
+	code:string;
+
 	/**
 	 * Creates an instance of SystemError.
 	 * @param {string} code Error code
 	 * @param {string} message Error message
 	 * @throws {external:Error} Throwing error if the code already defined
 	 */
-	constructor(code, message){
+	constructor(code:string, message:string){
 		super(message);
 		/**
 		 * Error code.
@@ -50,7 +52,7 @@ class SystemError extends Error{
 	 *   }
 	 * }
 	 */
-	static isSystemError(error){
+	static isSystemError(error:SystemError){
 		if((error instanceof SystemError)){
 			if (error.code != ""){
 				return true;
@@ -59,5 +61,3 @@ class SystemError extends Error{
 		return false;
 	}
 }
-
-exports.SystemError = SystemError;

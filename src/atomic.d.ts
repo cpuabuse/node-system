@@ -4,7 +4,10 @@
  * Single thread only.
  * @memberof module:system
  */
-declare class AtomicLock {
+export declare class AtomicLock {
+    locked: boolean;
+    maxCount: number;
+    count: number;
     /**
      * Creates an instance of AtomicLock.
      * Does not take any arguments or return any values.

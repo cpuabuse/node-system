@@ -4,14 +4,15 @@
  * @memberof module:system
  * @extends external:Error
  */
-declare class SystemError extends Error {
+export declare class SystemError extends Error {
+    code: string;
     /**
      * Creates an instance of SystemError.
      * @param {string} code Error code
      * @param {string} message Error message
      * @throws {external:Error} Throwing error if the code already defined
      */
-    constructor(code: any, message: any);
+    constructor(code: string, message: string);
     /**
      * Check if an object is indeed a functional SystemError.
      *
@@ -35,5 +36,5 @@ declare class SystemError extends Error {
      *   }
      * }
      */
-    static isSystemError(error: any): boolean;
+    static isSystemError(error: SystemError): boolean;
 }
