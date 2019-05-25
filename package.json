@@ -6,8 +6,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "tsc",
-    "pretest": "npm build",
-    "test": "node ./node_modules/mocha/bin/mocha && exit $?",
+    "test": "npm run build & node ./node_modules/mocha/bin/mocha && exit $?",
     "coverage": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly"
   },
   "repository": {
@@ -15,12 +14,12 @@
     "url": "git+https://github.com/cpuabuse/node-system.git"
   },
   "dependencies": {
-    "js-yaml": "^3.12.1"
+    "js-yaml": "^3.13.1"
   },
   "devDependencies": {
     "@types/node": "^12.0.2",
-    "coveralls": "^3.0.2",
-    "eslint": "^5.12.0",
+    "coveralls": "^3.0.3",
+    "eslint": "^5.16.0",
     "istanbul": "^1.1.0-alpha.1",
     "jsdoc-to-markdown": "^5.0.0",
     "mocha": "^6.1.4",
