@@ -14,7 +14,7 @@ const loaderError = require("./loaderError.js");
  * @inner
  * @memberof module:system
  */
-class Loader{
+export class Loader{
 	/**
 	 * @param {string} rootDir Absolute root directory.
 	 * @param {string} relativeInitDir Relative path to root.

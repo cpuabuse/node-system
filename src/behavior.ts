@@ -6,6 +6,7 @@ import {AtomicLock} from "./atomic";
 import {EventEmitter} from "events";
 export const behaviorCreationError:string = "behavior_creation_error";
 
+/* Behavior index type for behaviorId and behaviorIndex class members. Choosing not to document, as it seems unnecessary. */
 type BehaviorIndex = {
 	[key: string]: Array<string>;
 };

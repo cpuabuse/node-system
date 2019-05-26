@@ -1,4 +1,10 @@
-declare const loader: any;
+/**
+ * System is intended more than anything, for centralized managment.
+ * @module system
+ */
+import { AtomicLock } from "./atomic";
+import { Loader } from "./loader";
+export { AtomicLock };
 /**
  * Provides wide range of functionality for file loading and event exchange.
  * Throws standard error if failed to perform basic initializations, or system failure that cannot be reported otherwise has occured.
@@ -9,7 +15,7 @@ declare const loader: any;
  * - `loader_failed` - Loader did not construct the mandatory properties
  * @fires module:system.System#events#systemLoad
  */
-export declare class System extends loader.Loader {
+export declare class System extends Loader {
     /**
      * System options
      * @typedef {Object} module:system.System~options
@@ -220,4 +226,3 @@ export declare class System extends loader.Loader {
      */
     static log(text: any): void;
 }
-export {};

@@ -1,13 +1,9 @@
-declare const path: any;
-declare const fs: any;
-declare const yaml: any;
-declare const loaderError: any;
 /**
  * Required by system to perform file initialization.
  * @inner
  * @memberof module:system
  */
-declare class Loader {
+export declare class Loader {
     /**
      * @param {string} rootDir Absolute root directory.
      * @param {string} relativeInitDir Relative path to root.
@@ -130,90 +126,3 @@ declare class Loader {
      */
     static yamlToObject(string: any): any;
 }
-/**
- * System loader recursion.
- *
- * Note:
- *
- * - Default values are assumed for unspecified or empty values.
- * - Extension means recursive loading of data into variable, as if loading a new file into the current variable as new system.
- * - Relative path is relative to the directory location of current file.
- * @inner
- * @memberof module:system~Loader
- * @param {string} rootDir Root directory.
- * @param {Object} relativePath Relative path.
- * @param {string} initFilename Filename for settings.
- * @param {Object} targetObject Object to be filled.
- * @param {boolean} extend Extend the children objects or not.
- * @returns {external:Promise}
- * @throws Will throw an error if the directive is not an allowed one (folder, file, path, extend).
- * @example <caption>Default filename - null</caption> @lang yaml
- * # Variable settings to be populated with data from "system_root_dir/settings.yml"
- * settings: # Defaults to "settings"
- * @example <caption>Default filename - empty string</caption> @lang yaml
- * # Variable settings to be populated with data from "system_root_dir/settings.yml"
- * settings: "" # Defaults to "settings"
- * @example <caption>Specified filename</caption> @lang yaml
- * # Variable settings to be populated with data from "system_root_dir/xxx.yml"
- * settings: "xxx"
- * @example <caption>Default values</caption> @lang yaml
- * # Variable settings to be populated with data from "system_root_dir/settings.yml"
- * settings:
- *   folder: # Defaults to "./"
- *   file: # Defaults to "settings"
- *   path: # Defaults to "absolute"
- *   extend: # Defaults to "false"
- * @example <caption>Specified values</caption> @lang yaml
- * # Variable settings to be populated with data from "current_dir/hello/xxx.yml"
- * settings:
- *   folder: "hello"
- *   file: xxx
- *   path: relative
- *   extend: false
- * @example <caption>Extension</caption> @lang yaml
- * # Variable settings to be populated **recursively** with data from "current_dir/hello/xxx.yml"
- * settings:
- *   folder: "hello"
- *   file: xxx
- *   path: relative
- *   extend: true
- * @example <caption>Usage</caption>
- * // Input - ./settings/init.yml
- * // settings:
- * //   path: relative
- *
- * // Input - ./settings/settings.yml
- * // apples: red
- * // bananas: yellow
- *
- * // Target object to fill
- * var targetObject = {};
- *
- * initRecursion("./", "settings", "init.yml", targetObject, true));
- */
-declare function initRecursion(rootDir: any, relativePath: any, initFilename: any, targetObject: any, extend: any): Promise<void>;
-/**
- * Init and populate globalspace with settings - specific global object member per file.
- * Semantically this function has broader purpose than loadYaml.
- * @inner
- * @memberof module:system~Loader
- * @param {string} rootDir Root directory.
- * @param {string} initPath Relative directory to root.
- * @param {string} filename Filename.
- * @returns {Object} Javascript object with settings.
- * @example <caption>Usage</caption>
- * var settings = await initSettings("./", "settings", "settings");
- */
-declare function initSettings(rootDir: any, relativeDir: any, filename: any): Promise<any>;
-/**
- * Parses YAML file, and returns and object; Adds extension if absent.
- * @inner
- * @memberof module:system~Loader
- * @param {string} rootDir Absolute directory path.
- * @param {string} relativeDir Relative directory to root.
- * @param {string} filename Filename, with or without extension.
- * @returns {external:Promise} Javascript object.
- * @example <caption>Usage</caption>
- * var settings = await loadYaml("./", "settings", "settings");
- */
-declare function loadYaml(rootDir: any, relativeDir: any, filename: any): Promise<any>;

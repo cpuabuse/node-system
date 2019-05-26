@@ -3,14 +3,14 @@
  * System is intended more than anything, for centralized managment.
  * @module system
  */
-"use strict";
-const loader = require("./loader.js"); // Auxiliary system lib
-const systemError = require("./error.js");
-const behavior = require("./behavior.js");
-const atomic = require("./atomic.js");
-const events = require("./events.js");
-const loaderError = require("./loaderError.js");
 
+import * as events from "./events";
+import {AtomicLock} from "./atomic";
+import {Behavior} from "./behavior";
+import {Loader} from "./loader"; // Auxiliary system lib
+import {LoaderError} from "./loaderError";
+import {SystemError} from "./error";
+export {AtomicLock}; // Re-export
 /**
  * Provides wide range of functionality for file loading and event exchange.
  * Throws standard error if failed to perform basic initializations, or system failure that cannot be reported otherwise has occured.
@@ -21,7 +21,7 @@ const loaderError = require("./loaderError.js");
  * - `loader_failed` - Loader did not construct the mandatory properties
  * @fires module:system.System#events#systemLoad
  */
-export class System extends loader.Loader{
+export class System extends Loader{
 	/**
 	 * System options
 	 * @typedef {Object} module:system.System~options
@@ -67,7 +67,7 @@ export class System extends loader.Loader{
 		function processLoaderError(error){
 			if(onError){
 				if(typeof onError === "function"){
-					onError(error instanceof loaderError.LoaderError ? error : new loaderError.LoaderError("other_error", "Other error in System constructor has been rethrown as Loader Error."));
+					onError(error instanceof LoaderError ? error : new LoaderError("other_error", "Other error in System constructor has been rethrown as Loader Error."));
 				}
 			}
 		}
@@ -92,7 +92,7 @@ export class System extends loader.Loader{
 			 * Actual behaviors are located here.
 			 * @type {module:system~Behavior}
 			 */
-			this.system.behavior = new behavior.Behavior();
+			this.system.behavior = new Behavior();
 			/**
 			 * Actual errors are located here.
 			 * @abstract
@@ -124,14 +124,14 @@ export class System extends loader.Loader{
 					 * @param {module:system.System~filterContext} filterContext Information on the item to be filtered.
 					 * @returns {external:Promise} Promise, containing boolean result.
 					*/
-					isFile: filterContext => loader.Loader.isFile(loader.Loader.join(this.system.rootDir, loader.Loader.join(filterContext.dir, filterContext.itemName))),
+					isFile: filterContext => Loader.isFile(Loader.join(this.system.rootDir, Loader.join(filterContext.dir, filterContext.itemName))),
 					/**
 					 * Check if argument is a folder (relative to system root directory).
 					 * @function
 					 * @param {module:system.System~filterContext} filterContext Information on the item to be filtered
 					 * @returns {external:Promise} Promise, containing boolean result.
 					*/
-					isDir: filterContext => loader.Loader.isDir(this.system.rootDir, filterContext.item)
+					isDir: filterContext => Loader.isDir(this.system.rootDir, filterContext.item)
 				},
 				/**
 				 * Converts a file path to absolute operating system path. Used for external libraries, that require absolute path.
@@ -142,8 +142,8 @@ export class System extends loader.Loader{
 				 * @returns {external:Promise} Promise, containing string relative path.
 				*/
 				toAbsolute: (dir, file) => new Promise(resolve => {
-					let filePath = loader.Loader.join(dir, file);
-					resolve(loader.Loader.join(this.system.rootDir, filePath));
+					let filePath = Loader.join(dir, file);
+					resolve(Loader.join(this.system.rootDir, filePath));
 				}),
 				/**
 				 * Converts absolute path to relative path.
@@ -155,7 +155,7 @@ export class System extends loader.Loader{
 				*/
 				toRelative(rootDir, target){
 					return new Promise(function(resolve){
-						resolve(loader.Loader.toRelative(rootDir, target));
+						resolve(Loader.toRelative(rootDir, target));
 					});
 				},
 				/**
@@ -168,7 +168,7 @@ export class System extends loader.Loader{
 				*/
 				join(rootDir, target){
 					return new Promise(function(resolve){
-						resolve(loader.Loader.join(rootDir, target));
+						resolve(Loader.join(rootDir, target));
 					});
 				},
 				/**
@@ -206,11 +206,11 @@ export class System extends loader.Loader{
 				*/
 				getFile: async (dir, file, cacheTtl, force) => {
 					// Construct a path
-					var pathToFile = loader.Loader.join(dir, file);
+					var pathToFile = Loader.join(dir, file);
 
 					// Physically getting the file
 					var pGetFile = () => new Promise((resolve, reject) => {
-						loader.Loader.getFile(this.system.rootDir, dir, file).then(function(result){
+						Loader.getFile(this.system.rootDir, dir, file).then(function(result){
 							resolve(result);
 						}).catch(error => {
 							// this.fire("file_system_error");
@@ -316,7 +316,7 @@ export class System extends loader.Loader{
 				 */
 				list: async(dir, filter) => {
 					let filteredItems; // Return array
-					let itemNames = await loader.Loader.list(this.system.rootDir, dir); // Wait for folder contets
+					let itemNames = await Loader.list(this.system.rootDir, dir); // Wait for folder contets
 					let items = await this.system.file.join(dir, itemNames);
 
 					// Was the filter even specified?
@@ -363,7 +363,7 @@ export class System extends loader.Loader{
 				super();
 
 				// Report an error
-				throw new loaderError.LoaderError("system_options_failure", "The options provided to the system constructor are inconsistent.");
+				throw new LoaderError("system_options_failure", "The options provided to the system constructor are inconsistent.");
 			} else { // If no failures
 				// First things first, call a loader, if loader has failed, there are no tools to report gracefully, so the errors from there will just go above
 				super(options.rootDir, options.relativeInitDir, options.initFilename, load => {
@@ -388,7 +388,7 @@ export class System extends loader.Loader{
 							 * @type {Object}
 							*/
 							if(!(this.hasOwnProperty("events") && this.hasOwnProperty("behaviors"))){ // Make sure basic system carcass was initialized
-								throw new loaderError.LoaderError("loader_fail", "Mandatory initialization files are missing.");
+								throw new LoaderError("loader_fail", "Mandatory initialization files are missing.");
 							}
 
 							// Initialize the events
@@ -419,7 +419,7 @@ export class System extends loader.Loader{
 						}
 					}).catch(function(error){
 						// Errors returned from load or staticInitializationPromise
-						processLoaderError(new loaderError.LoaderError("functionality_error", "There was an error in the loader functionality in constructor subroutines."));
+						processLoaderError(new LoaderError("functionality_error", "There was an error in the loader functionality in constructor subroutines."));
 					});
 				});
 
@@ -501,7 +501,7 @@ export class System extends loader.Loader{
 			// Fire an error event that error already exists
 			this.fire(events.errorExists, "Error to be added already exists.");
 		} else {
-			this.system.error[code] = new systemError.SystemError(code, message);
+			this.system.error[code] = new SystemError(code, message);
 		}
 	}
 
@@ -669,7 +669,7 @@ export class System extends loader.Loader{
 			// Verify event exists
 			if(!this.events.hasOwnProperty(name)){
 				// throw new system error
-				throw new systemError.SystemError(this, eventAbsent, "Could not fire an event that is not described.");
+				throw new SystemError(this, eventAbsent, "Could not fire an event that is not described.");
 			}
 
 			// Locate event
@@ -701,7 +701,7 @@ export class System extends loader.Loader{
 				noFail = false;
 			}
 			if(name == eventAbsent){
-				if(systemError.SystemError.isSystemError(error)){
+				if(SystemError.isSystemError(error)){
 					if(error.code == eventAbsent){
 						noFail = false;
 					}
@@ -786,5 +786,5 @@ export class System extends loader.Loader{
 
 module.exports = {
 	System,
-	AtomicLock: atomic.AtomicLock
+	AtomicLock: AtomicLock
 };
