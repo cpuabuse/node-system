@@ -9,7 +9,5 @@
   "include":[
     "**/*"
   ],
-  "exclude":[
-    "src/meta/*"
-  ]
+  "exclude":[]
 }

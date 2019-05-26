@@ -2,10 +2,13 @@
 /*
 	Manages system behaviors.
 */
-"use strict";
+import {AtomicLock} from "./atomic";
+import {EventEmitter} from "events";
+export const behaviorCreationError:string = "behavior_creation_error";
 
-const events = require("events");
-const atomic = require("./atomic.js");
+type BehaviorIndex = {
+	[key: string]: Array<string>;
+};
 
 /**
  * System behavior class
@@ -13,7 +16,37 @@ const atomic = require("./atomic.js");
  * @memberof module:system
  * @extends external:EventEmitter
  */
-class Behavior extends events.EventEmitter{
+export class Behavior extends EventEmitter{
+	/**
+	 * Atomic lock to perform counter increments
+	 * @private
+	 * @type {module:system.AtomicLock}
+	 */
+	atomicLock: AtomicLock;
+
+	/**
+	 * IDs to use as actual event identifiers
+	 * @private
+	 * @type {Object}
+	 */
+	behaviorId: BehaviorIndex;
+
+	// behaviorId = { name:new array}
+
+	/**
+	 * Index to link id's back to behavior names
+	 * @private
+	 * @type {string[]}
+	 */
+	behaviorIndex: BehaviorIndex;
+
+	/**
+	 * Counter to use to generate IDs
+	 * @private
+	 * @type {number}
+	 */
+	nextBehaviorCounter: number = 0;
+
 	/**
 	 * Initializes system behavior
 	 */
@@ -21,33 +54,10 @@ class Behavior extends events.EventEmitter{
 		// Call superclass's constructor
 		super();
 
-		/**
-		 * Atomic lock to perform counter increments
-		 * @private
-		 * @type {module:system.AtomicLock}
-		 */
-		this.atomicLock = new atomic.AtomicLock();
-
-		/**
-		 * IDs to use as actual event identifiers
-		 * @private
-		 * @type {Object}
-		 */
-		this.behaviorId = new Object();
-
-		/**
-		 * Index to link id's back to behavior names
-		 * @private
-		 * @type {string[]}
-		 */
-		this.behaviorIndex = new Array();
-
-		/**
-		 * Counter to use to generate IDs
-		 * @private
-		 * @type {number}
-		 */
-		this.nextBehaviorCounter = 0;
+		// Instantiate class variables
+		this.atomicLock = new AtomicLock();
+		this.behaviorId = <BehaviorIndex>new Object();
+		this.behaviorIndex = <BehaviorIndex>new Object();
 	}
 
 	/**
@@ -58,7 +68,7 @@ class Behavior extends events.EventEmitter{
 	 * Does not check for inconsistencies within ID and index arrays, as if it is internally managed by this class, inconsistencies should not happen.
 	 * @param {string} name Name of the bahavior
 	 * @param {function} callback Behavior callback function
-	 * @return {number} ID of the behavior; `-1` if creation failed
+	 * @return {string} ID of the behavior; `behaviorCreationError` if creation failed
 	 * @example <caption>Usage</caption>
 	 * // Create a new instance of Behavior
 	 * var behavior = new Behavior();
@@ -66,7 +76,7 @@ class Behavior extends events.EventEmitter{
 	 * // Add a behavior
 	 * behavior.addBehavior("hello_behavior", () => console.log("Hello World"));
 	 */
-	async addBehavior(name, callback){
+	async addBehavior(name: string, callback: Function): Promise<string>{
 		if(typeof name === "string"){ // Name must be string
 			if(typeof callback === "function"){ // Callback must be a function
 				if(this.nextBehaviorCounter < this.getMaxListeners()){ // Overflow protection
@@ -74,7 +84,7 @@ class Behavior extends events.EventEmitter{
 					await this.atomicLock.lock();
 
 					// Increment next ID
-					let id = this.nextBehaviorCounter++;
+					let id: string = (this.nextBehaviorCounter++).toString();
 
 					// If no behavior with such name existed before, initialize an array for it
 					if(!this.behaviorId.hasOwnProperty(name)){
@@ -82,11 +92,12 @@ class Behavior extends events.EventEmitter{
 					}
 
 					// Populate ID and index
-					this.behaviorId[name].push(id.toString());
-					this.behaviorIndex.push(name);
+					this.behaviorId[name].push(id);
+					this.behaviorIndex[id] = new Array();
+					this.behaviorIndex[id].push(name);
 
 					// Add the behavior
-					this.addListener(id.toString(), callback);
+					this.addListener(id, <(...args: any[]) => void>callback);
 
 					// Release lock
 					this.atomicLock.release();
@@ -95,7 +106,7 @@ class Behavior extends events.EventEmitter{
 			}
 		}
 		// Return if failed
-		return -1;
+		return behaviorCreationError;
 	}
 
 	/**
@@ -114,7 +125,7 @@ class Behavior extends events.EventEmitter{
 	 * // Output:
 	 * // "Hello World"
 	 */
-	behave(name){
+	behave(name: string): void{
 		if(typeof name === "string"){
 			if(this.behaviorId.hasOwnProperty(name)){
 				this.behaviorId[name].forEach(event => {
@@ -126,5 +137,3 @@ class Behavior extends events.EventEmitter{
 		}
 	}
 }
-
-exports.Behavior = Behavior;

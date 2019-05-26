@@ -10,24 +10,32 @@
  * @memberof module:system
  */
 export class AtomicLock {
-	locked:boolean;
-	maxCount:number;
-	count:number;
-	
+	/**
+	 * Indicates the locked/unlocked state.
+	 * @private
+	 * @type {boolean}
+	 */
+	locked:boolean = false;
+
+	/**
+	 * Counter for current amount of instances in a queue.
+	 * @private
+	 * @type {number}
+	 */
+	maxCount:number = 0;
+
+	/**
+	 * Counter for current instance in queue.
+	 * @private
+	 * @type {number}
+	 */
+	count:number = 0;
+
 	/**
 	 * Creates an instance of AtomicLock.
 	 * Does not take any arguments or return any values.
 	 */
-	constructor(){
-		/**
-		 * Indicates the locked/unlocked state.
-		 * @private
-		 * @type {boolean}
-		 */
-		this.locked = false;
-		this.maxCount = 0;
-		this.count = 0;
-	}
+	constructor(){} /* eslint-disable-line no-useless-constructor *//* eslint-disable-line no-empty-function */// Not needed to instantiate
 
 	/**
 	 * Lock an atomic lock.

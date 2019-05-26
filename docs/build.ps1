@@ -16,6 +16,7 @@ src\events.js `
 src\errors.js `
 src\loaderError.js `
 src\meta\callback.js `
+src\behavior.js `
 test\test.js `
 test\test-atomic.js `
 test\test-errors.js `

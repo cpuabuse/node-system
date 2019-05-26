@@ -5,8 +5,23 @@
  * @memberof module:system
  */
 export declare class AtomicLock {
+    /**
+     * Indicates the locked/unlocked state.
+     * @private
+     * @type {boolean}
+     */
     locked: boolean;
+    /**
+     * Counter for current amount of instances in a queue.
+     * @private
+     * @type {number}
+     */
     maxCount: number;
+    /**
+     * Counter for current instance in queue.
+     * @private
+     * @type {number}
+     */
     count: number;
     /**
      * Creates an instance of AtomicLock.
