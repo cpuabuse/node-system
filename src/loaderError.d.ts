@@ -4,7 +4,7 @@
  * @memberof module:system
  * @extends external:Error
  */
-declare class LoaderError extends Error {
+export declare class LoaderError extends Error {
     /**
      * Creates an instance of LoaderError.
      * @param {string} [code=default_code] Error code
