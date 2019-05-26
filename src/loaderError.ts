@@ -10,7 +10,7 @@
  * @memberof module:system
  * @extends external:Error
  */
-class LoaderError extends Error{
+export class LoaderError extends Error{
 	/**
 	 * Creates an instance of LoaderError.
 	 * @param {string} [code=default_code] Error code
@@ -37,5 +37,3 @@ class LoaderError extends Error{
 		this.code = defaultCode ? "default_code" : code;
 	}
 }
-
-exports.LoaderError = LoaderError;

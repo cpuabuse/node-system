@@ -2,7 +2,6 @@
 /*
 	Atomic operations.
 */
-"use strict";
 
 /**
  * Creates an instance of AtomicLock.

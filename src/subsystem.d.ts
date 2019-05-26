@@ -14,7 +14,7 @@ export interface ConstructorArgs {
  * @typedef SubsystemMethod
  * @property {string} name Name of a function.
  * @property {Function} fn Function body, taking arbitrary arguments.
- */
+*/
 export declare type SubsystemMethod = {
     name: string;
     fn: Function;
@@ -28,6 +28,7 @@ declare type Method = {
 export declare class Subsystem {
     system: System;
     method: Method;
-    constructor(systemContext: System, subsystemMethods: Array<SubsystemMethod>);
+    data: any;
+    constructor(systemContext: System, subsystemMethods: Array<SubsystemMethod> | null);
 }
 export {};

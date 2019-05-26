@@ -2,7 +2,6 @@
 /*
 	Provides errors for the system.
 */
-"use strict";
 
 /**
  * Extended system error class.
