@@ -16,6 +16,7 @@ export interface OptionsInterface{
 
 export default class Options extends Info{
 	constructor(args:ConstructorArgs){
+		console.log("I AM HERE####################################################################################");
 		// Set options to be read
 		var options = <OptionsInterface>args.args;
 

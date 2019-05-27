@@ -2,6 +2,7 @@
 /*
 	Used for constructing subsystems within system.
 */
+import {AtomicLock} from "./atomic";
 import {System} from "./system"; /* eslint-disable-line no-unused-vars */// ESLint type import detection bug
 /**
  * Interface for subsystem constructor data exchange.
@@ -31,12 +32,14 @@ type Method = {
 	[key:string]:Function
 };
 
-export class Subsystem{
+export class Subsystem extends AtomicLock{
 	system:System;
 	method:Method;
 	data:any;
 
 	constructor(systemContext:System, subsystemMethods:Array<SubsystemMethod>|null){
+		super();
+
 		// Set reference to system
 		this.system = systemContext;
 

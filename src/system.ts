@@ -4,13 +4,18 @@
  * @module system
  */
 
+// Imports
 import * as events from "./events";
 import {AtomicLock} from "./atomic";
 import {Behavior} from "./behavior";
 import {Loader} from "./loader"; // Auxiliary system lib
 import {LoaderError} from "./loaderError";
+import {OptionsInterface} from "./subsystems/system.info.options";
 import {SystemError} from "./error";
-export {AtomicLock}; // Re-export
+
+// Re-export
+export {AtomicLock};
+
 /**
  * Provides wide range of functionality for file loading and event exchange.
  * Throws standard error if failed to perform basic initializations, or system failure that cannot be reported otherwise has occured.
@@ -57,14 +62,14 @@ export class System extends Loader{
 	 * @param {module:system.System~behavior[]} [behaviors] - [Optional] Behaviors to add.
 	 * @param {Function} [onError] - [Optional] Callback for error handling during delayed execution after loader has loaded. Takes error string as an argument.
 	 */
-	constructor(options, behaviors, onError){
+	constructor(options:OptionsInterface, behaviors, onError){
 		/**
 		 * Process the loader error.
 		 * Due to the design of the System constructor, this is supposed to be called only once during the constructor execution, no matter the failure.
 		 * We do not want the constructor to fail no matter what, so we perform check for onError existence and type. If failed, we ignore it. Moreover, if there was a different error caught, a Loader Error would be generated.
 		 * Currently there is no way to produce "other_error"; But the functionality will remain for the possibility of such error thrown with future functionality.
 		 */
-		function processLoaderError(error){
+		function processLoaderError(error:LoaderError){
 			if(onError){
 				if(typeof onError === "function"){
 					onError(error instanceof LoaderError ? error : new LoaderError("other_error", "Other error in System constructor has been rethrown as Loader Error."));
@@ -72,8 +77,8 @@ export class System extends Loader{
 			}
 		}
 
-		// Performs the static initialization part of the instance, post-superclass constructor
-		var staticInitialization = resolve => {
+		// Performs the static initialization part of the instance, during superclass constructor execution, so must not depend on it.
+		var staticInitialization: (resolve: (value?: {} | PromiseLike<{}> | undefined) => void, reject: (reason?: any) => void) => void = resolve => {
 			// System constants
 			/** Contains system info.
 			 * @type {module:system.System~options}
@@ -84,9 +89,15 @@ export class System extends Loader{
 				id: options.id,
 				rootDir: options.rootDir,
 				relativeInitDir: options.relativeInitDir,
-				initFilename: options.relatoveInitFilename,
+				initFilename: options.initFilename,
 				logging: options.logging
 			};
+
+			/**
+			 * Actual subsystems are located here.
+			 * @type {module:system~AtomicLock}
+			 */
+			this.system.subsystem = new Object();
 
 			/**
 			 * Actual behaviors are located here.
@@ -367,8 +378,20 @@ export class System extends Loader{
 			} else { // If no failures
 				// First things first, call a loader, if loader has failed, there are no tools to report gracefully, so the errors from there will just go above
 				super(options.rootDir, options.relativeInitDir, options.initFilename, load => {
-					Promise.all([load, staticInitializationPromise]).then(() => {
+					load.then(function(){
+						// Promise is there to maintain full concurrency for maintainability, no functionality implied
+						return new Promise(staticInitialization);
+					}).then(() => { // The following is code dependent on full initialization by static system initializer and Loader.
 						try {
+							// Initialize subsystems
+							if (this.hasOwnProperty("subsystems")){
+								for (let subsystem:string in this.subsystems){
+									import("./subsystems/" + subsystem).then(subsystemClass => {
+										this.system.subsystem[subsystem] = new subsystemClass({systemContext:this, args:this.subsystems[subsystem]});
+									});
+								}
+							}
+
 							/**
 							 * Events to be populated by the loader.
 							 * System by itself does not deal with events, it only confirms that the events were initialized. Although, if the events are fired, and failure to fire event is set to throw, or undocumented events encountered, it would throw errors.
@@ -422,9 +445,6 @@ export class System extends Loader{
 						processLoaderError(new LoaderError("functionality_error", "There was an error in the loader functionality in constructor subroutines."));
 					});
 				});
-
-				// Promise is there to maintain full concurrency for maintainability, no functionality implied
-				var staticInitializationPromise = new Promise(staticInitialization);
 			}
 		} catch(error){
 			processLoaderError(error);

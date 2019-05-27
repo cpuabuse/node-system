@@ -1,3 +1,4 @@
+import { AtomicLock } from "./atomic";
 import { System } from "./system";
 /**
  * Interface for subsystem constructor data exchange.
@@ -25,7 +26,7 @@ export declare type SubsystemMethod = {
 declare type Method = {
     [key: string]: Function;
 };
-export declare class Subsystem {
+export declare class Subsystem extends AtomicLock {
     system: System;
     method: Method;
     data: any;

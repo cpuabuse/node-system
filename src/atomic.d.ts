@@ -1,7 +1,7 @@
 /**
  * Creates an instance of AtomicLock.
  *
- * Single thread only.
+ * Single thread only, queue present.d
  * @memberof module:system
  */
 export declare class AtomicLock {

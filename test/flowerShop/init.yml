@@ -8,5 +8,5 @@ behaviors:
 errors:
 branch:
   extend: true
-subsystem:
+subsystems:
   extend: true

@@ -14,7 +14,7 @@ behaviors:
 errors:
 branch:
   extend: true
-subsystem:
+subsystems:
   extend: true`;
 const exampleInit = `behaviors:
 errors:

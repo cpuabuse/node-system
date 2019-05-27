@@ -1,0 +1,5 @@
+id: "stars"
+rootDir: "test"
+relativeInitDir: "stars"
+initFilename: "stars.yml"
+logging: "off"

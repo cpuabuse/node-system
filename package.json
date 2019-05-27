@@ -3,11 +3,16 @@
   "version": "0.4.1",
   "description": "System module",
   "main": "src/system.js",
+  "types": "src/system.d.ts",
   "license": "UNLICENSED",
   "scripts": {
+    "coverage": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly",
     "build": "tsc",
-    "test": "npm run build & node ./node_modules/mocha/bin/mocha && exit $?",
-    "coverage": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly"
+    "docs": "powershell ./docs/build.ps1",
+    "mocha": "mocha",
+    "postinstall": "npm run build",
+    "pretest": "npm run build",
+    "test": "npm run mocha"
   },
   "repository": {
     "type": "git",
@@ -29,6 +34,6 @@
     "typescript": "^3.4.5"
   },
   "pre-commit": [
-    "test"
+    "mocha"
   ]
 }

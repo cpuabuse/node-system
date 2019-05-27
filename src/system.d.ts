@@ -4,6 +4,7 @@
  */
 import { AtomicLock } from "./atomic";
 import { Loader } from "./loader";
+import { OptionsInterface } from "./subsystems/system.info.options";
 export { AtomicLock };
 /**
  * Provides wide range of functionality for file loading and event exchange.
@@ -48,7 +49,7 @@ export declare class System extends Loader {
      * @param {module:system.System~behavior[]} [behaviors] - [Optional] Behaviors to add.
      * @param {Function} [onError] - [Optional] Callback for error handling during delayed execution after loader has loaded. Takes error string as an argument.
      */
-    constructor(options: any, behaviors: any, onError: any);
+    constructor(options: OptionsInterface, behaviors: any, onError: any);
     /**
      * Checks options argument for missing incorrect property types
      * @param {module:system~System~options} options System options argument

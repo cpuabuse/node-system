@@ -6,7 +6,7 @@
 /**
  * Creates an instance of AtomicLock.
  *
- * Single thread only.
+ * Single thread only, queue present.d
  * @memberof module:system
  */
 export class AtomicLock {
@@ -46,7 +46,7 @@ export class AtomicLock {
 	 */
 	lock():Promise<void>{
 		/**
-		 * Function to increment the counters in an unnecessary safe manner
+		 * Function to increment the counters in an safe manner
 		 */
 		function increment(counter:number):number{
 			return counter === Number.MAX_SAFE_INTEGER ? 0 : counter + 1;
