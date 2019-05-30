@@ -10,6 +10,6 @@ export default class Info extends Subsystem{
 		super(args.systemContext, null);
 
 		// Assign data
-		this.data = args.args;
+		this.data = args.vars;
 	}
 }

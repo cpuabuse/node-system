@@ -1,0 +1,23 @@
+defaultSeverity: error
+extends:
+- tslint:all
+rules:
+  array-type: false
+  callable-types: false
+  completed-docs: false
+  eofline: false
+  indent:
+    options:
+    - tabs
+  interface-name: false
+  max-line-length: false
+  no-any: false
+  no-inferrable-types: false
+  no-var-keyword: false
+  one-line: false
+  only-arrow-functions: false
+  prefer-const: false
+  semicolon:
+    - true
+    - always
+  whitespace: false

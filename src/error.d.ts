@@ -1,28 +1,25 @@
-/**
- * Extended system error class.
- * @inner
- * @memberof module:system
- * @extends external:Error
- */
+/** Extended system error class. */
 export declare class SystemError extends Error {
+    /** Error code. */
     code: string;
     /**
      * Creates an instance of SystemError.
-     * @param {string} code Error code
-     * @param {string} message Error message
-     * @throws {external:Error} Throwing error if the code already defined
+     * @param code Error code
+     * @param message Error message
+     * @throws [[Error]] Throwing error if the code already defined
      */
     constructor(code: string, message: string);
     /**
      * Check if an object is indeed a functional SystemError.
      *
-     * Note:
+     * **Note**
      *
      * - Not checking for presence of code property, or for it being a string, as assuming that the object of SystemError type would have it initialized.
      * - Empty code errors will return false, due to the ambiguity.
-     * @param {module:system.SystemError} error Error to check
-     * @returns {boolean} Returns `true` if is is a SystemError, `false` if not.
-     * @example <caption>Usage</caption>
+     *
+     * **Usage**
+     *
+     * ```typescript
      * // Try to load JSON
      * try{
      *   loadJson();
@@ -35,6 +32,9 @@ export declare class SystemError extends Error {
      *     throw error;
      *   }
      * }
+     * ```
+     * @param error Error to check
+     * @returns Returns `true` if is is a SystemError, `false` if not.
      */
     static isSystemError(error: SystemError): boolean;
 }

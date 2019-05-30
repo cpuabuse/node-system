@@ -1,44 +1,34 @@
 /**
+ * Atomic operations.
+ */
+/**
  * Creates an instance of AtomicLock.
- *
- * Single thread only, queue present.d
- * @memberof module:system
+ * Single thread only, queue present.
  */
 export declare class AtomicLock {
-    /**
-     * Indicates the locked/unlocked state.
-     * @private
-     * @type {boolean}
-     */
-    locked: boolean;
-    /**
-     * Counter for current amount of instances in a queue.
-     * @private
-     * @type {number}
-     */
-    maxCount: number;
-    /**
-     * Counter for current instance in queue.
-     * @private
-     * @type {number}
-     */
-    count: number;
-    /**
-     * Creates an instance of AtomicLock.
-     * Does not take any arguments or return any values.
-     */
-    constructor();
+    /** Counter for current instance in queue. */
+    private count;
+    /** Indicates the locked/unlocked state. */
+    private locked;
+    /** Counter for current amount of instances in a queue. */
+    private maxCount;
     /**
      * Lock an atomic lock.
-     * @returns {external:Promise} Resolves when lock succeeds
-     * @example <caption>Usage</caption>
+     *
+     * **Usage**
+     *
+     * ```typescript
      * // Lock
      * exampleAtomicLock.lock();
+     * ```
+     * @returns Resolves when lock succeeds
      */
     lock(): Promise<void>;
     /**
      * Release atomic lock
-     * @example <caption>Usage</caption>
+     *
+     * **Usage**
+     *
      * // Release
      * exampleAtomicLock.release();
      */

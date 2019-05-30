@@ -1,4 +1,4 @@
-// system/system.js
+// File: system/system.js
 /**
  * System is intended more than anything, for centralized managment.
  * @module system
@@ -7,84 +7,101 @@
 // Imports
 import * as events from "./events";
 import {AtomicLock} from "./atomic";
-import {Behavior} from "./behavior";
+import {Behavior, BehaviorInterface} from "./behavior";
+import {SystemError} from "./error";
 import {Loader} from "./loader"; // Auxiliary system lib
 import {LoaderError} from "./loaderError";
 import {OptionsInterface} from "./subsystems/system.info.options";
-import {SystemError} from "./error";
 
 // Re-export
 export {AtomicLock};
 
+/** An interface to describe the resolve argument of promise executor. */
+export type Resolve = (value?: void | PromiseLike<void> | undefined) => void;
+export type Reject = (reason?: any) => void;
+export type Executor = (resolve: Resolve, reject: Reject) => void;
+
+/** System options. */
+export interface SystemArgs{
+	/** System instace internal ID. */
+	id: string;
+
+	/** Initialization file filename. */
+	initFilename: string;
+
+	/** The way system logs */
+	logging: string;
+
+	/** The relative directory to root of the location of the initialization file. */
+	relativeInitDir: string;
+
+	/** The root directory for the System instance. */
+	rootDir: string;
+}
+
+/** Error callback. */
+export interface ErrorCallback{
+	(error: LoaderError): void;
+}
+
+/** Filter context. */
+type FilterContext = {
+	/** Parent directory of the filtered item. */
+	dir: string;
+
+	/** Path to the filtered item */
+	item: string;
+
+	/** Name of the filtered item */
+	itemName: string;
+};
+
 /**
  * Provides wide range of functionality for file loading and event exchange.
  * Throws standard error if failed to perform basic initializations, or system failure that cannot be reported otherwise has occured.
- * @memberof module:system
- * @extends module:system~Loader
- * @throws {external:Error}
+ * @throws [[Error]]
  *
  * - `loader_failed` - Loader did not construct the mandatory properties
  * @fires module:system.System#events#systemLoad
  */
 export class System extends Loader{
-	/**
-	 * System options
-	 * @typedef {Object} module:system.System~options
-	 * @property {string} id - System instace internal ID.
-   * @property {string} rootDir - The root directory for the System instance.
-   * @property {string} relativeInitDir - The relative directory to root of the location of the initialization file.
-   * @property {string} initFilename - Initialization file filename.
-	 * @property {string} logging - The way system logs
-	 */
-
-	/**
-	 * System options
-	 * @typedef {Object} module:system.System~filterContext
-	 * @property {string} dir Parent directory of the filtered item
-	 * @property {string} itemName Name of the filtered item
-	 * @property {string} item Path to the filtered item
-	 */
-
-	/**
-	 * System behavior - an object, with a property where key is the name of the behavior, and value is the function, taking a system context as an argument.
-	 * @typedef {Object} module:system.System~behavior
-	 * @property {function}
-	 * @example <caption>Behavior - argument outline</caption>
-   * amazing_behavior: (that) => {
-   *   // Process system instance on "amazing_behavior"
-   *   amazingProcessor(that);
-   * }
-	 */
+	/** Contains system info. */
+	private system: {
+		/** Event emitter for the behaviors. Generally should use the public system instance methods instead. */
+		behavior: {
+			[key: string]: BehaviorInterface;
+		};
+		id: string;
+		initFilename: string;
+		logging: string;
+		relativeInitDir: string;
+		rootDir: string;
+	};
 
 	/**
 	 * The constructor will perform necessary preparations, so that failures can be processed with system events. Up until these preparations are complete, the failure will result in thrown standard Error.
-	 * @param {module:system.System~options} options System options.
-	 * @param {module:system.System~behavior[]} [behaviors] - [Optional] Behaviors to add.
-	 * @param {Function} [onError] - [Optional] Callback for error handling during delayed execution after loader has loaded. Takes error string as an argument.
+	 * @param options System options.
+	 * @param behaviors - Behaviors to add.
+	 * @param onError - Callback for error handling during delayed execution after loader has loaded. Takes error string as an argument.
 	 */
-	constructor(options:OptionsInterface, behaviors, onError){
+	public constructor(options: OptionsInterface, behaviors: BehaviorInterface, onError: ErrorCallback | null){
 		/**
 		 * Process the loader error.
 		 * Due to the design of the System constructor, this is supposed to be called only once during the constructor execution, no matter the failure.
 		 * We do not want the constructor to fail no matter what, so we perform check for onError existence and type. If failed, we ignore it. Moreover, if there was a different error caught, a Loader Error would be generated.
 		 * Currently there is no way to produce "other_error"; But the functionality will remain for the possibility of such error thrown with future functionality.
 		 */
-		function processLoaderError(error:LoaderError){
-			if(onError){
-				if(typeof onError === "function"){
+		function processLoaderError(error: LoaderError): void{
+			if(typeof onError === "function"){
+				if(onError){
 					onError(error instanceof LoaderError ? error : new LoaderError("other_error", "Other error in System constructor has been rethrown as Loader Error."));
 				}
 			}
 		}
 
 		// Performs the static initialization part of the instance, during superclass constructor execution, so must not depend on it.
-		var staticInitialization: (resolve: (value?: {} | PromiseLike<{}> | undefined) => void, reject: (reason?: any) => void) => void = resolve => {
+		var staticInitialization: Executor = (resolve: Resolve): void => {
 			// System constants
-			/** Contains system info.
-			 * @type {module:system.System~options}
-			 * @readonly
-			 * @property {module:system~Behavior} behavior Event emitter for the behaviors. Generally should use the public system instance methods instead.
-			 */
 			this.system = {
 				id: options.id,
 				rootDir: options.rootDir,
@@ -377,6 +394,7 @@ export class System extends Loader{
 				throw new LoaderError("system_options_failure", "The options provided to the system constructor are inconsistent.");
 			} else { // If no failures
 				// First things first, call a loader, if loader has failed, there are no tools to report gracefully, so the errors from there will just go above
+				
 				super(options.rootDir, options.relativeInitDir, options.initFilename, load => {
 					load.then(function(){
 						// Promise is there to maintain full concurrency for maintainability, no functionality implied
@@ -386,8 +404,13 @@ export class System extends Loader{
 							// Initialize subsystems
 							if (this.hasOwnProperty("subsystems")){
 								for (let subsystem:string in this.subsystems){
-									import("./subsystems/" + subsystem).then(subsystemClass => {
-										this.system.subsystem[subsystem] = new subsystemClass({systemContext:this, args:this.subsystems[subsystem]});
+									import("./subsystems/" + this.subsystems[subsystem].type).then(subsystemClass => {
+										let systemArgs = new Object();
+										if(this.subsystems[subsystem].args.includes("system_args")){
+											systemArgs["system_args"] = options;
+										}
+
+										this.system.subsystem[subsystem] = new subsystemClass({systemContext:this, args:systemArgs, vars:this.subsystems[subsystem].vars});
 									});
 								}
 							}

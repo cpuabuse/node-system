@@ -11,7 +11,6 @@ jobs:
   - stage: Post test
     name: npm next release
     node_js: '12'
-    script: echo "Deploying..."
     deploy:
       email: cpuabuse@gmail.com
       provider: npm
@@ -28,3 +27,15 @@ jobs:
       # Coverage
       npm run coverage
       cat ./coverage/lcov.info | node ./node_modules/coveralls/bin/coveralls.js
+  - name: docs
+    node_js: '12'
+    script: npm run docs
+    deploy:
+      provider: pages
+        local_dir: docs/
+        skip_cleanup: true
+        github_token:
+          secure: 
+        keep_history: true
+        on:
+          branch: master

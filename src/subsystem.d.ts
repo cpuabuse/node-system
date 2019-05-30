@@ -1,14 +1,14 @@
 import { AtomicLock } from "./atomic";
 import { System } from "./system";
-/**
- * Interface for subsystem constructor data exchange.
- * @typedef ConstructorArgs
- * @property {module:system.System} systemContext Context of a parent system.
- * @property {Object} args Arbitrary arguments.
- */
+/** Interface for subsystem constructor data exchange. */
 export interface ConstructorArgs {
+    /** Context of a parent system. */
     systemContext: System;
-    args: any;
+    args: null | {
+        system_args?: any;
+    };
+    /** Arbitrary arguments from a file. */
+    vars: any;
 }
 /**
  * A way methods are transfered to a subsystem.

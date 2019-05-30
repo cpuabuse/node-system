@@ -3,53 +3,50 @@
  * @module system
  */
 import { AtomicLock } from "./atomic";
+import { BehaviorInterface } from "./behavior";
 import { Loader } from "./loader";
+import { LoaderError } from "./loaderError";
 import { OptionsInterface } from "./subsystems/system.info.options";
 export { AtomicLock };
+/** An interface to describe the resolve argument of promise executor. */
+export declare type Resolve = (value?: void | PromiseLike<void> | undefined) => void;
+export declare type Reject = (reason?: any) => void;
+export declare type Executor = (resolve: Resolve, reject: Reject) => void;
+/** System options. */
+export interface SystemArgs {
+    /** System instace internal ID. */
+    id: string;
+    /** Initialization file filename. */
+    initFilename: string;
+    /** The way system logs */
+    logging: string;
+    /** The relative directory to root of the location of the initialization file. */
+    relativeInitDir: string;
+    /** The root directory for the System instance. */
+    rootDir: string;
+}
+/** Error callback. */
+export interface ErrorCallback {
+    (error: LoaderError): void;
+}
 /**
  * Provides wide range of functionality for file loading and event exchange.
  * Throws standard error if failed to perform basic initializations, or system failure that cannot be reported otherwise has occured.
- * @memberof module:system
- * @extends module:system~Loader
- * @throws {external:Error}
+ * @throws [[Error]]
  *
  * - `loader_failed` - Loader did not construct the mandatory properties
  * @fires module:system.System#events#systemLoad
  */
 export declare class System extends Loader {
-    /**
-     * System options
-     * @typedef {Object} module:system.System~options
-     * @property {string} id - System instace internal ID.
-   * @property {string} rootDir - The root directory for the System instance.
-   * @property {string} relativeInitDir - The relative directory to root of the location of the initialization file.
-   * @property {string} initFilename - Initialization file filename.
-     * @property {string} logging - The way system logs
-     */
-    /**
-     * System options
-     * @typedef {Object} module:system.System~filterContext
-     * @property {string} dir Parent directory of the filtered item
-     * @property {string} itemName Name of the filtered item
-     * @property {string} item Path to the filtered item
-     */
-    /**
-     * System behavior - an object, with a property where key is the name of the behavior, and value is the function, taking a system context as an argument.
-     * @typedef {Object} module:system.System~behavior
-     * @property {function}
-     * @example <caption>Behavior - argument outline</caption>
-   * amazing_behavior: (that) => {
-   *   // Process system instance on "amazing_behavior"
-   *   amazingProcessor(that);
-   * }
-     */
+    /** Contains system info. */
+    private system;
     /**
      * The constructor will perform necessary preparations, so that failures can be processed with system events. Up until these preparations are complete, the failure will result in thrown standard Error.
-     * @param {module:system.System~options} options System options.
-     * @param {module:system.System~behavior[]} [behaviors] - [Optional] Behaviors to add.
-     * @param {Function} [onError] - [Optional] Callback for error handling during delayed execution after loader has loaded. Takes error string as an argument.
+     * @param options System options.
+     * @param behaviors - Behaviors to add.
+     * @param onError - Callback for error handling during delayed execution after loader has loaded. Takes error string as an argument.
      */
-    constructor(options: OptionsInterface, behaviors: any, onError: any);
+    constructor(options: OptionsInterface, behaviors: BehaviorInterface, onError: ErrorCallback | null);
     /**
      * Checks options argument for missing incorrect property types
      * @param {module:system~System~options} options System options argument

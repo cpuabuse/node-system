@@ -1,22 +1,19 @@
 // src/loaderError.js
-/*
-	Provides errors to use during system loading.
-*/
-"use strict";
-
 /**
- * Extended error class for system loading errors.
- * @inner
- * @memberof module:system
- * @extends external:Error
+ * Provides errors to use during system loading.
  */
+
+/** Extended error class for system loading errors. */
 export class LoaderError extends Error{
+	/** Error code */
+	code:string;
+
 	/**
 	 * Creates an instance of LoaderError.
-	 * @param {string} [code=default_code] Error code
-	 * @param {string} [message=default_message] Error message
+	 * @param code Error code
+	 * @param message Error message
 	 */
-	constructor(code, message){
+	constructor(code: string, message: string){
 		let defaultCode = false;
 		let defaultMessage = false;
 

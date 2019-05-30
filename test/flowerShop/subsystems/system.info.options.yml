@@ -1,5 +1,6 @@
-id: "stars"
-rootDir: "test"
-relativeInitDir: "stars"
-initFilename: "stars.yml"
-logging: "off"
+type: system.info.options
+vars:
+  homepage: https://github.com/cpuabuse/node-system
+args:
+  - system_args
+depends:

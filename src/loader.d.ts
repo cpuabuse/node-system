@@ -1,24 +1,25 @@
+/// <reference types="node" />
 /**
- * Required by system to perform file initialization.
- * @inner
- * @memberof module:system
+ * Constructor callback.
+ * @param done Fullfills when constructor finishes execution
  */
+export declare type ConstructorCallback = (done: Promise<void>) => void;
+/** Required by system to perform file initialization. */
 export declare class Loader {
     /**
-     * @param {string} rootDir Absolute root directory.
-     * @param {string} relativeInitDir Relative path to root.
-     * @param {string} initFilename Filename.
-     * @param {function} callback Callback to call with Promise of completion.
-     * @throws Will rethrow errors from initRecursion
+     * @param rootDir Absolute root directory.
+     * @param relativeInitDir Relative path to root.
+     * @param initFilename Filename.
+     * @param callback Callback to call with Promise of completion.
+     * @throws [[LoaderError]] Will throw `unexpected_constructor`
      */
-    constructor(rootDir: any, arg_relativeInitDir: any, arg_initFilename: any, callback: any);
+    constructor(rootDir: string, arg_relativeInitDir: string, arg_initFilename: string, callback: ConstructorCallback);
     /**
      * Gets file contents.
-     * @param {string} rootDir Absolute root directory.
-     * @param {string} relativeDir Directory relative to root.
-     * @param {string} file Full file name.
-     * @returns {external:Promise} File contents.
-     * @example <caption>Usage</caption>
+     *
+     * **Usage**
+     *
+     * ```typescript
      * // Load files
      * var grapefruitJuicer = Loader.getFile("c:\machines", "appliances", "grapefruitJuicer.txt");
      *
@@ -34,38 +35,52 @@ export declare class Loader {
      *
      * // Output
      * // 1000W powerful juicer
+     * ```
+     * @param rootDir Absolute root directory.
+     * @param relativeDir Directory relative to root.
+     * @param file Full file name.
+     * @returns File contents.
      */
-    static getFile(rootDir: any, relativeDir: any, file: any): Promise<{}>;
+    static getFile(rootDir: string, relativeDir: string, file: string): Promise<Buffer>;
     /**
      * Extracts relative path from rootDir to target.
-     * @param {string} dir Source folder.
-     * @param {string|string[]} target File/folder name|names.
-     * @returns {string|string[]} Relative path|paths.
-     * @example <caption>Usage</caption>
+     *
+     * **Usage**
+     *
+     * ```typescript
      * // Convert path and output the result
      * console.log(Loader.toRelative("c:\machines\refrigerators", "c:\machines\appliances"));
      *
      * // Output
      * // ..\appliances
+     * ```
+     * @param dir Source folder.
+     * @param target File/folder name|names.
+     * @returns Relative path|paths.
      */
-    static toRelative(dir: any, target: any): any;
+    static toRelative(dir: string, target: string | Array<string>): string | Array<string>;
     /**
      * Join a root directory with a file/folder or an array of files/folders to absolute path.
-     * @param {...string|string[]} pathArrays File/folder name|names.
-     * @returns {string|string[]} Absolute path|paths.
-     * @example <caption>Usage</caption>
+     *
+     * **Usage**
+     *
+     * ```typescript
      * // Join and log result
      * console.log(Loader.join("c:\machines", "appliances"))
      *
      * // Output
      * // c:\machines\appliances
+     * ```
+     * @param pathArrays File/folder name|names.
+     * @returns Absolute path|paths.
      */
-    static join(...pathArrays: any[]): any;
+    static join(...pathArrays: Array<string | Array<string>>): string | Array<string>;
     /**
      * Checks if is a file
-     * @param {string} rawPath Full filepath.
-     * @returns {external:Promise} Returns `true` if a file, `false` if not.
-     * @example <caption>Usage</caption>
+     *
+     * **Usage**
+     *
+     * ```typescript
      * // Verify file
      * Loader.isFile("c:\machines\appliances\grapefruitJuicer.txt").then(function(result){
      *   console.log(result);
@@ -76,14 +91,17 @@ export declare class Loader {
      *
      * // Output
      * // true
+     * ```
+     * @param rawPath Full filepath.
+     * @returns Returns `true` if a file, `false` if not.
      */
-    static isFile(rawPath: any): Promise<{}>;
+    static isFile(rawPath: string): Promise<boolean>;
     /**
      * Checks if is a directory.
-     * @param {string} rootDir Absolute root directory.
-     * @param {string} relativeDir Relative directory to root.
-     * @returns {external:Promise} Returns `true` if a directory, `false` if not.
-     * @example <caption>Usage</caption>
+     *
+     * **Usage**
+     *
+     * ```typescript
      * // Verify directory
      * Loader.isDir("c:\machines\appliances","grapefruitJuicer.txt").then(function(result){
      *   console.log(result);
@@ -94,14 +112,18 @@ export declare class Loader {
      *
      * // Output
      * // false
+     * ```
+     * @param rootDir Absolute root directory.
+     * @param relativeDir Relative directory to root.
+     * @returns Returns `true` if a directory, `false` if not.
      */
-    static isDir(rootDir: any, relativeDir: any): Promise<{}>;
+    static isDir(rootDir: string, relativeDir: string): Promise<boolean>;
     /**
      * Returns an array of strings, representing the contents of a folder.
-     * @param {string} rootDir Root directory.
-     * @param {string} relativeDir Relative directory.
-     * @returns {external:Promise} Array with contents; Rejects with errors from [fs.readdir](https://nodejs.org/api/fs.html#fs_fs_readdir_path_options_callback).
-     * @example <caption>Usage</caption>
+     *
+     * **Usage**
+     *
+     * ```typescript
      * // List directory contents
      * Loader.list("c:","machines").then(function(result){
      *   console.log(result);
@@ -111,18 +133,26 @@ export declare class Loader {
      *
      * // Output
      * // ["machines", "appliances"]
+     * ```
+     * @param rootDir Root directory.
+     * @param relativeDir Relative directory.
+     * @returns Array with contents; Rejects with errors from [fs.readdir](https://nodejs.org/api/fs.html#fs_fs_readdir_path_options_callback).
      */
-    static list(rootDir: any, relativeDir: any): Promise<{}>;
+    static list(rootDir: string, relativeDir: string): Promise<Array<string>>;
     /**
      * Converts YAML string to a JS object.
-     * @param {string} string YAML string.
-     * @returns {Object} Javascript object.
-     * @example <caption>Usage</caption>
+     *
+     *  **Usage**
+     *
+     * ```typescript
      * // Ouput conversion of YAML to JSON
      * console.log(Loader.yamlToObject("Wine: Red"));
      *
      * // Output
      * // {"Wine": "Red"}
+     * ```
+     * @param string YAML string.
+     * @returns Javascript object.
      */
-    static yamlToObject(string: any): any;
+    static yamlToObject(string: string): any;
 }

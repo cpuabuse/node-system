@@ -1,14 +1,14 @@
 {
   "name": "cpuabuse-system",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "System module",
   "main": "src/system.js",
   "types": "src/system.d.ts",
   "license": "UNLICENSED",
   "scripts": {
-    "coverage": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly",
+    "coverage": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly",
     "build": "tsc",
-    "docs": "powershell ./docs/build.ps1",
+    "docs": "typedoc --ignoreCompilerErrors",
     "mocha": "mocha",
     "postinstall": "npm run build",
     "pretest": "npm run build",
@@ -22,18 +22,23 @@
     "js-yaml": "^3.13.1"
   },
   "devDependencies": {
-    "@types/node": "^12.0.2",
+    "@types/js-yaml": "^3.12.1",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^12.0.4",
     "@typescript-eslint/eslint-plugin": "^1.9.0",
     "@typescript-eslint/parser": "^1.9.0",
     "coveralls": "^3.0.3",
     "eslint": "^5.16.0",
     "istanbul": "^1.1.0-alpha.1",
-    "jsdoc-to-markdown": "^5.0.0",
+    "jshint": "^2.10.2",
     "mocha": "^6.1.4",
     "pre-commit": "^1.2.2",
-    "typescript": "^3.4.5"
+    "tslint": "^5.17.0",
+    "typedoc": "^0.14.2",
+    "typescript": "^3.5.1"
   },
   "pre-commit": [
-    "mocha"
+    "mocha",
+    "docs"
   ]
 }

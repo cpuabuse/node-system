@@ -1,47 +1,60 @@
-// info.options.ts
+// File: info.options.ts
 /*
 	Used for storing system options.
 */
 import {ConstructorArgs} from "../subsystem"; /* eslint-disable-line no-unused-vars */// ESLint type import detection bug
 import Info from "./system.info";
 import {LoaderError} from "../loaderError";
+import {SystemArgs} from "../system"; /* eslint-disable-line no-unused-vars */// ESLint type import detection bug
 
-export interface OptionsInterface{
-	id:string;
-	rootDir:string;
-	relativeInitDir:string;
-	initFilename:string;
-	logging:string;
+interface OptionsVars{
+	homepage: string;
 };/* eslint-disable-line no-extra-semi */// ESLint inteface no-extra-semi bug
+export interface OptionsInterface extends SystemArgs, OptionsVars{};/* eslint-disable-line no-extra-semi */// ESLint inteface no-extra-semi bug
 
 export default class Options extends Info{
 	constructor(args:ConstructorArgs){
-		console.log("I AM HERE####################################################################################");
 		// Set options to be read
-		var options = <OptionsInterface>args.args;
+		if (args.args !== null){
+			if(args.args.hasOwnProperty("system_args")){
+				// Assign system option args
+				let options = <SystemArgs>args.args["system_args"];
 
-		if(checkOptionsFailure(options)){
-			// Call a dummy superconstructor
-			super({
-				systemContext: args.systemContext,
-				args: null
-			});
+				// Check options failure
+				if(!checkOptionsFailure(options)){
+					let vars:OptionsInterface = {
+						...options,
+						...<OptionsVars>args.vars
+					};
 
-			// Report an error
-			throw new LoaderError("system_options_failure", "The options provided to the system constructor are inconsistent.");
-		} else {
-			// Call superclass constructor
-			super({
-				systemContext: args.systemContext,
-				args: options
-			});
+					// Call superclass constructor
+					super({
+						systemContext: args.systemContext,
+						args: null,
+						vars
+					});
+
+					// Terminate function execution
+					return;
+				}
+			}
 		}
+
+		// Call superconstructor with dummy arguments
+		super({
+			systemContext: args.systemContext,
+			args: null,
+			vars: null
+		});
+
+		// Report an error
+		throw new LoaderError("system_options_failure", "The options provided to the system constructor are inconsistent.");
 	}
 }
 
 /**
  * Checks options argument for missing incorrect property types
- * @param {module:system~System~options} options System options argument
+ * @param {module:system~System~SystemArgs} options System options argument
  * @returns {boolean} Returns true if the arguments is corrupt; false if OK
  * @example <caption>Usage</caption>
  * var options = {
@@ -56,7 +69,7 @@ export default class Options extends Info{
 *   throw new Error ("Options inconsistent.");
 * }
 */
-function checkOptionsFailure(options:OptionsInterface){
+function checkOptionsFailure(options:SystemArgs){
 	let failed = false;
 
 	if(options){

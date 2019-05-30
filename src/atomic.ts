@@ -1,92 +1,75 @@
-// src/atomic.ts
-/*
-	Atomic operations.
-*/
+// File: src/atomic.ts
+/**
+ * Atomic operations.
+ */
+
+import {Resolve} from "./system"; /* eslint-disable-line no-unused-vars */// ESLint type import detection bug
 
 /**
  * Creates an instance of AtomicLock.
- *
- * Single thread only, queue present.d
- * @memberof module:system
+ * Single thread only, queue present.
  */
-export class AtomicLock {
-	/**
-	 * Indicates the locked/unlocked state.
-	 * @private
-	 * @type {boolean}
-	 */
-	locked:boolean = false;
+export class AtomicLock{
+	/** Counter for current instance in queue. */
+	private count: number = 0;
 
-	/**
-	 * Counter for current amount of instances in a queue.
-	 * @private
-	 * @type {number}
-	 */
-	maxCount:number = 0;
+	/** Indicates the locked/unlocked state. */
+	private locked: boolean = false;
 
-	/**
-	 * Counter for current instance in queue.
-	 * @private
-	 * @type {number}
-	 */
-	count:number = 0;
-
-	/**
-	 * Creates an instance of AtomicLock.
-	 * Does not take any arguments or return any values.
-	 */
-	constructor(){} /* eslint-disable-line no-useless-constructor *//* eslint-disable-line no-empty-function */// Not needed to instantiate
+	/** Counter for current amount of instances in a queue. */
+	private maxCount: number = 0;
 
 	/**
 	 * Lock an atomic lock.
-	 * @returns {external:Promise} Resolves when lock succeeds
-	 * @example <caption>Usage</caption>
+	 *
+	 * **Usage**
+	 *
+	 * ```typescript
 	 * // Lock
 	 * exampleAtomicLock.lock();
+	 * ```
+	 * @returns Resolves when lock succeeds
 	 */
-	lock():Promise<void>{
-		/**
-		 * Function to increment the counters in an safe manner
-		 */
-		function increment(counter:number):number{
+	public async lock(): Promise<void>{
+		// Assign current queue counter
+		var count: number = this.maxCount;
+
+		/** Function to increment the counters in an safe manner. */
+		function increment(counter: number): number{
 			return counter === Number.MAX_SAFE_INTEGER ? 0 : counter + 1;
 		}
-
-		// Assign current queue counter
-		var count:number = this.maxCount;
 
 		// Increment max counter
 		this.maxCount = increment(this.maxCount);
 
-		return (async ():Promise<void> => {
-			while(true){ /* eslint-disable-line no-constant-condition */// <== Necessary to achieve the exclusive functionality
-				if(this.locked){
-					let timeout = new Promise(function(resolve){
-						setImmediate(function(){
-							resolve();
-						});
+		while(true){ /* eslint-disable-line no-constant-condition */// Necessary to achieve the exclusive functionality
+			if(this.locked){
+				await new Promise(function(resolve: Resolve): void{ /* eslint-disable-line no-await-in-loop */// The purpose of this file is to execute this line
+					setImmediate(function(): void{
+						resolve();
 					});
-					await timeout;
-				} else if (count === this.count){
-					// Lock
-					this.locked = true;
+				});
+			} else if (count === this.count){
+				// Lock
+				this.locked = true;
 
-					// Increment next unlock counter
-					this.count = increment(this.count);
+				// Increment next unlock counter
+				this.count = increment(this.count);
 
-					return;
-				}
+				return;
 			}
-		})();
+		}
 	}
 
 	/**
 	 * Release atomic lock
-	 * @example <caption>Usage</caption>
+	 *
+	 * **Usage**
+	 *
 	 * // Release
 	 * exampleAtomicLock.release();
 	 */
-	release():void{
+	public release(): void{
 		this.locked = false;
 	}
 }

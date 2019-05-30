@@ -1,48 +1,47 @@
 // src/loader.ts
-/*
-	Contains methods necessary to initialize the system and work with file system.
-*/
-"use strict";
-
-const path = require("path");
-const fs   = require("fs");
-const yaml = require("js-yaml");
-const loaderError = require("./loaderError.js");
+/**
+ * Contains methods necessary to initialize the system and work with file system.
+ */
+import * as fs from "fs";
+import * as path from "path";
+import * as yaml from "js-yaml";
+import {LoaderError} from "./loaderError";
 
 /**
- * Required by system to perform file initialization.
- * @inner
- * @memberof module:system
+ * Constructor callback.
+ * @param done Fullfills when constructor finishes execution
  */
+export type ConstructorCallback = (done:Promise<void>) => void;
+
+/** Required by system to perform file initialization. */
 export class Loader{
 	/**
-	 * @param {string} rootDir Absolute root directory.
-	 * @param {string} relativeInitDir Relative path to root.
-	 * @param {string} initFilename Filename.
-	 * @param {function} callback Callback to call with Promise of completion.
-	 * @throws Will rethrow errors from initRecursion
+	 * @param rootDir Absolute root directory.
+	 * @param relativeInitDir Relative path to root.
+	 * @param initFilename Filename.
+	 * @param callback Callback to call with Promise of completion.
+	 * @throws [[LoaderError]] Will throw `unexpected_constructor`
 	 */
-	constructor(rootDir, arg_relativeInitDir, arg_initFilename, callback){
-		/**
-		 * A dummy constructor.
-		 */
+	constructor(rootDir:string, arg_relativeInitDir:string, arg_initFilename:string, callback:ConstructorCallback){
+		/** A dummy constructor. */
 		function dummyConstructor(){}/* eslint-disable-line no-empty-function */// Empty because dummy
-		/**
-		 * The standard constructor.
-		 */
+
+		/** The standard constructor. */
 		var standardConstructor = () => {
 			// Initialization recursion; The error handling of the callback will happen asynchronously
 			callback(initRecursion(rootDir, arg_relativeInitDir, arg_initFilename, this, true));
 		};
+
 		// Determine which constructor to use.
-		let previousIsNull = null;
+		let previousIsNull: boolean | null = null;
 		for (var a = 0; a < arguments.length; a++){
 			if (a === 0){
 				previousIsNull = arguments[a] === null; /* eslint-disable-line prefer-rest-params */
 			} else if (previousIsNull !== (arguments[a] === null)){ /* eslint-disable-line prefer-rest-params */
-				throw new loaderError.LoaderError("unexpected_constructor", "Null and String arguments found while deciding the constructor method.");
+				throw new LoaderError("unexpected_constructor", "Null and String arguments found while deciding the constructor method.");
 			}
 		}
+
 		/*
 			Call the appropriate constructor.
 			The execution path for neither true, false or null is removed, since there is no way to reach it.
@@ -57,11 +56,10 @@ export class Loader{
 
 	/**
 	 * Gets file contents.
-	 * @param {string} rootDir Absolute root directory.
-	 * @param {string} relativeDir Directory relative to root.
-	 * @param {string} file Full file name.
-	 * @returns {external:Promise} File contents.
-	 * @example <caption>Usage</caption>
+	 *
+	 * **Usage**
+	 *
+	 * ```typescript
 	 * // Load files
 	 * var grapefruitJuicer = Loader.getFile("c:\machines", "appliances", "grapefruitJuicer.txt");
 	 *
@@ -77,8 +75,13 @@ export class Loader{
 	 *
 	 * // Output
 	 * // 1000W powerful juicer
+	 * ```
+	 * @param rootDir Absolute root directory.
+	 * @param relativeDir Directory relative to root.
+	 * @param file Full file name.
+	 * @returns File contents.
 	 */
-	static getFile(rootDir, relativeDir, file){
+	static getFile(rootDir:string, relativeDir:string, file:string):Promise<Buffer>{
 		return new Promise(function(resolve, reject){
 			fs.readFile(path.join(rootDir, relativeDir, file), function(err, data){
 				if (err){
@@ -92,19 +95,23 @@ export class Loader{
 
 	/**
 	 * Extracts relative path from rootDir to target.
-	 * @param {string} dir Source folder.
-	 * @param {string|string[]} target File/folder name|names.
-	 * @returns {string|string[]} Relative path|paths.
-	 * @example <caption>Usage</caption>
+	 *
+	 * **Usage**
+	 *
+	 * ```typescript
 	 * // Convert path and output the result
 	 * console.log(Loader.toRelative("c:\machines\refrigerators", "c:\machines\appliances"));
 	 *
 	 * // Output
 	 * // ..\appliances
+	 * ```
+	 * @param dir Source folder.
+	 * @param target File/folder name|names.
+	 * @returns Relative path|paths.
 	 */
-	static toRelative(dir, target){
+	static toRelative(dir: string, target: string | Array<string>): string | Array<string>{
 		if (Array.isArray(target)){
-			var targets = new Array(); // Prepare the return array
+			let targets: Array<string> = new Array(); // Prepare the return array
 
 			// Populate return array
 			target.forEach(function(_target){
@@ -120,22 +127,26 @@ export class Loader{
 
 	/**
 	 * Join a root directory with a file/folder or an array of files/folders to absolute path.
-	 * @param {...string|string[]} pathArrays File/folder name|names.
-	 * @returns {string|string[]} Absolute path|paths.
-	 * @example <caption>Usage</caption>
+	 *
+	 * **Usage**
+	 *
+	 * ```typescript
 	 * // Join and log result
 	 * console.log(Loader.join("c:\machines", "appliances"))
 	 *
 	 * // Output
 	 * // c:\machines\appliances
+	 * ```
+	 * @param pathArrays File/folder name|names.
+	 * @returns Absolute path|paths.
 	 */
-	static join(...pathArrays){
+	static join(...pathArrays: Array<string | Array<string>>): string | Array<string>{
 		// Determine maximum pathArray length & construct metadata
-		var maxLength = 0;
-		var arraysMeta = new Array();
+		var maxLength: number = 0;
+		var arraysMeta: Array<{isArray: boolean, length:number}> = new Array();
 		pathArrays.forEach(function(pathArray){
-			let isArray = Array.isArray(pathArray);
-			let length = isArray ? pathArray.length : 1;
+			let isArray: boolean = Array.isArray(pathArray);
+			let length: number = isArray ? pathArray.length : 1;
 
 			// Populate arrays array
 			arraysMeta.push({
@@ -155,19 +166,19 @@ export class Loader{
 		}
 
 		// Loop
-		let filter = arraysMeta.filter(function(array){
+		let filter: Array<{isArray: boolean, length:number}> = arraysMeta.filter(function(array){
 			return array.isArray;
 		});
 		if(filter.length === 0){
 			// Return a string if no arrays
-			return path.join(...pathArrays);
+			return path.join(...<Array<string>>pathArrays); // Casting due to inability of compiler to detect that there are no other types possible
 		} else { // In case of arrays present
-			var results = new Array(); // Prepare the return array
+			var results: Array<string> = new Array(); // Prepare the return array
 			for(let i = 0; i < maxLength; i++){
-				let joinData = new Array();
+				let joinData: Array<string> = new Array();
 				pathArrays.forEach(function(pathArray, index){
-					let toPush = null;
-					let {length} = arraysMeta[index];
+					let toPush: string | null = null;
+					let {length}: {isArray: boolean, length: number} = arraysMeta[index];
 					if(arraysMeta[index].isArray){
 						if(length < i + 1){
 							if(length > 0){
@@ -177,7 +188,7 @@ export class Loader{
 							toPush = pathArray[i];
 						}
 					} else {
-						toPush = pathArray;
+						toPush = <string>pathArray; // Casting due to inability of compiler to detect that there are no other types possible
 					}
 					if(toPush !== null){
 						joinData.push(toPush);
@@ -191,9 +202,10 @@ export class Loader{
 
 	/**
 	 * Checks if is a file
-	 * @param {string} rawPath Full filepath.
-	 * @returns {external:Promise} Returns `true` if a file, `false` if not.
-	 * @example <caption>Usage</caption>
+	 *
+	 * **Usage**
+	 *
+	 * ```typescript
 	 * // Verify file
 	 * Loader.isFile("c:\machines\appliances\grapefruitJuicer.txt").then(function(result){
 	 *   console.log(result);
@@ -204,8 +216,11 @@ export class Loader{
 	 *
 	 * // Output
 	 * // true
+	 * ```
+	 * @param rawPath Full filepath.
+	 * @returns Returns `true` if a file, `false` if not.
 	 */
-	static isFile(rawPath){
+	static isFile(rawPath: string): Promise<boolean>{
 		return new Promise(function(resolve){
 			fs.stat(rawPath, function(err, stats){
 				if (err){
@@ -219,10 +234,10 @@ export class Loader{
 
 	/**
 	 * Checks if is a directory.
-	 * @param {string} rootDir Absolute root directory.
-	 * @param {string} relativeDir Relative directory to root.
-	 * @returns {external:Promise} Returns `true` if a directory, `false` if not.
-	 * @example <caption>Usage</caption>
+	 *
+	 * **Usage**
+	 *
+	 * ```typescript
 	 * // Verify directory
 	 * Loader.isDir("c:\machines\appliances","grapefruitJuicer.txt").then(function(result){
 	 *   console.log(result);
@@ -233,8 +248,12 @@ export class Loader{
 	 *
 	 * // Output
 	 * // false
+	 * ```
+	 * @param rootDir Absolute root directory.
+	 * @param relativeDir Relative directory to root.
+	 * @returns Returns `true` if a directory, `false` if not.
 	 */
-	static isDir(rootDir, relativeDir){
+	static isDir(rootDir:string, relativeDir:string):Promise<boolean>{
 		return new Promise(function(resolve){
 			fs.stat(path.join(rootDir, relativeDir), function(err, stats){
 				if (err){
@@ -248,10 +267,10 @@ export class Loader{
 
 	/**
 	 * Returns an array of strings, representing the contents of a folder.
-	 * @param {string} rootDir Root directory.
-	 * @param {string} relativeDir Relative directory.
-	 * @returns {external:Promise} Array with contents; Rejects with errors from [fs.readdir](https://nodejs.org/api/fs.html#fs_fs_readdir_path_options_callback).
-	 * @example <caption>Usage</caption>
+	 *
+	 * **Usage**
+	 *
+	 * ```typescript
 	 * // List directory contents
 	 * Loader.list("c:","machines").then(function(result){
 	 *   console.log(result);
@@ -261,8 +280,12 @@ export class Loader{
 	 *
 	 * // Output
 	 * // ["machines", "appliances"]
+	 * ```
+	 * @param rootDir Root directory.
+	 * @param relativeDir Relative directory.
+	 * @returns Array with contents; Rejects with errors from [fs.readdir](https://nodejs.org/api/fs.html#fs_fs_readdir_path_options_callback).
 	 */
-	static list(rootDir, relativeDir){
+	static list(rootDir: string, relativeDir: string): Promise<Array<string>>{
 		return new Promise(function(resolve, reject){
 			fs.readdir(path.join(rootDir, relativeDir), function(err, files){
 				if (err){
@@ -276,16 +299,20 @@ export class Loader{
 
 	/**
 	 * Converts YAML string to a JS object.
-	 * @param {string} string YAML string.
-	 * @returns {Object} Javascript object.
-	 * @example <caption>Usage</caption>
+	 *
+	 *  **Usage**
+	 *
+	 * ```typescript
 	 * // Ouput conversion of YAML to JSON
 	 * console.log(Loader.yamlToObject("Wine: Red"));
 	 *
 	 * // Output
 	 * // {"Wine": "Red"}
+	 * ```
+	 * @param string YAML string.
+	 * @returns Javascript object.
 	 */
-	static yamlToObject(string){
+	static yamlToObject(string: string):any{
 		return yaml.load(string);
 	}
 }
@@ -293,51 +320,69 @@ export class Loader{
 /**
  * System loader recursion.
  *
- * Note:
+ * **Note**
  *
  * - Default values are assumed for unspecified or empty values.
  * - Extension means recursive loading of data into variable, as if loading a new file into the current variable as new system.
  * - Relative path is relative to the directory location of current file.
- * @inner
- * @memberof module:system~Loader
- * @param {string} rootDir Root directory.
- * @param {Object} relativePath Relative path.
- * @param {string} initFilename Filename for settings.
- * @param {Object} targetObject Object to be filled.
- * @param {boolean} extend Extend the children objects or not.
- * @returns {external:Promise}
- * @throws Will throw an error if the directive is not an allowed one (folder, file, path, extend).
- * @example <caption>Default filename - null</caption> @lang yaml
+ *
+ *  **Default filename - null**
+ *
+ * ```yaml
  * # Variable settings to be populated with data from "system_root_dir/settings.yml"
  * settings: # Defaults to "settings"
- * @example <caption>Default filename - empty string</caption> @lang yaml
+ * ```
+ *
+ * **Default filename - empty string**
+ *
+ * ```yaml
  * # Variable settings to be populated with data from "system_root_dir/settings.yml"
  * settings: "" # Defaults to "settings"
- * @example <caption>Specified filename</caption> @lang yaml
+ * ```
+ *
+ * **Specified filename**
+ *
+ * ```yaml
  * # Variable settings to be populated with data from "system_root_dir/xxx.yml"
  * settings: "xxx"
- * @example <caption>Default values</caption> @lang yaml
+ * ```
+ *
+ * **Default values**
+ *
+ * ```yaml
  * # Variable settings to be populated with data from "system_root_dir/settings.yml"
  * settings:
  *   folder: # Defaults to "./"
  *   file: # Defaults to "settings"
  *   path: # Defaults to "absolute"
  *   extend: # Defaults to "false"
- * @example <caption>Specified values</caption> @lang yaml
+ * ```
+ *
+ * **Specified values**
+ *
+ * ```yaml
  * # Variable settings to be populated with data from "current_dir/hello/xxx.yml"
  * settings:
  *   folder: "hello"
  *   file: xxx
  *   path: relative
  *   extend: false
- * @example <caption>Extension</caption> @lang yaml
+ * ```
+ *
+ * **Extension**
+ *
+ * ```yaml
  * # Variable settings to be populated **recursively** with data from "current_dir/hello/xxx.yml"
  * settings:
  *   folder: "hello"
  *   file: xxx
  *   path: relative
  *   extend: true
- * @example <caption>Usage</caption>
+ * ```
+ *
+ * **Usage**
+ *
+ * ```typescript
  * // Input - ./settings/init.yml
  * // settings:
  * //   path: relative
@@ -350,13 +395,20 @@ export class Loader{
  * var targetObject = {};
  *
  * initRecursion("./", "settings", "init.yml", targetObject, true));
+ * ```
+ * @param rootDir Root directory.
+ * @param relativePath Relative path.
+ * @param initFilename Filename for settings.
+ * @param targetObject Object to be filled.
+ * @param extend Extend the children objects or not.
+ * @throws [[Error]] Will throw an error if the directive is not an allowed one (folder, file, path, extend).
  */
 async function initRecursion(
-	rootDir,
-	relativePath,
-	initFilename,
-	targetObject,
-	extend
+	rootDir: string,
+	relativePath: string,
+	initFilename: string,
+	targetObject:any,
+	extend: boolean
 ){
 	// Initialize the initialization file
 	let init = await initSettings(rootDir, relativePath, initFilename);
@@ -368,10 +420,10 @@ async function initRecursion(
 
 	// Initialize files
 	for (var key in init) {
-		let folder = relativePath,
-			file = key,
-			pathIsAbsolute = true,
-			extend = false;
+		let folder: string = relativePath,
+			file: string = key,
+			pathIsAbsolute: boolean = true,
+			extend: boolean = false;
 		switch (typeof init[key]){
 			case "string": {
 				if (init[key] != ""){
@@ -383,7 +435,7 @@ async function initRecursion(
 			case "object": {
 				if(init[key] !== null){ // Custom properties
 					// Check if property is set or assume default
-					let checkDefaultStringDirective = function (property) {
+					let checkDefaultStringDirective: (property: string) => boolean = function (property) {
 						if (init[key].hasOwnProperty(property)){
 							if ((typeof init[key][property]) === "string"){
 								if (init[key][property] != "") {
@@ -394,7 +446,7 @@ async function initRecursion(
 						return false;
 					}
 
-					let checkDefaultBooleanDirective = function (property) {
+					let checkDefaultBooleanDirective: (property: string) => boolean = function (property) {
 						if (init[key].hasOwnProperty(property)){
 							if ((typeof init[key][property]) === "boolean"){
 								return true;
@@ -440,25 +492,26 @@ async function initRecursion(
 /**
  * Init and populate globalspace with settings - specific global object member per file.
  * Semantically this function has broader purpose than loadYaml.
- * @inner
- * @memberof module:system~Loader
- * @param {string} rootDir Root directory.
- * @param {string} initPath Relative directory to root.
- * @param {string} filename Filename.
- * @returns {Object} Javascript object with settings.
- * @example <caption>Usage</caption>
+ *
+ * **Usage**
+ *
+ * ```typescript
  * var settings = await initSettings("./", "settings", "settings");
+ * ```
+ * @param rootDir Root directory.
+ * @param initPath Relative directory to root.
+ * @param filename Filename.
+ * @returns Javascript object with settings.
  */
 async function initSettings(
-	rootDir,
-	relativeDir,
-	filename // Filename, without extention; If null, then varname will be used instead
+	rootDir: string,
+	relativeDir: string,
+	filename: string // Filename, without extention; If null, then varname will be used instead
 ){
     try {
         // Set the global object from an argument of varname to data from YAML file with path constructed from varname; or filename, if filename provided
         return await loadYaml(rootDir, relativeDir, filename);
     } catch (err) {
-        console.error("Critical file not loaded - " + filename);
         // Error thrown for now. Because the caller handling of the systemErrorLevel variable does not exist yet.
         throw(err);
     }
@@ -466,17 +519,19 @@ async function initSettings(
 
 /**
  * Parses YAML file, and returns and object; Adds extension if absent.
- * @inner
- * @memberof module:system~Loader
- * @param {string} rootDir Absolute directory path.
- * @param {string} relativeDir Relative directory to root.
- * @param {string} filename Filename, with or without extension.
- * @returns {external:Promise} Javascript object.
- * @example <caption>Usage</caption>
+ *
+ * **Usage**
+ *
+ * ```typescript
  * var settings = await loadYaml("./", "settings", "settings");
+ * ```
+ * @param rootDir Absolute directory path.
+ * @param relativeDir Relative directory to root.
+ * @param filename Filename, with or without extension.
+ * @returns Javascript object.
  */
-async function loadYaml(rootDir, relativeDir, filename){
-	var fileExtension = ".yml"; // Making a variale for interpreted language like this would not even save any memory, but it feels right
+async function loadYaml(rootDir: string, relativeDir: string, filename: string){
+	var fileExtension: string = ".yml"; // Making a variale for interpreted language like this would not even save any memory, but it feels right
 
 	// Add file extension if absent
 	if(!filename.endsWith(fileExtension)){
@@ -485,16 +540,9 @@ async function loadYaml(rootDir, relativeDir, filename){
 
 	// Try to read the file contents and retuen them; If we fail, we log filename to error stream, and rethrow the error
 	try {
-		var contents = await Loader.getFile(rootDir, relativeDir, filename);
-		return yaml.load(contents);
+		var contents: Buffer = await Loader.getFile(rootDir, relativeDir, filename);
+		return yaml.load(contents.toString());
 	} catch (err) {
-		// Prints path of problem filename
-		console.error("Could not open: " + filename);
 		throw(err);
 	}
 }
-
-module.exports = {
-	Loader,
-	loadYaml
-};

@@ -1,56 +1,50 @@
-// src/behaviors.ts
-/*
-	Manages system behaviors.
-*/
+// File: src/behaviors.ts
+/**
+ * Manages system behaviors.
+ */
 import {AtomicLock} from "./atomic";
 import {EventEmitter} from "events";
-export const behaviorCreationError:string = "behavior_creation_error";
+import {System} from "./system";
 
-/* Behavior index type for behaviorId and behaviorIndex class members. Choosing not to document, as it seems unnecessary. */
+/** Behavior creation error, returned by [[Behavior.addBehavior]]. */
+export const behaviorCreationError: string = "behavior_creation_error";
+
+/**
+ * System behavior - an object, with a property where key is the name of the behavior, and value is the function, taking a system context as an argument.
+ *
+ * **Behavior - argument outline**
+ *
+ * ```typescript
+ *  amazing_behavior: (that) => {
+ *   // Process system instance on "amazing_behavior"
+ *   amazingProcessor(that);
+ * }
+ * ```
+ */
+export interface BehaviorInterface{
+	(that: System): void;
+}
+
+/** Behavior index type for behaviorId and behaviorIndex class members. */
 type BehaviorIndex = {
 	[key: string]: Array<string>;
 };
 
-/**
- * System behavior class
- * @inner
- * @memberof module:system
- * @extends external:EventEmitter
- */
+/** System behavior class. */
 export class Behavior extends EventEmitter{
-	/**
-	 * Atomic lock to perform counter increments
-	 * @private
-	 * @type {module:system.AtomicLock}
-	 */
+	/** Atomic lock to perform counter increments. */
 	atomicLock: AtomicLock;
 
-	/**
-	 * IDs to use as actual event identifiers
-	 * @private
-	 * @type {Object}
-	 */
+	/** IDs to use as actual event identifiers. */
 	behaviorId: BehaviorIndex;
 
-	// behaviorId = { name:new array}
-
-	/**
-	 * Index to link id's back to behavior names
-	 * @private
-	 * @type {string[]}
-	 */
+	/** Index to link id's back to behavior names. */
 	behaviorIndex: BehaviorIndex;
 
-	/**
-	 * Counter to use to generate IDs
-	 * @private
-	 * @type {number}
-	 */
+	/** Counter to use to generate IDs. */
 	nextBehaviorCounter: number = 0;
 
-	/**
-	 * Initializes system behavior
-	 */
+	/** Initializes system behavior. */
 	constructor(){
 		// Call superclass's constructor
 		super();
@@ -64,18 +58,22 @@ export class Behavior extends EventEmitter{
 	/**
 	 * Adds a behavior to the behavior class instance.
 	 *
-	 * Note:
+	 * **Note**
 	 *
 	 * Does not check for inconsistencies within ID and index arrays, as if it is internally managed by this class, inconsistencies should not happen.
-	 * @param {string} name Name of the bahavior
-	 * @param {function} callback Behavior callback function
-	 * @return {string} ID of the behavior; `behaviorCreationError` if creation failed
-	 * @example <caption>Usage</caption>
+	 *
+	 * **Usage**
+	 *
+	 * ```typescript
 	 * // Create a new instance of Behavior
 	 * var behavior = new Behavior();
 	 *
 	 * // Add a behavior
 	 * behavior.addBehavior("hello_behavior", () => console.log("Hello World"));
+	 * ```
+	 * @param name Name of the bahavior
+	 * @param callback Behavior callback function
+	 * @returns ID of the behavior; `behaviorCreationError` if creation failed
 	 */
 	async addBehavior(name: string, callback: Function): Promise<string>{
 		if(typeof name === "string"){ // Name must be string
@@ -111,9 +109,11 @@ export class Behavior extends EventEmitter{
 	}
 
 	/**
-	 * Triggers behaviors registered for name
-	 * @param {string} name Behavior name
-	 * @example <caption>Usage</caption>
+	 * Triggers behaviors registered for name.
+	 *
+	 * **Usage**
+	 *
+	 * ```typescript
 	 * // Create a new instance of Behavior
 	 * var behavior = new Behavior();
 	 *
@@ -125,6 +125,8 @@ export class Behavior extends EventEmitter{
 	 *
 	 * // Output:
 	 * // "Hello World"
+	 * ```
+	 * @param name Behavior name
 	 */
 	behave(name: string): void{
 		if(typeof name === "string"){

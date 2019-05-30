@@ -4,15 +4,16 @@
 */
 import {AtomicLock} from "./atomic";
 import {System} from "./system"; /* eslint-disable-line no-unused-vars */// ESLint type import detection bug
-/**
- * Interface for subsystem constructor data exchange.
- * @typedef ConstructorArgs
- * @property {module:system.System} systemContext Context of a parent system.
- * @property {Object} args Arbitrary arguments.
- */
+
+/** Interface for subsystem constructor data exchange. */
 export interface ConstructorArgs{
-	systemContext:System;
-	args:any;
+	/** Context of a parent system. */
+	systemContext: System;
+	args: null | {
+		system_args?: any
+	};
+	/** Arbitrary arguments from a file. */
+	vars: any;
 };/* eslint-disable-line no-extra-semi */// ESLint inteface no-extra-semi bug
 
 /**
