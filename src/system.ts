@@ -6,12 +6,13 @@
 
 // Imports
 import * as events from "./events";
+import {Behavior, BehaviorInterface} from "./behavior"; /* eslint-disable-line no-unused-vars */// ESLint type import detection bug
 import {AtomicLock} from "./atomic";
-import {Behavior, BehaviorInterface} from "./behavior";
-import {SystemError} from "./error";
 import {Loader} from "./loader"; // Auxiliary system lib
 import {LoaderError} from "./loaderError";
-import {OptionsInterface} from "./subsystems/system.info.options";
+import {OptionsInterface} from "./subsystems/system.info.options"; /* eslint-disable-line no-unused-vars */// ESLint type import detection bug
+import {Subsystem} from "./subsystem"; /* eslint-disable-line no-unused-vars */// ESLint type import detection bug
+import {SystemError} from "./error";
 
 // Re-export
 export {AtomicLock};
@@ -53,7 +54,6 @@ export interface Filter{
 	(filterContext: FilterContext): Promise<boolean>;
 }
 
-
 /** Filter context. */
 type FilterContext = {
 	/** Parent directory of the filtered item. */
@@ -81,13 +81,26 @@ export class System extends Loader{
 		behavior: Behavior;
 
 		/** Actual errors are located here. */
-		error: Object;
+		error: {
+			[key: string]: SystemError;
+		};
 
 		/** File system methods. */
 		file: {
 			/** File cache. */
-			cache: Object;
-			files: Array<Object>;
+			cache: {
+				/** Array of actual files and reverse indices pointing from files to index */
+				files: Array<{rIndex: string}>;
+
+				/** Index pointing to files */
+				index: {
+					pathToFile: {
+						cacheTtl: number;
+						expires: number;
+						file: Buffer;
+					};
+				};
+			};
 
 			/** Filters */
 			filter: {
@@ -97,7 +110,18 @@ export class System extends Loader{
 				/** Check if argument is a file (relative to system root directory). */
 				isFile: Filter;
 			};
+
 			/**
+			 * // TODO: Switch to proper function
+			 * Joins two paths.
+			 * @param rootDir Relative (to system root) directory.
+			 * @param target File/folder path to rootDir.
+			 * @returns Promise, containing string path.
+			 */
+			join: (dir: string | Array<string>, file: string | Array<string>) => Promise<string | Array<string>>;
+
+			/**
+			 * // TODO: Switch to proper function
 			 * Converts a file path to absolute operating system path. Used for external libraries, that require absolute path.
 			 * @param dir Relative directory to the root directory..
 			 * @param file Folder/file name.
@@ -106,20 +130,13 @@ export class System extends Loader{
 			toAbsolute: (dir: string, file: string) => Promise<string>;
 
 			/**
+			 * // TODO: Switch to proper function
 			 * Converts absolute path to relative path.
 			 * @param rootDir Relative (to system root) directory.
 			 * @param target Absolute (to system root) file/folder path.
 			 * @returns Promise, containing string relative path.
 			 */
 			toRelative: (dir: string, file: string) => Promise<string>;
-
-			/**
-			 * Joins two paths.
-			 * @param rootDir Relative (to system root) directory.
-			 * @param target File/folder path to rootDir.
-			 * @returns Promise, containing string path.
-			 */
-			join: (dir: string | Array<string>, file: string | Array<string>) => Promise<string | Array<string>>;
 		};
 		id: string;
 		initFilename: string;
@@ -139,7 +156,7 @@ export class System extends Loader{
 	 * @param behaviors - Behaviors to add.
 	 * @param onError - Callback for error handling during delayed execution after loader has loaded. Takes error string as an argument.
 	 */
-	public constructor(options: OptionsInterface, behaviors: BehaviorInterface, onError: ErrorCallback | null){
+	public constructor(options: OptionsInterface, behaviors: BehaviorInterface, onError: ErrorCallback | null){ /* eslint-disable-line constructor-super */// Rule bugs out
 		/**
 		 * Process the loader error.
 		 * Due to the design of the System constructor, this is supposed to be called only once during the constructor execution, no matter the failure.
@@ -147,296 +164,9 @@ export class System extends Loader{
 		 * Currently there is no way to produce "other_error"; But the functionality will remain for the possibility of such error thrown with future functionality.
 		 */
 		function processLoaderError(error: LoaderError): void{
-			if(typeof onError === "function"){
-				if(onError){
-					onError(error instanceof LoaderError ? error : new LoaderError("other_error", "Other error in System constructor has been rethrown as Loader Error."));
-				}
+			if(typeof onError === "function"){ // Implied that it is not null
+				onError(error instanceof LoaderError ? error : new LoaderError("other_error", "Other error in System constructor has been rethrown as Loader Error."));
 			}
-		}
-
-		// Performs the static initialization part of the instance, during superclass constructor execution, so must not depend on it.
-		var staticInitialization: Executor = (resolve: Resolve): void => {
-			// System constants
-			this.system = {
-				id: options.id,
-				rootDir: options.rootDir,
-				relativeInitDir: options.relativeInitDir,
-				initFilename: options.initFilename,
-				logging: options.logging
-			};
-
-			/**
-			 * Actual subsystems are located here.
-			 * @type {module:system~AtomicLock}
-			 */
-			this.system.subsystem = new Object();
-
-			/**
-			 * Actual behaviors are located here.
-			 * @type {module:system~Behavior}
-			 */
-			this.system.behavior = new Behavior();
-			/**
-			 * Actual errors are located here.
-			 * @abstract
-			 * @type {Object}
-			 */
-			this.system.error = new Object();
-
-			/**
-			 * File system methods.
-			 * @type {Object}
-			 */
-			this.system.file = {
-				/**
-				 * File cache.
-				 * @type {Object}
-				 */
-				cache: {
-					index: {}, // Index pointing to files
-					files: [] // Array of actual files and reverse indices pointing from files to index
-				},
-				/**
-				 * File level filters.
-				 * @type {Object}
-				 */
-				filter: {
-					/**
-					 * Check if argument is a file (relative to system root directory).
-					 * @function
-					 * @param {module:system.System~filterContext} filterContext Information on the item to be filtered.
-					 * @returns {external:Promise} Promise, containing boolean result.
-					*/
-					isFile: filterContext => Loader.isFile(Loader.join(this.system.rootDir, Loader.join(filterContext.dir, filterContext.itemName))),
-					/**
-					 * Check if argument is a folder (relative to system root directory).
-					 * @function
-					 * @param {module:system.System~filterContext} filterContext Information on the item to be filtered
-					 * @returns {external:Promise} Promise, containing boolean result.
-					*/
-					isDir: filterContext => Loader.isDir(this.system.rootDir, filterContext.item)
-				},
-				/**
-				 * Converts a file path to absolute operating system path. Used for external libraries, that require absolute path.
-				 * @async
-				 * @function
-				 * @param {string} dir Relative directory to the root directory..
-				 * @param {string} file Folder/file name.
-				 * @returns {external:Promise} Promise, containing string relative path.
-				*/
-				toAbsolute: (dir, file) => new Promise(resolve => {
-					let filePath = Loader.join(dir, file);
-					resolve(Loader.join(this.system.rootDir, filePath));
-				}),
-				/**
-				 * Converts absolute path to relative path.
-				 * @async
-				 * @function
-				 * @param {string} rootDir Relative (to system root) directory.
-				 * @param {string} target Absolute (to system root) file/folder path.
-				 * @returns {external:Promise} Promise, containing string relative path.
-				*/
-				toRelative(rootDir, target){
-					return new Promise(function(resolve){
-						resolve(Loader.toRelative(rootDir, target));
-					});
-				},
-				/**
-				 * Joins two paths.
-				 * @async
-				 * @function
-				 * @param {string} rootDir Relative (to system root) directory.
-				 * @param {string} target File/folder path to rootDir.
-				 * @returns {external:Promise} Promise, containing string path.
-				*/
-				join(rootDir, target){
-					return new Promise(function(resolve){
-						resolve(Loader.join(rootDir, target));
-					});
-				},
-				/**
-				 * Get file contents relative to system root directory.
-				 * files = [
-				 *   {
-				 *     file: actual_file,
-				 *     rIndex: {
-				 *       dir: "dirA",
-				 *       file: "fileA"
-				 *     }
-				 *   },
-				 *   {
-				 *     file: actual_file_b,
-				 *     rIndex: {
-				 *       dir: "dirB",
-				 *       file: "fileB"
-				 *     }
-				 *   }
-				 * ]
-				 * index = {
-				 *   "dirA": {
-				 *     "FileA": file_entry_link_a
-				 *   },
-				 *   "dirB": {
-				 *     "FileB": file_entry_link_b
-				 *   }
-				 * }
-				 *
-				 * @async
-				 * @function
-				 * @param {string} dir Directory, relative to system root.
-				 * @param {string} file Filename.
-				 * @returns {external:Promise} Promise, containing string with file contents..
-				*/
-				getFile: async (dir, file, cacheTtl, force) => {
-					// Construct a path
-					var pathToFile = Loader.join(dir, file);
-
-					// Physically getting the file
-					var pGetFile = () => new Promise((resolve, reject) => {
-						Loader.getFile(this.system.rootDir, dir, file).then(function(result){
-							resolve(result);
-						}).catch(error => {
-							// this.fire("file_system_error");
-							reject(this.system.error.file_system_error);
-						});
-					});
-
-					const maxFiles = 100;
-					const defaultCacheTtl = 86400;
-					const milliSecondsInSeconds = 1000;
-
-					// Set cache to default if not provided
-					if(cacheTtl === null){
-						cacheTtl = defaultCacheTtl;
-					}
-					var {index, files} = this.system.file.cache;
-					if(maxFiles > 0){
-						// Find expiration time and current time
-						var currentTimeStamp = Math.trunc(new Date().getTime() / milliSecondsInSeconds);
-						var expirationTimeStamp = currentTimeStamp + cacheTtl;
-
-						// Find if file is cached
-						let cached = false;
-						if(index.hasOwnProperty(pathToFile)){
-								cached = true;
-						}
-
-						// Process for cached
-						if(cached){
-							if (index[pathToFile].cacheTtl === cacheTtl){
-								// If expired; Not expired is anticipated to be the most used path
-								if(currentTimeStamp > index[pathToFile].expires){
-									index[pathToFile].file = await pGetFile();
-									index[pathToFile].expires = expirationTimeStamp;
-								} else if (force){
-									index[pathToFile].file = await pGetFile();
-								}
-							} else { // New ttl
-								if(index[pathToFile].expires > expirationTimeStamp){
-									index[pathToFile].expires = expirationTimeStamp;
-								}
-								index[pathToFile].cacheTtl = cacheTtl;
-								if (force){
-									index[pathToFile].file = await pGetFile();
-								}
-							}
-						} else { // <== if(cached)
-							let nextFile;
-							let filesLength = files.length;
-
-							// Determine index and prepare space
-							if (filesLength >= maxFiles){
-								// Update indices
-								delete index[files[0].rIndex];
-								if(Object.keys(index[files[0].rIndex]).length == 0){
-									delete index[files[0].rIndex];
-								}
-
-								// Shift the array
-								files.shift();
-
-								// Assign next file index
-								nextFile = maxFiles - 1;
-							} else {
-								nextFile = filesLength;
-							}
-
-							// Unshift the array
-							files.unshift({
-								file: await pGetFile(),
-								rIndex: {},
-								expires: expirationTimeStamp,
-								cacheTtl
-							});
-
-							// Add indices
-							index[pathToFile] = files[nextFile];
-							files[nextFile].rIndex = pathToFile;
-						} // <== if(cached) {} else {...}
-						return index[pathToFile].file;
-					} else { // <== if(maxFiles > 0)
-						return await pGetFile();
-					}
-				},
-				/**
-				 * Get contents of yaml file relative to system root directory.
-				 * @async
-				 * @function
-				 * @param {string} dir Directory, relative to system root.
-				 * @param {string} file Filename.
-				 * @returns {external:Promise} Promise, containing string with file contents..
-				*/
-				getYaml: (dir, file) => loader.loadYaml(this.system.rootDir, dir, file),
-				/**
-				 * List the contents of the folder, relative to system root directory.
-				 * @async
-				 * @function
-				 * @param {string} dir Folder relative to system root.
-				 * @param {function} filter Filter function.
-				 * @returns {external:Promise} Promise, containing an array of filtered strings - files/folders relative to system root.
-				 * @example <caption>List folders</caption>
-				 * systemInstance.system.file.list("css", systemInstance.system.file.filter.isDir);
-				 */
-				list: async(dir, filter) => {
-					let filteredItems; // Return array
-					let itemNames = await Loader.list(this.system.rootDir, dir); // Wait for folder contets
-					let items = await this.system.file.join(dir, itemNames);
-
-					// Was the filter even specified?
-					if(filter !== null){
-						filteredItems = new Array(); // Prepare return object
-						let {length} = items; // Cache length
-						let filterMatches = new Array(); // Operations dataholder; Contains Promises
-
-						// Filter and populate promises
-						for (let i = 0; i < length; i++){
-							// Declare and populate filter context
-							var filterContext = {
-								dir,
-								itemName: itemNames[i],
-								item: items[i]
-							};
-							filterMatches[i] = filter(filterContext);
-						}
-
-						// Work on results
-						await Promise.all(filterMatches).then(values => {
-							// Populate return object preserving the order
-							for (let i = 0; i < length; i++){
-								if(values[i]){
-									filteredItems.push(itemNames[i]);
-								}
-							}
-						});
-					} else { // <== if(filter !== null)
-						filteredItems = itemNames;
-					}
-
-					// Finally - return filtered items
-					return filteredItems;
-				} // <== list
-			}; // <== file
-			resolve();
 		}
 
 		try{
@@ -449,11 +179,293 @@ export class System extends Loader{
 				throw new LoaderError("system_options_failure", "The options provided to the system constructor are inconsistent.");
 			} else { // If no failures
 				// First things first, call a loader, if loader has failed, there are no tools to report gracefully, so the errors from there will just go above
-				
+
 				super(options.rootDir, options.relativeInitDir, options.initFilename, load => {
-					load.then(function(){
-						// Promise is there to maintain full concurrency for maintainability, no functionality implied
-						return new Promise(staticInitialization);
+					load.then(() => {
+						// Promise is there to maintain full concurrency for maintainability, no functionality implied; Performs the static initialization part of the instance, during superclass constructor execution, so must not depend on it.
+						return new Promise((resolve: Resolve): void => {
+							// System constants
+							this.system = {
+								id: options.id,
+								rootDir: options.rootDir,
+								relativeInitDir: options.relativeInitDir,
+								initFilename: options.initFilename,
+								logging: options.logging
+							};
+
+							/**
+							 * Actual subsystems are located here.
+							 * @type {module:system~AtomicLock}
+							 */
+							this.system.subsystem = new Object();
+
+							/**
+							 * Actual behaviors are located here.
+							 * @type {module:system~Behavior}
+							 */
+							this.system.behavior = new Behavior();
+							/**
+							 * Actual errors are located here.
+							 * @abstract
+							 * @type {Object}
+							 */
+							this.system.error = new Object();
+				
+							/**
+							 * File system methods.
+							 * @type {Object}
+							 */
+							this.system.file = {
+								/**
+								 * File cache.
+								 * @type {Object}
+								 */
+								cache: {
+									index: {}, // Index pointing to files
+									files: [] // Array of actual files and reverse indices pointing from files to index
+								},
+								/**
+								 * File level filters.
+								 * @type {Object}
+								 */
+								filter: {
+									/**
+									 * Check if argument is a file (relative to system root directory).
+									 * @function
+									 * @param {module:system.System~filterContext} filterContext Information on the item to be filtered.
+									 * @returns {external:Promise} Promise, containing boolean result.
+									*/
+									isFile: filterContext => Loader.isFile(Loader.join(this.system.rootDir, Loader.join(filterContext.dir, filterContext.itemName))),
+									/**
+									 * Check if argument is a folder (relative to system root directory).
+									 * @function
+									 * @param {module:system.System~filterContext} filterContext Information on the item to be filtered
+									 * @returns {external:Promise} Promise, containing boolean result.
+									*/
+									isDir: filterContext => Loader.isDir(this.system.rootDir, filterContext.item)
+								},
+								/**
+								 * Converts a file path to absolute operating system path. Used for external libraries, that require absolute path.
+								 * @async
+								 * @function
+								 * @param {string} dir Relative directory to the root directory..
+								 * @param {string} file Folder/file name.
+								 * @returns {external:Promise} Promise, containing string relative path.
+								*/
+								toAbsolute: (dir, file) => new Promise(resolve => {
+									let filePath = Loader.join(dir, file);
+									resolve(Loader.join(this.system.rootDir, filePath));
+								}),
+								/**
+								 * Converts absolute path to relative path.
+								 * @async
+								 * @function
+								 * @param {string} rootDir Relative (to system root) directory.
+								 * @param {string} target Absolute (to system root) file/folder path.
+								 * @returns {external:Promise} Promise, containing string relative path.
+								*/
+								toRelative(rootDir, target){
+									return new Promise(function(resolve){
+										resolve(Loader.toRelative(rootDir, target));
+									});
+								},
+								/**
+								 * Joins two paths.
+								 * @async
+								 * @function
+								 * @param {string} rootDir Relative (to system root) directory.
+								 * @param {string} target File/folder path to rootDir.
+								 * @returns {external:Promise} Promise, containing string path.
+								*/
+								join(rootDir, target){
+									return new Promise(function(resolve){
+										resolve(Loader.join(rootDir, target));
+									});
+								},
+								/**
+								 * Get file contents relative to system root directory.
+								 * files = [
+								 *   {
+								 *     file: actual_file,
+								 *     rIndex: {
+								 *       dir: "dirA",
+								 *       file: "fileA"
+								 *     }
+								 *   },
+								 *   {
+								 *     file: actual_file_b,
+								 *     rIndex: {
+								 *       dir: "dirB",
+								 *       file: "fileB"
+								 *     }
+								 *   }
+								 * ]
+								 * index = {
+								 *   "dirA": {
+								 *     "FileA": file_entry_link_a
+								 *   },
+								 *   "dirB": {
+								 *     "FileB": file_entry_link_b
+								 *   }
+								 * }
+								 *
+								 * @async
+								 * @function
+								 * @param {string} dir Directory, relative to system root.
+								 * @param {string} file Filename.
+								 * @returns {external:Promise} Promise, containing string with file contents..
+								*/
+								getFile: async (dir, file, cacheTtl, force) => {
+									// Construct a path
+									var pathToFile = Loader.join(dir, file);
+				
+									// Physically getting the file
+									var pGetFile = () => new Promise((resolve, reject) => {
+										Loader.getFile(this.system.rootDir, dir, file).then(function(result){
+											resolve(result);
+										}).catch(error => {
+											// this.fire("file_system_error");
+											reject(this.system.error.file_system_error);
+										});
+									});
+				
+									const maxFiles = 100;
+									const defaultCacheTtl = 86400;
+									const milliSecondsInSeconds = 1000;
+				
+									// Set cache to default if not provided
+									if(cacheTtl === null){
+										cacheTtl = defaultCacheTtl;
+									}
+									var {index, files} = this.system.file.cache;
+									if(maxFiles > 0){
+										// Find expiration time and current time
+										var currentTimeStamp = Math.trunc(new Date().getTime() / milliSecondsInSeconds);
+										var expirationTimeStamp = currentTimeStamp + cacheTtl;
+				
+										// Find if file is cached
+										let cached = false;
+										if(index.hasOwnProperty(pathToFile)){
+												cached = true;
+										}
+				
+										// Process for cached
+										if(cached){
+											if (index[pathToFile].cacheTtl === cacheTtl){
+												// If expired; Not expired is anticipated to be the most used path
+												if(currentTimeStamp > index[pathToFile].expires){
+													index[pathToFile].file = await pGetFile();
+													index[pathToFile].expires = expirationTimeStamp;
+												} else if (force){
+													index[pathToFile].file = await pGetFile();
+												}
+											} else { // New ttl
+												if(index[pathToFile].expires > expirationTimeStamp){
+													index[pathToFile].expires = expirationTimeStamp;
+												}
+												index[pathToFile].cacheTtl = cacheTtl;
+												if (force){
+													index[pathToFile].file = await pGetFile();
+												}
+											}
+										} else { // <== if(cached)
+											let nextFile;
+											let filesLength = files.length;
+				
+											// Determine index and prepare space
+											if (filesLength >= maxFiles){
+												// Update indices
+												delete index[files[0].rIndex];
+												if(Object.keys(index[files[0].rIndex]).length == 0){
+													delete index[files[0].rIndex];
+												}
+				
+												// Shift the array
+												files.shift();
+				
+												// Assign next file index
+												nextFile = maxFiles - 1;
+											} else {
+												nextFile = filesLength;
+											}
+				
+											// Unshift the array
+											files.unshift({
+												file: await pGetFile(),
+												rIndex: {},
+												expires: expirationTimeStamp,
+												cacheTtl
+											});
+				
+											// Add indices
+											index[pathToFile] = files[nextFile];
+											files[nextFile].rIndex = pathToFile;
+										} // <== if(cached) {} else {...}
+										return index[pathToFile].file;
+									} else { // <== if(maxFiles > 0)
+										return await pGetFile();
+									}
+								},
+								/**
+								 * Get contents of yaml file relative to system root directory.
+								 * @async
+								 * @function
+								 * @param {string} dir Directory, relative to system root.
+								 * @param {string} file Filename.
+								 * @returns {external:Promise} Promise, containing string with file contents..
+								*/
+								getYaml: (dir, file) => loader.loadYaml(this.system.rootDir, dir, file),
+								/**
+								 * List the contents of the folder, relative to system root directory.
+								 * @async
+								 * @function
+								 * @param {string} dir Folder relative to system root.
+								 * @param {function} filter Filter function.
+								 * @returns {external:Promise} Promise, containing an array of filtered strings - files/folders relative to system root.
+								 * @example <caption>List folders</caption>
+								 * systemInstance.system.file.list("css", systemInstance.system.file.filter.isDir);
+								 */
+								list: async(dir, filter) => {
+									let filteredItems; // Return array
+									let itemNames = await Loader.list(this.system.rootDir, dir); // Wait for folder contets
+									let items = await this.system.file.join(dir, itemNames);
+				
+									// Was the filter even specified?
+									if(filter !== null){
+										filteredItems = new Array(); // Prepare return object
+										let {length} = items; // Cache length
+										let filterMatches = new Array(); // Operations dataholder; Contains Promises
+				
+										// Filter and populate promises
+										for (let i = 0; i < length; i++){
+											// Declare and populate filter context
+											var filterContext = {
+												dir,
+												itemName: itemNames[i],
+												item: items[i]
+											};
+											filterMatches[i] = filter(filterContext);
+										}
+				
+										// Work on results
+										await Promise.all(filterMatches).then(values => {
+											// Populate return object preserving the order
+											for (let i = 0; i < length; i++){
+												if(values[i]){
+													filteredItems.push(itemNames[i]);
+												}
+											}
+										});
+									} else { // <== if(filter !== null)
+										filteredItems = itemNames;
+									}
+				
+									// Finally - return filtered items
+									return filteredItems;
+								} // <== list
+							}; // <== file
+							resolve();
+						});
 					}).then(() => { // The following is code dependent on full initialization by static system initializer and Loader.
 						try {
 							// Initialize subsystems

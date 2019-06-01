@@ -2,8 +2,8 @@
  * System is intended more than anything, for centralized managment.
  * @module system
  */
-import { AtomicLock } from "./atomic";
 import { BehaviorInterface } from "./behavior";
+import { AtomicLock } from "./atomic";
 import { Loader } from "./loader";
 import { LoaderError } from "./loaderError";
 import { OptionsInterface } from "./subsystems/system.info.options";

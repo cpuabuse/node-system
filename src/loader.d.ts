@@ -13,7 +13,7 @@ export declare class Loader {
      * @param callback Callback to call with Promise of completion.
      * @throws [[LoaderError]] Will throw `unexpected_constructor`
      */
-    constructor(rootDir: string | null, arg_relativeInitDir: string | null, arg_initFilename: string | null, callback: ConstructorCallback | null);
+    constructor(rootDir?: string, arg_relativeInitDir?: string, arg_initFilename?: string, callback?: ConstructorCallback);
     /**
      * Gets file contents.
      *
