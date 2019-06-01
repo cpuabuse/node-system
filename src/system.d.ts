@@ -30,12 +30,29 @@ export interface ErrorCallback {
     (error: LoaderError): void;
 }
 /**
+ * Check if argument is a file or folder (relative to system root directory), or any other filter.
+ * @param filterContext Information on the item to be filtered.
+ * @returns Promise, containing boolean result.
+ */
+export interface Filter {
+    (filterContext: FilterContext): Promise<boolean>;
+}
+/** Filter context. */
+declare type FilterContext = {
+    /** Parent directory of the filtered item. */
+    dir: string;
+    /** Path to the filtered item */
+    item: string;
+    /** Name of the filtered item */
+    itemName: string;
+};
+/**
  * Provides wide range of functionality for file loading and event exchange.
  * Throws standard error if failed to perform basic initializations, or system failure that cannot be reported otherwise has occured.
  * @throws [[Error]]
  *
  * - `loader_failed` - Loader did not construct the mandatory properties
- * @fires module:system.System#events#systemLoad
+ * // TODO: @event module:system.System#events#systemLoad
  */
 export declare class System extends Loader {
     /** Contains system info. */

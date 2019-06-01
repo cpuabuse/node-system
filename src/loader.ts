@@ -22,7 +22,7 @@ export class Loader{
 	 * @param callback Callback to call with Promise of completion.
 	 * @throws [[LoaderError]] Will throw `unexpected_constructor`
 	 */
-	constructor(rootDir:string, arg_relativeInitDir:string, arg_initFilename:string, callback:ConstructorCallback){
+	constructor(rootDir:string | null, arg_relativeInitDir:string | null, arg_initFilename:string | null, callback:ConstructorCallback | null){
 		/** A dummy constructor. */
 		function dummyConstructor(){}/* eslint-disable-line no-empty-function */// Empty because dummy
 

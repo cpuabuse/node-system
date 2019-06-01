@@ -44,6 +44,16 @@ export interface ErrorCallback{
 	(error: LoaderError): void;
 }
 
+/**
+ * Check if argument is a file or folder (relative to system root directory), or any other filter.
+ * @param filterContext Information on the item to be filtered.
+ * @returns Promise, containing boolean result.
+ */
+export interface Filter{
+	(filterContext: FilterContext): Promise<boolean>;
+}
+
+
 /** Filter context. */
 type FilterContext = {
 	/** Parent directory of the filtered item. */
@@ -62,20 +72,65 @@ type FilterContext = {
  * @throws [[Error]]
  *
  * - `loader_failed` - Loader did not construct the mandatory properties
- * @fires module:system.System#events#systemLoad
+ * // TODO: @event module:system.System#events#systemLoad
  */
 export class System extends Loader{
 	/** Contains system info. */
-	private system: {
-		/** Event emitter for the behaviors. Generally should use the public system instance methods instead. */
-		behavior: {
-			[key: string]: BehaviorInterface;
+	private system!: { // Override compiler, as this property is set from async function callback down the road
+		/** Event emitter for the behaviors. Generally should use the public system instance methods instead. Actual behaviors are located here. */
+		behavior: Behavior;
+
+		/** Actual errors are located here. */
+		error: Object;
+
+		/** File system methods. */
+		file: {
+			/** File cache. */
+			cache: Object;
+			files: Array<Object>;
+
+			/** Filters */
+			filter: {
+				/** Check if argument is a folder (relative to system root directory). */
+				isDir: Filter;
+
+				/** Check if argument is a file (relative to system root directory). */
+				isFile: Filter;
+			};
+			/**
+			 * Converts a file path to absolute operating system path. Used for external libraries, that require absolute path.
+			 * @param dir Relative directory to the root directory..
+			 * @param file Folder/file name.
+			 * @returns Promise, containing string relative path.
+			 */
+			toAbsolute: (dir: string, file: string) => Promise<string>;
+
+			/**
+			 * Converts absolute path to relative path.
+			 * @param rootDir Relative (to system root) directory.
+			 * @param target Absolute (to system root) file/folder path.
+			 * @returns Promise, containing string relative path.
+			 */
+			toRelative: (dir: string, file: string) => Promise<string>;
+
+			/**
+			 * Joins two paths.
+			 * @param rootDir Relative (to system root) directory.
+			 * @param target File/folder path to rootDir.
+			 * @returns Promise, containing string path.
+			 */
+			join: (dir: string | Array<string>, file: string | Array<string>) => Promise<string | Array<string>>;
 		};
 		id: string;
 		initFilename: string;
 		logging: string;
 		relativeInitDir: string;
 		rootDir: string;
+
+		/** Actual subsystems are located here. */
+		subsystem: {
+			[key: string]: Subsystem;
+		};
 	};
 
 	/**

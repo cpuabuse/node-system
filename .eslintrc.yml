@@ -11,6 +11,9 @@ parserOptions:
   ecmaFeatures:
     impliedStrict: true
 rules:
+  arrow-parens:
+    - error
+    - as-needed
   eol-last: off
   func-names: off
   func-style:
@@ -25,7 +28,10 @@ rules:
   max-len: off
   max-lines: off
   max-lines-per-function: off
-  multiline-ternary: off
+  max-statements: off
+  multiline-ternary: # Enforce or disallow newlines between operands of ternary expressions
+    - error
+    - never
   no-inline-comments: off
   no-magic-numbers: 
     - error
@@ -33,6 +39,9 @@ rules:
       - 0
       - 1
       - -1
+  no-new-object: off
+  no-prototype-builtins: off
+  no-shadow: off
   no-tabs: off
   no-ternary: off
   no-var: off
@@ -40,5 +49,10 @@ rules:
   padded-blocks: off
   prefer-arrow-callback: off
   prefer-const: off
-  space-before-blocks: off
-  space-before-function-paren: off
+  space-before-blocks:
+    - error
+    - never
+  space-before-function-paren:
+    - error
+    - never
+  quote-props: off
