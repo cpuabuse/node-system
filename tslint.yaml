@@ -15,6 +15,7 @@ rules:
   no-any: false
   no-inferrable-types: false
   no-var-keyword: false
+  no-void-expression: false # Requires expressions of type void to appear in statement position.
   one-line: false
   only-arrow-functions: false
   prefer-const: false
