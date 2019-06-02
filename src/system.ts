@@ -113,7 +113,7 @@ interface SystemProperty{
 		 *
 		 * **Structure**
 		 *
-		 * ```text
+		 * ```
 		 * files = [
 		 *   {
 		 *     file: actual_file,
