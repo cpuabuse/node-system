@@ -20,6 +20,10 @@ rules:
   # Forbids an object literal to appear in a type assertion expression. Casting to any or to unknown is still allowed.
   # Does not make sense, as we use both type definition an assertion.
   no-object-literal-type-assertion: false
+
+  # Disallows classes that are not strictly necessary.
+  # Design principle is more important than functionality
+  no-unnecessary-class: false
   no-var-keyword: false
   no-void-expression: false # Requires expressions of type void to appear in statement position.
   one-line: false

@@ -3,7 +3,6 @@
  * Performs basic tests.
  * If error is thrown, node will exit with code 1, otherwise 0.
 */
-"use strict";
 
 /**
  * Series of tests for the system.
@@ -25,7 +24,7 @@ const waitTime = 200;
  * @member AtomicLock
  * @memberof module:system~test
  */
-function testAtomicLock(){
+export function testAtomicLock(){
 	describe("AtomicLock", function() {
 		// Assing variables
 		let atomicLock = new system.AtomicLock();

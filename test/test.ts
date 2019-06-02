@@ -1,23 +1,22 @@
-// test/test.ts
-/*
-	Performs basic tests.
-	If error is thrown, node will exit with code 1, otherwise 0.
-*/
-"use strict";
+// File: test/test.ts
 /**
- * Series of tests for the system.
- * @inner
- * @member test
- * @memberof module:system
+ * Performs basic tests.
+ * If error is thrown, node will exit with code 1, otherwise 0.
  */
 
+import {testAtomicLock} from "./test-atomic";
+import {testLoaderError, testSystemError} from "./test-errors";
+import {testLoader} from "./test-loader";
+import {testSystem} from "./test-system";
+
 // DEBUG: Devonly - promise throw
-process.on("unhandledRejection", up => {
+process.on("unhandledRejection" as NodeJS.Signals, function(up: NodeJS.Signals): void{
 	throw up;
 });
 
-require("./test-errors.js").testLoaderError();
-require("./test-errors.js").testSystemError();
-require("./test-loader.js").testLoader();
-require("./test-system.js").testSystem();
-require("./test-atomic.js").testAtomicLock();
+// Run tests
+testLoaderError();
+testSystemError();
+testLoader();
+testSystem();
+testAtomicLock();

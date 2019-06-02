@@ -11,7 +11,7 @@ import {SystemError} from "./error";
 import * as events from "./events";
 import {Loader, loadYaml} from "./loader"; // Auxiliary system lib
 import {LoaderError} from "./loaderError";
-import {Subsystem} from "./subsystem"; /* eslint-disable-line no-unused-vars */// ESLint type import detection bug
+import {ISubsystem, Subsystem} from "./subsystem"; /* eslint-disable-line no-unused-vars */// ESLint type import detection bug
 import {OptionsInterface} from "./subsystems/system.info.options"; /* eslint-disable-line no-unused-vars */// ESLint type import detection bug
 
 // Re-export
@@ -76,16 +76,6 @@ type FileObject = {
 	file: Buffer;
 	rIndex: string;
 };
-
-/** Properties of the subsystems class property */
-interface ISubsystemsProperty{
-	args: Array<string> | any;
-	depends: Array<string> | any;
-	type: string | any;
-	vars: {
-		homepage: string | any;
-	} | any;
-}
 
 /** Contains system info. */
 interface ISystemProperty{
@@ -217,6 +207,11 @@ interface ISystemProperty{
 	};
 }
 
+/** Type used internally to cast to for operations to confirm correct types of Loader-loaded objects. */
+type LoaderProperty = {
+	[key: string]: LoaderProperty;
+};
+
 /** Checks that the data initialized by the loader is proper for the objects. */
 function isProperLoaderObject(object: {[key: string]: any}, property: string, type: string): boolean{
 	var proper: boolean = false;
@@ -224,6 +219,12 @@ function isProperLoaderObject(object: {[key: string]: any}, property: string, ty
 	if (object.hasOwnProperty(property)){
 		let objectProperty: any = object[property];
 		switch(type){
+		case "array":
+			if(Array.isArray(objectProperty)){
+				proper = true;
+			}
+			break;
+
 		case "object":
 			if(typeof objectProperty === "object" && objectProperty !== null){
 				proper = true;
@@ -272,9 +273,7 @@ export class System extends Loader{
 	};
 
 	/** Contains subsystem data. */
-	private readonly subsystems: {
-		[key: string]: ISubsystemsProperty;
-	} | any;
+	private readonly subsystems: any;
 
 	/** Contains system info. */
 	private system!: ISystemProperty; // Override compiler, as this property is set from async function callback down the road
@@ -351,8 +350,8 @@ export class System extends Loader{
 							const milliSecondsInSeconds: number = 1000;
 
 							// Set cache to default if not provided
-							if(cacheTtl === null){ /* tslint:disable-line strict-type-predicates *//* eslint-disable-line capitalized-comments */// The functionality is there for future, cacheTtl will be initialized from loader
-								cacheTtl = defaultCacheTtl; /* tslint:disable-line no-parameter-reassignment *//* eslint-disable-line no-param-reassign *//* eslint-disable-line capitalized-comments */// The functionality is there for future, cacheTtl will be initialized from loader
+							if(cacheTtl === null){ /* tslint:disable-line strict-type-predicates */// The functionality is there for future, cacheTtl will be initialized from loader
+								cacheTtl = defaultCacheTtl; /* tslint:disable-line no-parameter-reassignment *//* eslint-disable-line no-param-reassign */// The functionality is there for future, cacheTtl will be initialized from loader
 							}
 							if(maxFiles > 0){
 								// Find expiration time and current time
@@ -479,24 +478,26 @@ export class System extends Loader{
 				})()).then(() => { // The following is code dependent on full initialization by static system initializer and Loader.
 					try {
 						// Initialize subsystems
-						if (isProperLoaderObject(this, "subsystem", "object")){
-							let subsystems: ISubsystemsProperty = this.subsystems as ISubsystemsProperty;
+						if (isProperLoaderObject(this, "subsystems", "object")){
+							let subsystems: LoaderProperty = this.subsystems as LoaderProperty;
 							for (let subsystem in subsystems){
 								if(isProperLoaderObject(subsystems, subsystem, "object")){
-									if(isProperLoaderObject((subsystems as {[key: string]: {[key: string]: any}})[subsystem], "type", "string")){
-										import(`./subsystems/${subsystems[subsystem].type}`).then((subsystemClass: Subsystem): void => {
+									let subsystemsProperty: LoaderProperty = subsystems[subsystem];
+									if(isProperLoaderObject(subsystemsProperty, "type", "string")){
+										import(`./subsystems/${subsystemsProperty.type as unknown as string}`).then((subsystemClass: ISubsystem): void => {
 											let systemArgs: {system_args?: OptionsInterface} = new Object() as {system_args?: OptionsInterface}; /* eslint-disable-line camelcase */// Variables defined in yml file
-											if(this.subsystems[subsystem].hasOwnProperty("args")){
-												if(this.subsystems[subsystem].args !== null){
-													if(this.subsystems[subsystem].args.includes("system_args")){
-														systemArgs["system_args"] = options;
-													}
+											if(isProperLoaderObject(subsystemsProperty, "args", "array")){
+												if((subsystemsProperty.args as unknown as Array<any>).includes("system_args")){ /* eslint-disable-line no-extra-parens */// Parens are necessary
+													systemArgs["system_args"] = options; /* tslint:disable-line no-string-literal */
 												}
 											}
 
-											this.system.subsystem[subsystem] = new subsystemClass({systemContext:this, args:systemArgs, vars:this.subsystems[subsystem].vars}); /* eslint-disable-line new-cap */// It is an argument
-										}).catch(function(error){
-											console.log(error);
+											this.system.subsystem[subsystem] = new subsystemClass({ /* eslint-disable-line new-cap */// It is an argument
+												args: systemArgs,
+												systemContext: this,
+												vars: subsystemsProperty.vars});
+										}).catch(function(): void{
+											throw new LoaderError("loader_fail", "Could not load defined subsystems.");
 										});
 									}
 								}
@@ -509,13 +510,13 @@ export class System extends Loader{
 						// Initialize the events
 						for (let err in this.errors){
 							// Will skip garbled errors
-							if (typeof this.errors[err] === "object"){ /* tslint:disable-line strict-type-predicates *//* eslint-disable-line capitalized-comments */// It is an argument
+							if (typeof this.errors[err] === "object"){ /* tslint:disable-line strict-type-predicates */// It is an argument
 								// Set default error message for absent message
 								let message: string = "Error message not set.";
 								if (this.errors[err].hasOwnProperty("message")){
 									if (typeof this.errors[err].message === "string"){
 										if (this.errors[err].message !== ""){
-											({message} = err);
+											({message} = this.errors[err] as {message: string});
 										}
 									}
 								}
@@ -532,7 +533,7 @@ export class System extends Loader{
 					} catch (error){
 						processLoaderError(error);
 					}
-				}).catch(function(error){
+				}).catch(function(): void{
 					// Errors returned from load or staticInitializationPromise
 					processLoaderError(new LoaderError("functionality_error", "There was an error in the loader functionality in constructor subroutines."));
 				});
@@ -544,8 +545,8 @@ export class System extends Loader{
 
 	/**
 	 * Checks options argument for missing incorrect property types
-	 * @param {module:system~System~options} options System options argument
-	 * @returns {boolean} Returns true if the arguments is corrupt; false if OK
+	 * @param options System options argument
+	 * @returns Returns true if the arguments is corrupt; false if OK
 	 * @example <caption>Usage</caption>
 	 * var options = {
 	 *   id: "stars",

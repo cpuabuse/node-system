@@ -1,15 +1,10 @@
 /**
- * Series of tests for the system.
- * @inner
- * @member test
- * @memberof module:system
- */
-declare const system: any;
-declare const assert: any;
-declare const waitTime = 200;
+ * Performs basic tests.
+ * If error is thrown, node will exit with code 1, otherwise 0.
+*/
 /**
  * Tests of AtomicLock class.
  * @member AtomicLock
  * @memberof module:system~test
  */
-declare function testAtomicLock(): void;
+export declare function testAtomicLock(): void;

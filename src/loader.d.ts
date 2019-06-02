@@ -7,6 +7,23 @@ export declare type ConstructorCallback = (done: Promise<void>) => void;
 /** Required by system to perform file initialization. */
 export declare class Loader {
     /**
+     * Extracts relative path from rootDir to target.
+     *
+     * **Usage**
+     *
+     * ```typescript
+     * // Convert path and output the result
+     * console.log(Loader.toRelative("c:\machines\refrigerators", "c:\machines\appliances"));
+     *
+     * // Output
+     * // ..\appliances
+     * ```
+     * @param dir Source folder.
+     * @param target File/folder name|names.
+     * @returns Relative path|paths.
+     */
+    static toRelative(dir: string, target: string | Array<string>): string | Array<string>;
+    /**
      * @param rootDir Absolute root directory.
      * @param relativeInitDir Relative path to root.
      * @param initFilename Filename.
@@ -42,23 +59,6 @@ export declare class Loader {
      * @returns File contents.
      */
     static getFile(rootDir: string, relativeDir: string, file: string): Promise<Buffer>;
-    /**
-     * Extracts relative path from rootDir to target.
-     *
-     * **Usage**
-     *
-     * ```typescript
-     * // Convert path and output the result
-     * console.log(Loader.toRelative("c:\machines\refrigerators", "c:\machines\appliances"));
-     *
-     * // Output
-     * // ..\appliances
-     * ```
-     * @param dir Source folder.
-     * @param target File/folder name|names.
-     * @returns Relative path|paths.
-     */
-    static toRelative(dir: string, target: string | Array<string>): string | Array<string>;
     /**
      * Join a root directory with a file/folder or an array of files/folders to absolute path.
      *

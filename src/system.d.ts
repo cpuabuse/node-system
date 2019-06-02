@@ -74,8 +74,8 @@ export declare class System extends Loader {
     constructor(options: OptionsInterface, behaviors: BehaviorInterface, onError: IErrorCallback | null);
     /**
      * Checks options argument for missing incorrect property types
-     * @param {module:system~System~options} options System options argument
-     * @returns {boolean} Returns true if the arguments is corrupt; false if OK
+     * @param options System options argument
+     * @returns Returns true if the arguments is corrupt; false if OK
      * @example <caption>Usage</caption>
      * var options = {
      *   id: "stars",

@@ -21,7 +21,7 @@ const nonExistentFileOrDir = "Non-existent file or directory";
  * @member Loader
  * @memberof module:system~test
  */
-function testLoader(){
+export function testLoader(){
 	describe("Loader", function() {
 		/**
 		 * Tests the constructor for:

@@ -14,6 +14,11 @@ rules:
   arrow-parens:
     - error
     - as-needed
+  capitalized-comments:
+    - error
+    - always
+    - ignorePattern:
+        tslint
   eol-last: off
   func-names: off
   func-style:
@@ -36,8 +41,10 @@ rules:
   multiline-ternary: # Enforce or disallow newlines between operands of ternary expressions
     - error
     - never
+  newline-per-chained-call: off
   no-array-constructor: off
   no-inline-comments: off
+  no-loop-func: off
   no-magic-numbers: 
     - error
     - ignore:
@@ -68,3 +75,6 @@ rules:
       named: never
       asyncArrow: always
   quote-props: off
+
+# Rules implemented in TSLint
+  dot-notation: off

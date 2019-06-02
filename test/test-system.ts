@@ -23,7 +23,7 @@ const nonExistentFileOrDir = "Non-existent file or directory";
  * @member System
  * @memberof module:system~test
  */
-function testSystem(){
+export function testSystem(){
 	describe("System", function() {
 		/**
 		 * Tests constructor for the following.

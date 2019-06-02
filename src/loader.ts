@@ -1,20 +1,54 @@
-// src/loader.ts
+// File: src/loader.ts
 /**
  * Contains methods necessary to initialize the system and work with file system.
  */
 import * as fs from "fs";
-import * as path from "path";
 import * as yaml from "js-yaml";
+import * as path from "path";
+
 import {LoaderError} from "./loaderError";
 
 /**
  * Constructor callback.
  * @param done Fullfills when constructor finishes execution
  */
-export type ConstructorCallback = (done:Promise<void>) => void;
+export type ConstructorCallback = (done: Promise<void>) => void;
 
 /** Required by system to perform file initialization. */
 export class Loader{
+	/**
+	 * Extracts relative path from rootDir to target.
+	 *
+	 * **Usage**
+	 *
+	 * ```typescript
+	 * // Convert path and output the result
+	 * console.log(Loader.toRelative("c:\machines\refrigerators", "c:\machines\appliances"));
+	 *
+	 * // Output
+	 * // ..\appliances
+	 * ```
+	 * @param dir Source folder.
+	 * @param target File/folder name|names.
+	 * @returns Relative path|paths.
+	 */
+	public static toRelative(dir: string, target: string | Array<string>): string | Array<string>{
+		if (Array.isArray(target)){
+			let results: Array<string> = new Array() as Array<string>; // Prepare the return array
+
+			// Populate return array
+			target.forEach(function(targetMember: string): void{
+				results.push(path.relative(dir, targetMember));
+			});
+
+			// Return an array
+			return results;
+		}
+
+		// Return a string if not an array
+		return path.relative(dir, target);
+	}
+
 	/**
 	 * @param rootDir Absolute root directory.
 	 * @param relativeInitDir Relative path to root.
@@ -22,7 +56,7 @@ export class Loader{
 	 * @param callback Callback to call with Promise of completion.
 	 * @throws [[LoaderError]] Will throw `unexpected_constructor`
 	 */
-	constructor(rootDir?:string, arg_relativeInitDir?:string, arg_initFilename?:string, callback?:ConstructorCallback){
+	public constructor(rootDir?: string, arg_relativeInitDir?: string, arg_initFilename?: string, callback?: ConstructorCallback){
 		/** A dummy constructor. */
 		function dummyConstructor(){}/* eslint-disable-line no-empty-function */// Empty because dummy
 
@@ -91,38 +125,6 @@ export class Loader{
 				}
 			});
 		});
-	}
-
-	/**
-	 * Extracts relative path from rootDir to target.
-	 *
-	 * **Usage**
-	 *
-	 * ```typescript
-	 * // Convert path and output the result
-	 * console.log(Loader.toRelative("c:\machines\refrigerators", "c:\machines\appliances"));
-	 *
-	 * // Output
-	 * // ..\appliances
-	 * ```
-	 * @param dir Source folder.
-	 * @param target File/folder name|names.
-	 * @returns Relative path|paths.
-	 */
-	static toRelative(dir: string, target: string | Array<string>): string | Array<string>{
-		if (Array.isArray(target)){
-			let targets: Array<string> = new Array(); // Prepare the return array
-
-			// Populate return array
-			target.forEach(function(_target){
-				targets.push(path.relative(dir, _target));
-			})
-			// Return an array
-			return targets;
-		}
-
-		// Return a string if not an array
-		return path.relative(dir, target);
 	}
 
 	/**

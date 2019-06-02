@@ -1,5 +1,8 @@
 import { AtomicLock } from "./atomic";
 import { System } from "./system";
+export interface ISubsystem extends Subsystem {
+    new (args: ConstructorArgs): ISubsystem;
+}
 /** Interface for subsystem constructor data exchange. */
 export interface ConstructorArgs {
     /** Context of a parent system. */

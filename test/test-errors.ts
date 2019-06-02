@@ -18,7 +18,7 @@ const assert = require("assert");
  * @member LoaderError
  * @memberof module:system~test
  */
-function testLoaderError(){
+export function testLoaderError(){
 	describe("LoaderError", function(){
 		describe("constructor", function(){
 			it("should initialize with default values", function(){
@@ -39,7 +39,7 @@ function testLoaderError(){
  * @member SystemError
  * @memberof module:system~test
  */
-function testSystemError(){
+export function testSystemError(){
 	describe("SystemError", function(){
 		describe(".isSystemError()", function(){
 			it("should return false for an empty error code", function(){
