@@ -156,3 +156,17 @@ export declare class Loader {
      */
     static yamlToObject(string: string): any;
 }
+/**
+ * Parses YAML file, and returns and object; Adds extension if absent.
+ *
+ * **Usage**
+ *
+ * ```typescript
+ * var settings = await loadYaml("./", "settings", "settings");
+ * ```
+ * @param rootDir Absolute directory path.
+ * @param relativeDir Relative directory to root.
+ * @param filename Filename, with or without extension.
+ * @returns Javascript object.
+ */
+export declare function loadYaml(rootDir: string, relativeDir: string, filename: string): Promise<any>;

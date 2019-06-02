@@ -55,6 +55,8 @@ declare type FilterContext = {
  * // TODO: @event module:system.System#events#systemLoad
  */
 export declare class System extends Loader {
+    /** Contains subsystem data. */
+    private readonly subsystems?;
     /** Contains system info. */
     private system;
     /**
@@ -112,7 +114,7 @@ export declare class System extends Loader {
      * @fires module:system.System#events#behaviorAttach
      * @fires module:system.System#events#behaviorAttachFail
      * @fires module:system.System#events#behaviorAttachRequestFail
-* @example <caption>Usage</caption>
+     * @example <caption>Usage</caption>
      * var options = {
      *   id: "lab_inventory",
      *   rootDir: "labs",

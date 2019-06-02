@@ -253,7 +253,7 @@ export class Loader{
 	 * @param relativeDir Relative directory to root.
 	 * @returns Returns `true` if a directory, `false` if not.
 	 */
-	static isDir(rootDir:string, relativeDir:string):Promise<boolean>{
+	static isDir(rootDir:string, relativeDir:string): Promise<boolean>{
 		return new Promise(function(resolve){
 			fs.stat(path.join(rootDir, relativeDir), function(err, stats){
 				if (err){
@@ -530,15 +530,15 @@ async function initSettings(
  * @param filename Filename, with or without extension.
  * @returns Javascript object.
  */
-async function loadYaml(rootDir: string, relativeDir: string, filename: string){
-	var fileExtension: string = ".yml"; // Making a variale for interpreted language like this would not even save any memory, but it feels right
+export async function loadYaml(rootDir: string, relativeDir: string, filename: string){
+	var fileExtension: string = ".yml"; // Making a variable for interpreted language like this would not even save any memory, but it feels right
 
 	// Add file extension if absent
 	if(!filename.endsWith(fileExtension)){
 		filename += fileExtension;
 	}
 
-	// Try to read the file contents and retuen them; If we fail, we log filename to error stream, and rethrow the error
+	// Try to read the file contents and return them; If we fail, we log filename to error stream, and rethrow the error
 	try {
 		var contents: Buffer = await Loader.getFile(rootDir, relativeDir, filename);
 		return yaml.load(contents.toString());

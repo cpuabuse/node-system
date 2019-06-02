@@ -19,19 +19,23 @@ rules:
   func-style:
     - error
     - declaration
+  id-length: off
   indent:
     - error
     - tab
+  init-declarations: off
   keyword-spacing: off
   line-comment-position: off
   lines-around-comment: off
   max-len: off
   max-lines: off
   max-lines-per-function: off
+  max-params: off
   max-statements: off
   multiline-ternary: # Enforce or disallow newlines between operands of ternary expressions
     - error
     - never
+  no-array-constructor: off
   no-inline-comments: off
   no-magic-numbers: 
     - error
@@ -40,12 +44,15 @@ rules:
       - 1
       - -1
   no-new-object: off
+  no-plusplus: off
   no-prototype-builtins: off
   no-shadow: off
   no-tabs: off
   no-ternary: off
   no-var: off
+  no-warning-comments: off
   one-line: off
+  one-var: off
   padded-blocks: off
   prefer-arrow-callback: off
   prefer-const: off
