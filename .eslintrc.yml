@@ -50,6 +50,7 @@ rules:
   no-shadow: off
   no-tabs: off
   no-ternary: off
+  no-undefined: off
   no-var: off
   no-warning-comments: off
   one-line: off

@@ -23,7 +23,7 @@ export type Reject = (reason?: any) => void;
 export type Executor = (resolve: Resolve, reject: Reject) => void;
 
 /** System options. */
-export interface SystemArgs{
+export interface ISystemArgs{
 	/** System instace internal ID. */
 	id: string;
 
@@ -41,7 +41,7 @@ export interface SystemArgs{
 }
 
 /** Error callback. */
-export interface ErrorCallback{
+export interface IErrorCallback{
 	(error: LoaderError): void;
 }
 
@@ -50,7 +50,7 @@ export interface ErrorCallback{
  * @param filterContext Information on the item to be filtered.
  * @returns Promise, containing boolean result.
  */
-export interface Filter{
+export interface IFilter{
 	(filterContext: FilterContext): Promise<boolean>;
 }
 
@@ -77,8 +77,18 @@ type FileObject = {
 	rIndex: string;
 };
 
+/** Properties of the subsystems class property */
+interface ISubsystemsProperty{
+	args: Array<string> | any;
+	depends: Array<string> | any;
+	type: string | any;
+	vars: {
+		homepage: string | any;
+	} | any;
+}
+
 /** Contains system info. */
-interface SystemProperty{
+interface ISystemProperty{
 	/** Event emitter for the behaviors. Generally should use the public system instance methods instead. Actual behaviors are located here. */
 	behavior: Behavior;
 
@@ -103,10 +113,10 @@ interface SystemProperty{
 		/** Filters */
 		filter: {
 			/** Check if argument is a folder (relative to system root directory). */
-			isDir: Filter;
+			isDir: IFilter;
 
 			/** Check if argument is a file (relative to system root directory). */
-			isFile: Filter;
+			isFile: IFilter;
 		};
 		/**
 		 * Get file contents relative to system root directory.
@@ -175,7 +185,7 @@ interface SystemProperty{
 		 * systemInstance.system.file.list("css", systemInstance.system.file.filter.isDir);
 		 * ```
 		 */
-		list(dir: string, filter: Filter | null): Promise<Array<string>>;
+		list(dir: string, filter: IFilter | null): Promise<Array<string>>;
 
 		/**
 		 * // TODO: Switch to proper function
@@ -207,6 +217,33 @@ interface SystemProperty{
 	};
 }
 
+/** Checks that the data initialized by the loader is proper for the objects. */
+function isProperLoaderObject(object: {[key: string]: any}, property: string, type: string): boolean{
+	var proper: boolean = false;
+
+	if (object.hasOwnProperty(property)){
+		let objectProperty: any = object[property];
+		switch(type){
+		case "object":
+			if(typeof objectProperty === "object" && objectProperty !== null){
+				proper = true;
+			}
+			break;
+
+		case "string":
+			if(typeof objectProperty === "string" && objectProperty !== ""){
+				proper = true;
+			}
+			break;
+
+		default:
+		}
+	}
+
+	// Return
+	return proper;
+}
+
 /**
  * Provides wide range of functionality for file loading and event exchange.
  * Throws standard error if failed to perform basic initializations, or system failure that cannot be reported otherwise has occured.
@@ -235,19 +272,12 @@ export class System extends Loader{
 	};
 
 	/** Contains subsystem data. */
-	private readonly subsystems?: {
-		[key: string]: {
-			args: Array<string> | null;
-			depends: Array<string> | null;
-			type: string;
-			vars: {
-				homepage: string | null;
-			} | null;
-		};
-	};
+	private readonly subsystems: {
+		[key: string]: ISubsystemsProperty;
+	} | any;
 
 	/** Contains system info. */
-	private system!: SystemProperty; // Override compiler, as this property is set from async function callback down the road
+	private system!: ISystemProperty; // Override compiler, as this property is set from async function callback down the road
 
 	/**
 	 * The constructor will perform necessary preparations, so that failures can be processed with system events. Up until these preparations are complete, the failure will result in thrown standard Error.
@@ -255,7 +285,7 @@ export class System extends Loader{
 	 * @param behaviors - Behaviors to add.
 	 * @param onError - Callback for error handling during delayed execution after loader has loaded. Takes error string as an argument.
 	 */
-	public constructor(options: OptionsInterface, behaviors: BehaviorInterface, onError: ErrorCallback | null){ /* eslint-disable-line constructor-super */// Rule bugs out
+	public constructor(options: OptionsInterface, behaviors: BehaviorInterface, onError: IErrorCallback | null){ /* eslint-disable-line constructor-super */// Rule bugs out
 		/**
 		 * Process the loader error.
 		 * Due to the design of the System constructor, this is supposed to be called only once during the constructor execution, no matter the failure.
@@ -281,7 +311,7 @@ export class System extends Loader{
 			// First things first, call a loader, if loader has failed, there are no tools to report gracefully, so the errors from there will just go above
 			super(options.rootDir, options.relativeInitDir, options.initFilename, (load: Promise<void>): void => {
 				load.then((): Promise<void> => (async (): Promise<void> => { /* eslint-disable-line require-await */// It is async by design, not by need
-					this.system = new Object() as SystemProperty;
+					this.system = new Object() as ISystemProperty;
 					this.system.id = options.id;
 					this.system.rootDir = options.rootDir;
 					this.system.relativeInitDir = options.relativeInitDir;
@@ -398,7 +428,7 @@ export class System extends Loader{
 						async	join(rootDir: string, target: string | Array<string>): Promise<string | Array<string>>{ /* eslint-disable-line require-await */// We want file methods to produce same type output
 							return Loader.join(rootDir, target);
 						},
-						list: async (dir: string, filter: Filter | null): Promise<Array<string>> => {
+						list: async (dir: string, filter: IFilter | null): Promise<Array<string>> => {
 							var filteredItems: Array<string>; // Return array
 							var itemNames: Array<string> = await Loader.list(this.system.rootDir, dir); // Wait for folder contets
 							var items: Array<string> = await this.system.file.join(dir, itemNames) as Array<string>; // The return will be always be an array
@@ -449,27 +479,29 @@ export class System extends Loader{
 				})()).then(() => { // The following is code dependent on full initialization by static system initializer and Loader.
 					try {
 						// Initialize subsystems
-						if (this.hasOwnProperty("subsystems")){
-							for (let subsystem in this.subsystems){
-								if(this.subsystems.hasOwnProperty(subsystem)){
-									import(`./subsystems/${this.subsystems[subsystem].type}`).then((subsystemClass: Subsystem): void => {
-										let systemArgs: {system_args?: OptionsInterface} = new Object() as {system_args?: OptionsInterface}; /* eslint-disable-line camelcase */// Variables defined in yml file
-										if(this.subsystems[subsystem].hasOwnProperty("args")){
-											if(this.subsystems[subsystem].args !== null){
-												if(this.subsystems[subsystem].args.includes("system_args")){
-													systemArgs["system_args"] = options;
+						if (isProperLoaderObject(this, "subsystem", "object")){
+							let subsystems: ISubsystemsProperty = this.subsystems as ISubsystemsProperty;
+							for (let subsystem in subsystems){
+								if(isProperLoaderObject(subsystems, subsystem, "object")){
+									if(isProperLoaderObject((subsystems as {[key: string]: {[key: string]: any}})[subsystem], "type", "string")){
+										import(`./subsystems/${subsystems[subsystem].type}`).then((subsystemClass: Subsystem): void => {
+											let systemArgs: {system_args?: OptionsInterface} = new Object() as {system_args?: OptionsInterface}; /* eslint-disable-line camelcase */// Variables defined in yml file
+											if(this.subsystems[subsystem].hasOwnProperty("args")){
+												if(this.subsystems[subsystem].args !== null){
+													if(this.subsystems[subsystem].args.includes("system_args")){
+														systemArgs["system_args"] = options;
+													}
 												}
 											}
-										}
 
-										this.system.subsystem[subsystem] = new subsystemClass({systemContext:this, args:systemArgs, vars:this.subsystems[subsystem].vars}); /* eslint-disable-line new-cap */// It is an argument
-									}).catch(function(error){
-										console.log(error);
-									});
+											this.system.subsystem[subsystem] = new subsystemClass({systemContext:this, args:systemArgs, vars:this.subsystems[subsystem].vars}); /* eslint-disable-line new-cap */// It is an argument
+										}).catch(function(error){
+											console.log(error);
+										});
+									}
 								}
 							}
 						}
-
 						if(!(this.hasOwnProperty("events") && this.hasOwnProperty("behaviors"))){ // Make sure basic system carcass was initialized
 							throw new LoaderError("loader_fail", "Mandatory initialization files are missing.");
 						}
@@ -483,7 +515,7 @@ export class System extends Loader{
 								if (this.errors[err].hasOwnProperty("message")){
 									if (typeof this.errors[err].message === "string"){
 										if (this.errors[err].message !== ""){
-											{message} = err;
+											({message} = err);
 										}
 									}
 								}

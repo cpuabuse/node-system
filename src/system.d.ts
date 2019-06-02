@@ -13,7 +13,7 @@ export declare type Resolve = (value?: void | PromiseLike<void> | undefined) => 
 export declare type Reject = (reason?: any) => void;
 export declare type Executor = (resolve: Resolve, reject: Reject) => void;
 /** System options. */
-export interface SystemArgs {
+export interface ISystemArgs {
     /** System instace internal ID. */
     id: string;
     /** Initialization file filename. */
@@ -26,7 +26,7 @@ export interface SystemArgs {
     rootDir: string;
 }
 /** Error callback. */
-export interface ErrorCallback {
+export interface IErrorCallback {
     (error: LoaderError): void;
 }
 /**
@@ -34,7 +34,7 @@ export interface ErrorCallback {
  * @param filterContext Information on the item to be filtered.
  * @returns Promise, containing boolean result.
  */
-export interface Filter {
+export interface IFilter {
     (filterContext: FilterContext): Promise<boolean>;
 }
 /** Filter context. */
@@ -55,8 +55,14 @@ declare type FilterContext = {
  * // TODO: @event module:system.System#events#systemLoad
  */
 export declare class System extends Loader {
+    private readonly errors?;
+    /**
+     * Events to be populated by the loader.
+     * System by itself does not deal with events, it only confirms that the events were initialized. Although, if the events are fired, and failure to fire event is set to throw, or undocumented events encountered, it would throw errors.
+     */
+    private readonly events?;
     /** Contains subsystem data. */
-    private readonly subsystems?;
+    private readonly subsystems;
     /** Contains system info. */
     private system;
     /**
@@ -65,7 +71,7 @@ export declare class System extends Loader {
      * @param behaviors - Behaviors to add.
      * @param onError - Callback for error handling during delayed execution after loader has loaded. Takes error string as an argument.
      */
-    constructor(options: OptionsInterface, behaviors: BehaviorInterface, onError: ErrorCallback | null);
+    constructor(options: OptionsInterface, behaviors: BehaviorInterface, onError: IErrorCallback | null);
     /**
      * Checks options argument for missing incorrect property types
      * @param {module:system~System~options} options System options argument

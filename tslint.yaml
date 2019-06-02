@@ -10,7 +10,6 @@ rules:
   indent:
     options:
     - tabs
-  interface-name: false
   interface-over-type-literal: false # Prefer an interface declaration over a type literal
   max-line-length: false
   newline-per-chained-call: false
@@ -34,7 +33,6 @@ rules:
   # Checks that type literal members are separated by semicolons. Enforces a trailing semicolon for multiline type literals.
   # Commas for type literal oneliners
   type-literal-delimiter:
-    - always
-    - singleLine
-      - never
+    singleLine:
+      - always
   whitespace: false

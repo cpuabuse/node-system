@@ -5,12 +5,12 @@
 import {ConstructorArgs} from "../subsystem"; /* eslint-disable-line no-unused-vars */// ESLint type import detection bug
 import Info from "./system.info";
 import {LoaderError} from "../loaderError";
-import {SystemArgs} from "../system"; /* eslint-disable-line no-unused-vars */// ESLint type import detection bug
+import {ISystemArgs} from "../system"; /* eslint-disable-line no-unused-vars */// ESLint type import detection bug
 
 interface OptionsVars{
 	homepage: string;
 };/* eslint-disable-line no-extra-semi */// ESLint inteface no-extra-semi bug
-export interface OptionsInterface extends SystemArgs, OptionsVars{};/* eslint-disable-line no-extra-semi */// ESLint inteface no-extra-semi bug
+export interface OptionsInterface extends ISystemArgs, OptionsVars{};/* eslint-disable-line no-extra-semi */// ESLint inteface no-extra-semi bug
 
 export default class Options extends Info{
 	constructor(args:ConstructorArgs){
