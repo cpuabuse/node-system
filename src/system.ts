@@ -216,8 +216,35 @@ interface SystemProperty{
  * // TODO: @event module:system.System#events#systemLoad
  */
 export class System extends Loader{
+	private readonly errors?: {
+		[key: string]: {
+			message?: string;
+		};
+	};
+
+	/**
+	 * Events to be populated by the loader.
+	 * System by itself does not deal with events, it only confirms that the events were initialized. Although, if the events are fired, and failure to fire event is set to throw, or undocumented events encountered, it would throw errors.
+	 */
+	private readonly events?: {
+		[key: string]: {
+			behavior?: boolean;
+			error?: string;
+			log?: string;
+		};
+	};
+
 	/** Contains subsystem data. */
-	private readonly subsystems?: any;
+	private readonly subsystems?: {
+		[key: string]: {
+			args: Array<string> | null;
+			depends: Array<string> | null;
+			type: string;
+			vars: {
+				homepage: string | null;
+			} | null;
+		};
+	};
 
 	/** Contains system info. */
 	private system!: SystemProperty; // Override compiler, as this property is set from async function callback down the road
@@ -425,50 +452,38 @@ export class System extends Loader{
 						if (this.hasOwnProperty("subsystems")){
 							for (let subsystem in this.subsystems){
 								if(this.subsystems.hasOwnProperty(subsystem)){
-									import("./subsystems/" + this.subsystems[subsystem].type).then(subsystemClass => {
-										let systemArgs = new Object();
-										if(this.subsystems[subsystem].args.includes("system_args")){
-											systemArgs["system_args"] = options;
+									import(`./subsystems/${this.subsystems[subsystem].type}`).then((subsystemClass: Subsystem): void => {
+										let systemArgs: {system_args?: OptionsInterface} = new Object() as {system_args?: OptionsInterface}; /* eslint-disable-line camelcase */// Variables defined in yml file
+										if(this.subsystems[subsystem].hasOwnProperty("args")){
+											if(this.subsystems[subsystem].args !== null){
+												if(this.subsystems[subsystem].args.includes("system_args")){
+													systemArgs["system_args"] = options;
+												}
+											}
 										}
 
-										this.system.subsystem[subsystem] = new subsystemClass({systemContext:this, args:systemArgs, vars:this.subsystems[subsystem].vars});
+										this.system.subsystem[subsystem] = new subsystemClass({systemContext:this, args:systemArgs, vars:this.subsystems[subsystem].vars}); /* eslint-disable-line new-cap */// It is an argument
+									}).catch(function(error){
+										console.log(error);
 									});
 								}
 							}
 						}
 
-						/**
-						 * Events to be populated by the loader.
-						 * System by itself does not deal with events, it only confirms that the events were initialized. Although, if the events are fired, and failure to fire event is set to throw, or undocumented events encountered, it would throw errors.
-						 * @abstract
-						 * @instance
-						 * @member events
-						 * @memberof module:system.System
-						 * @type {Object}
-						 */
-
-						/**
-						 * Behavior describtions initialized by loader.
-						 * @abstract
-						 * @instance
-						 * @member behaviors
-						 * @memberof module:system.System
-						 * @type {Object}
-						 */
 						if(!(this.hasOwnProperty("events") && this.hasOwnProperty("behaviors"))){ // Make sure basic system carcass was initialized
 							throw new LoaderError("loader_fail", "Mandatory initialization files are missing.");
 						}
 
 						// Initialize the events
-						for (var err in this.errors){
+						for (let err in this.errors){
 							// Will skip garbled errors
-							if (typeof this.errors[err] === "object"){
+							if (typeof this.errors[err] === "object"){ /* tslint:disable-line strict-type-predicates *//* eslint-disable-line capitalized-comments */// It is an argument
 								// Set default error message for absent message
-								let message = "Error message not set.";
+								let message: string = "Error message not set.";
 								if (this.errors[err].hasOwnProperty("message")){
 									if (typeof this.errors[err].message === "string"){
-										if (this.errors[err].message != "") {
-											({message} = err);
+										if (this.errors[err].message !== ""){
+											{message} = err;
 										}
 									}
 								}
