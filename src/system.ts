@@ -1,7 +1,9 @@
-// File: system/system.js
+/*
+	File: system/system.js
+	cpuabuse.com
+*/
 /**
  * System is intended more than anything, for centralized managment.
- * @module system
  */
 
 // Imports

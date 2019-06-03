@@ -1,6 +1,5 @@
 /**
  * System is intended more than anything, for centralized managment.
- * @module system
  */
 import { AtomicLock } from "./atomic";
 import { BehaviorInterface } from "./behavior";
