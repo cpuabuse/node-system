@@ -38,17 +38,17 @@ export function testSystem(){
 		 */
 		describe("constructor", function(){
 			it("should still execute with inappropriate options and no ways to report an error", function(){
-				new system.System(); /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
+				new system.System({}); /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
 			});
 			it("should execute with inappropriate options and error reporting not being a function", function(){
-				new system.System(null, null, "notFunction"); /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
+				new system.System({options: null, behaviors: null, onError: "notFunction"}); /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
 			});
 			it("should fail with inappropriate options", function(done){
-					new system.System(null, null, function(error){ /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
+					new system.System({options: null, behaviors: null, onError: function(error){ /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
 						assert.strictEqual(error.code, "system_options_failure");
 						assert.strictEqual(error.message, "The options provided to the system constructor are inconsistent.");
 						done();
-					});
+					}});
 			});
 			it("should fail with no events or behaviors files", function(done){
 				let options = {
@@ -59,7 +59,7 @@ export function testSystem(){
 					logging: "off"
 				};
 
-				new system.System(options, null, function(err){ /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
+				new system.System({options: options, behaviors: null, onError: function(err){ /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
 					assert.throws(
 						function(){
 							throw err;
@@ -69,7 +69,7 @@ export function testSystem(){
 						}
 					);
 					done();
-				});
+				}});
 			});
 			it("should report functionality_error with fake options", function(done){
 				let options = {
@@ -80,7 +80,7 @@ export function testSystem(){
 					logging: "off"
 				};
 
-				new system.System(options, null, function(err){ /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
+				new system.System({options: options, behaviors: null, onError: function(err){ /* eslint-disable-line no-new */// "new System" is only used for side-effects of testing
 					assert.throws(
 						function(){
 							throw err;
@@ -90,7 +90,7 @@ export function testSystem(){
 						}
 					);
 					done();
-				});
+				}});
 			});
 			/**
 			 * Post-instance initialization error tests.
@@ -124,16 +124,16 @@ export function testSystem(){
 				];
 				let systemTest;
 				before(function(done){
-					systemTest = new system.System(
-						options,
-						[
+					systemTest = new system.System({
+						options: options,
+						behaviors: [
 							{
 								"system_load" (){
 									done();
 								}
 							}
 						]
-					);
+					});
 				});
 				it("should not generate inappropriately defined errors", function(){
 					assert.strictEqual(systemTest.system.error.hasOwnProperty("not_object"), false);
@@ -187,16 +187,16 @@ export function testSystem(){
 
 				// Promise that will resolve on system_load
 				let systemTestLoad = new Promise(function(resolve){
-					systemTest = new system.System(
-						element.options,
-						[
+					systemTest = new system.System({
+						options: element.options,
+						behaviors: [
 							{
 								"system_load": () => {
 									resolve();
 								}
 							}
 						]
-					);
+					});
 				});
 
 				before(function(done){

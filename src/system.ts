@@ -14,7 +14,6 @@ import * as events from "./events";
 import {Loader, loadYaml} from "./loader"; // Auxiliary system lib
 import {LoaderError} from "./loaderError";
 import {ISubsystem, Subsystem} from "./subsystem"; /* eslint-disable-line no-unused-vars */// ESLint type import detection bug
-import {OptionsInterface} from "./subsystems/system.info.options"; /* eslint-disable-line no-unused-vars */// ESLint type import detection bug
 
 // Re-export
 export {AtomicLock};
@@ -25,7 +24,7 @@ export type Reject = (reason?: any) => void;
 export type Executor = (resolve: Resolve, reject: Reject) => void;
 
 /** System options. */
-export interface ISystemArgs{
+export interface IOptions{
 	/** System instace internal ID. */
 	id: string;
 
@@ -286,7 +285,7 @@ export class System extends Loader{
 	 * @param behaviors - Behaviors to add.
 	 * @param onError - Callback for error handling during delayed execution after loader has loaded. Takes error string as an argument.
 	 */
-	public constructor(options: OptionsInterface, behaviors: BehaviorInterface, onError: IErrorCallback | null){ /* eslint-disable-line constructor-super */// Rule bugs out
+	public constructor({options, behaviors, onError}: {options: IOptions, behaviors: BehaviorInterface, onError: (IErrorCallback | null)}){ /* eslint-disable-line constructor-super */// Rule bugs out
 		/**
 		 * Process the loader error.
 		 * Due to the design of the System constructor, this is supposed to be called only once during the constructor execution, no matter the failure.
