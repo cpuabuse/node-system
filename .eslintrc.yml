@@ -38,6 +38,7 @@ rules:
   max-lines-per-function: off
   max-params: off
   max-statements: off
+  multiline-comment-style: off
   multiline-ternary: # Enforce or disallow newlines between operands of ternary expressions
     - error
     - never
@@ -60,6 +61,9 @@ rules:
   no-undefined: off
   no-var: off
   no-warning-comments: off
+  object-curly-newline:
+    - error
+    - multiline: true
   one-line: off
   one-var: off
   padded-blocks: off

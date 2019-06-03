@@ -497,7 +497,8 @@ export class System extends Loader{
 											this.system.subsystem[subsystem] = new subsystemClass({ /* eslint-disable-line new-cap */// It is an argument
 												args: systemArgs,
 												systemContext: this,
-												vars: subsystemsProperty.vars});
+												vars: subsystemsProperty.vars
+											});
 										}).catch(function(): void{
 											throw new LoaderError("loader_fail", "Could not load defined subsystems.");
 										});
