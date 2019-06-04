@@ -1,8 +1,12 @@
-// test/test-atomic.ts
+/*	
+	File: test/test-atomic.ts
+	cpuabuse.com
+*/
+
 /**
  * Performs basic tests.
  * If error is thrown, node will exit with code 1, otherwise 0.
-*/
+ */
 
 /**
  * Series of tests for the system.

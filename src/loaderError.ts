@@ -1,4 +1,8 @@
-// src/loaderError.js
+/*	
+	File: src/loaderError.js
+	cpuabuse.com
+*/
+
 /**
  * Provides errors to use during system loading.
  */

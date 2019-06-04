@@ -2,6 +2,7 @@
 	File: system/system.js
 	cpuabuse.com
 */
+
 /**
  * System is intended more than anything, for centralized managment.
  */
