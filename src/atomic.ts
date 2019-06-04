@@ -1,4 +1,8 @@
-// File: src/atomic.ts
+/*
+	File: src/atomic.ts
+	cpuabuse.com
+*/
+
 /**
  * Atomic operations.
  */

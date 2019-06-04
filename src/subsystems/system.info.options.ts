@@ -1,7 +1,12 @@
-// File: info.options.ts
 /*
-	Used for storing system options.
+	File: info.options.ts
+	cpuabuse.com
 */
+
+/**
+ * Used for storing system options.
+ */
+
 import {ConstructorArgs} from "../subsystem"; /* eslint-disable-line no-unused-vars */// ESLint type import detection bug
 import Info from "./system.info";
 import {LoaderError} from "../loaderError";
