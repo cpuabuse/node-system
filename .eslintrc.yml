@@ -4,81 +4,12 @@ env:
 parser: "@typescript-eslint/parser"
 plugins:
   - "@typescript-eslint"
-extends: "eslint:all"
+  - prettier
+extends:
+  - airbnb
+  - plugin:prettier/recommended
 parserOptions:
   ecmaVersion: 2019
   sourceType: module
   ecmaFeatures:
     impliedStrict: true
-rules:
-  arrow-parens:
-    - error
-    - as-needed
-  capitalized-comments:
-    - error
-    - always
-    - ignorePattern:
-        tslint
-  eol-last: off
-  func-names: off
-  func-style:
-    - error
-    - declaration
-  id-length: off
-  indent:
-    - error
-    - tab
-  init-declarations: off
-  keyword-spacing: off
-  line-comment-position: off
-  lines-around-comment: off
-  max-depth: off
-  max-len: off
-  max-lines: off
-  max-lines-per-function: off
-  max-params: off
-  max-statements: off
-  multiline-comment-style: off
-  multiline-ternary: # Enforce or disallow newlines between operands of ternary expressions
-    - error
-    - never
-  newline-per-chained-call: off
-  no-array-constructor: off
-  no-inline-comments: off
-  no-loop-func: off
-  no-magic-numbers: 
-    - error
-    - ignore:
-      - 0
-      - 1
-      - -1
-  no-new-object: off
-  no-plusplus: off
-  no-prototype-builtins: off
-  no-shadow: off
-  no-tabs: off
-  no-ternary: off
-  no-undefined: off
-  no-var: off
-  no-warning-comments: off
-  object-curly-newline:
-    - error
-    - multiline: true
-  one-line: off
-  one-var: off
-  padded-blocks: off
-  prefer-arrow-callback: off
-  prefer-const: off
-  sort-imports: off # Conflicts with TSLint
-  space-before-blocks:
-    - error
-    - never
-  space-before-function-paren:
-    - error
-    - anonymous: never
-      named: never
-      asyncArrow: always
-  quote-props: off
-
-# Rules implemented in TSLint
-  dot-notation: off
