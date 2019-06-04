@@ -1,6 +1,6 @@
 /*
-    File: src/atomic.ts
-    cpuabuse.com
+	File: src/atomic.ts
+	cpuabuse.com
 */
 
 /**

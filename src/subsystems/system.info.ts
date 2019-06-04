@@ -1,9 +1,9 @@
-/*	 
-	 File: info.ts
-	 cpuabuse.com
+/*
+	File: info.ts
+	cpuabuse.com
 */
 
-/** 
+/**
  * Subsystem info.
  */
 

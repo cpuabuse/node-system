@@ -1,9 +1,9 @@
-/*	
+/*
 	File: info.options.ts
 	cpuabuse.com
 */
 
-/** 
+/**
  * Used for storing system options.
  */
 

@@ -1,4 +1,4 @@
-/*	
+/*
 	File: src/system-file.ts
 	cpuabuse.com
 */

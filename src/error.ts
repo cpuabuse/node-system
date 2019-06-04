@@ -1,9 +1,9 @@
-/*	
+/*
 	File: src/error.ts
 	cpuabuse.com
 */
 
-/** 
+/**
  * Provides errors for the system.
  */
 

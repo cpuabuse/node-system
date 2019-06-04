@@ -1,9 +1,13 @@
-/*	
+/*
 	File: src/errors.ts
 	cpuabuse.com
 */
 
 /** 
+ * Contains list of errors used in system.
+ */
+
+/**
  * Contains list of errors used in system.
  */
 

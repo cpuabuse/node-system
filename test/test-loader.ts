@@ -1,4 +1,4 @@
-/*	
+/*
 	File: test/test-loader.ts
 	cpuabuse.com
 */

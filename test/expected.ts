@@ -1,9 +1,9 @@
-/*  
-  File: test/expected.ts
-  cpuabuse.com
+/*
+	File: test/expected.ts
+	cpuabuse.com
 */
 
-/** 
+/**
  * Contains constants for comparing against in testing.
  */
 

@@ -1,6 +1,6 @@
- /*   
-    File: src/meta/externals.ts
-    cpuabuse.com
+/*
+	File: src/meta/externals.ts
+	cpuabuse.com
 */
 
 /**

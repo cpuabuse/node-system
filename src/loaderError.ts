@@ -1,4 +1,4 @@
-/*	
+/*
 	File: src/loaderError.js
 	cpuabuse.com
 */

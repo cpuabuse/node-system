@@ -1,6 +1,6 @@
 /*
-    File:  meta/callback.ts
-    cpuabuse.com
+	File: meta/callback.ts
+	cpuabuse.com
 */
 
 /**
