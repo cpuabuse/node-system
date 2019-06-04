@@ -3,7 +3,7 @@
 	cpuabuse.com
 */
 
-/** 
+/**
  * Used for constructing subsystems within system.
  */
 

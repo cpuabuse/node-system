@@ -1,6 +1,6 @@
-/*    
-    File: src/events.ts
-    cpuabuse.com
+/*
+	File: src/events.ts
+	cpuabuse.com
 */
 
 /**

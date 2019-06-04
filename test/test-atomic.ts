@@ -1,4 +1,4 @@
-/*	
+/*
 	File: test/test-atomic.ts
 	cpuabuse.com
 */

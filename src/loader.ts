@@ -1,4 +1,4 @@
-/*	
+/*
 	File: src/loader.ts
 	cpuabuse.com
 */

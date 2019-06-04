@@ -1,4 +1,4 @@
-/*	
+/*
 	File: test.ts
 	cpuabuse.com
 */

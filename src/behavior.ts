@@ -1,4 +1,4 @@
-/*	
+/*
 	File: src/behaviors.ts
 	cpuabuse.com
 */

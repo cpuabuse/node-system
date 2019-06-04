@@ -1,6 +1,6 @@
 /*
-    File: src/subsystems/system.file.ts
-    cpuabuse.com
+	File: src/subsystems/system.file.ts
+	cpuabuse.com
 */
 
 "use strict";
