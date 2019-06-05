@@ -3,34 +3,29 @@
  * Performs basic tests.
  * If error is thrown, node will exit with code 1, otherwise 0.
 */
-"use strict";
+
 
 // Set eslint to ingore describe and it for assert
 /* global describe:true */
 /* global it:true */
 /* global before:true */
-
-const loader = require("../src/loader.js");
-const loaderError = require("../src/loaderError.js");
-const assert = require("assert");
-const path = require("path");
+import * as loader from "../src/loader";
+import * as loaderError from "../src/loaderError";
+import * as assert from "assert";
+import * as path from "path";
 const nonExistentFileOrDir = "Non-existent file or directory";
 
 /**
  * Tests for the Loader class.
- * @member Loader
- * @memberof module:system~test
  */
 export function testLoader(){
 	describe("Loader", function() {
 		/**
 		 * Tests the constructor for:
-		 *
+		 * 
 		 * - "unexpected_constructor" error
 		 * - Non-failure with dummy
 		 * - "Invalid intialization entry type" error
-		 * @member constructor
-		 * @memberof module:system~test.Loader
 		 */
 		describe("constructor", function(){
 			it("should produce unexpected_constructor error, with incoherent args", function(){
@@ -65,7 +60,6 @@ export function testLoader(){
 		/**
 		 * Tests that function produces appropriate object from YAML string.
 		 * @function yamlToObject
-		 * @memberof module:system~test.Loader
 		 */
 		describe(".yamlToObject()", function(){
 			let data = "Wine: Red";
@@ -183,9 +177,6 @@ export function testLoader(){
 
 				/**
 				 * Constructor should either reject or not.
-				 * @instance
-				 * @member constructor
-				 * @memberof module:system~test.Loader
 				 */
 				describe("constructor", function(){
 					it("should " + (element.hasOwnProperty("constructorError") ? "reject with" + element.hasOwnProperty("constructorError") : "not reject"), function(){
@@ -195,9 +186,6 @@ export function testLoader(){
 
 				/**
 				 * Checks for instance grandchildren values.
-				 * @instance
-				 * @member grandChildrenCompare
-				 * @memberof module:system~test.Loader
 				 */
 				if(element.hasOwnProperty("grandChildrenCompare")){
 					if(element.grandChildrenCompare.length > 0){
@@ -214,9 +202,6 @@ export function testLoader(){
 
 				/**
 				 * Checks for instance greatgrandchildren values.
-				 * @instance
-				 * @member greatGrandChildrenCompare
-				 * @memberof module:system~test.Loader
 				 */
 				if(element.hasOwnProperty("greatGrandChildrenCompare")){
 					if(element.greatGrandChildrenCompare.length > 0){
@@ -233,12 +218,9 @@ export function testLoader(){
 
 				/**
 				 * Tests the list function for:
-				 *
+				 * 
 				 * - List length consistency
 				 * - Rejection with inconsistent args
-				 * @instance
-				 * @function list
-				 * @memberof module:system~test.Loader
 				 */
 				describe(".list(\"" + element.rootDir + "\", \"" + element.dir + "\")", function(){
 					it("should have a length of " + element.filesAndFoldersAmount.toString() + "with args", function(done) {
@@ -257,9 +239,6 @@ export function testLoader(){
 				 *
 				 * - Single argument
 				 * - Array as argument
-				 * @instance
-				 * @function toRelative
-				 * @memberof module:system~test.Loader
 				 */
 				describe(".toRelative()", function(){
 					let absolutePath = element.rootDir + path.sep + element.dir; // Absolute path from root
@@ -276,9 +255,6 @@ export function testLoader(){
 				 *
 				 * - Single argument
 				 * - Array as argument
-				 * @instance
-				 * @function join
-				 * @memberof module:system~test.Loader
 				 */
 				describe(".join(\"" + element.rootDir + "\", \"" + element.dir + "\")", function(){
 					let expectedPath = element.rootDir + path.sep + element.dir;
@@ -296,9 +272,6 @@ export function testLoader(){
 				 * - Being a file
 				 * - Not being a file for a directory
 				 * - Not being a file for non-existant file
-				 * @instance
-				 * @function isFile
-				 * @memberof module:system~test.Loader
 				 */
 				describe(".isFile(\"" + element.rootDir + "\", \"" + element.dir + "\", \"" + element.rawFilename + "\")", function(){
 					let isFile = loader.Loader.isFile(element.rootDir + path.sep + element.dir + path.sep + element.rawFilename);
@@ -328,9 +301,6 @@ export function testLoader(){
 				 * - A directory
 				 * - A file
 				 * - A non-existant directory
-				 * @instance
-				 * @function isDir
-				 * @memberof module:system~test.Loader
 				 */
 				describe(".isDir()" , function(){
 					it("should be a directory with args (\"" + element.rootDir + "\", \"" + element.dir + "\")", function(done){
