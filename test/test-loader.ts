@@ -12,51 +12,74 @@
 /* global describe:true */
 /* global it:true */
 /* global before:true */
-import * as loader from "../src/loader";
-import * as loaderError from "../src/loaderError";
 import * as assert from "assert";
 import * as path from "path";
+import { Loader } from "../src/loader";
+import { LoaderError } from "../src/loaderError";
+
 const nonExistentFileOrDir = "Non-existent file or directory";
 
 /**
  * Tests for the Loader class.
  */
-export function testLoader(){
-	describe("Loader", function() {
+export function testLoader() {
+	describe("Loader", function loaderLoader() {
 		/**
 		 * Tests the constructor for:
-		 * 
+		 *
 		 * - "unexpected_constructor" error
 		 * - Non-failure with dummy
 		 * - "Invalid intialization entry type" error
 		 */
-		describe("constructor", function(){
-			it("should produce unexpected_constructor error, with incoherent args", function(){
+		describe("constructor", function loaderConstructor() {
+			it("should produce unexpected_constructor error, with incoherent args", function loaderConstructorUnexpected() {
 				assert.throws(
-					function(){
-						new loader.Loader("string", null, "string", null); /* eslint-disable-line no-new */// "new Loader" is only used for side-effects of testing
+					function loaderConstructorUnexpectedThrowsFn() {
+						new Loader /* eslint-disable-line no-new */( // "new Loader" is only used for side-effects of testing
+							"string",
+							null,
+							"string",
+							null
+						);
 					},
-					function(error){
-						return ((error instanceof loaderError.LoaderError) && error.code === "unexpected_constructor");
+					function loaderConstructorUnexpectedThrowsError(
+						error: LoaderError | Error
+					) {
+						return (
+							error instanceof LoaderError &&
+							error.code === "unexpected_constructor"
+						);
 					}
 				);
 			});
-			it("should not fail as a dummy", function(){
-				new loader.Loader(null); /* eslint-disable-line no-new */// "new Loader" is only used for side-effects of testing
+			it("should not fail as a dummy", function loaderConstructorDummy() {
+				new Loader(null, null, null, null); /* eslint-disable-line no-new */ // "new Loader" is only used for side-effects of testing
 			});
-			it("should produce \"Invalid intialization entry type - average_height\", when called with respective initialization file", function(){
-				new loader.Loader("test", "trees", "init", function(load){ /* eslint-disable-line no-new */// "new Loader" is only used for side-effects of testing
-					load.catch(function(err){
-						assert.throws(
-							function(){
-								throw err;
-							},
-							function(error){
-								return ((error instanceof Error) && error.message === "Invalid intialization entry type - average_height");
-							}
-						);
-					});
-				});
+			it('should produce "Invalid intialization entry type - average_height", when called with respective initialization file', function loaderConstructorInvalid() {
+				/* eslint-disable-next-line no-new */ // "new Loader" is only used for side-effects of testing
+				new Loader(
+					"test",
+					"trees",
+					"init",
+					function loaderConstructorInvalidLoad(load) {
+						load.catch(function loaderConstructorInvalidCatch(err) {
+							assert.throws(
+								function loaderConstructorInvalidThrows() {
+									throw err;
+								},
+								function loaderConstructorInvalidError(
+									error: LoaderError | Error
+								) {
+									return (
+										error instanceof LoaderError &&
+										error.message ===
+											"Invalid intialization entry type - average_height"
+									);
+								}
+							);
+						});
+					}
+				);
 			});
 		});
 
@@ -64,13 +87,13 @@ export function testLoader(){
 		 * Tests that function produces appropriate object from YAML string.
 		 * @function yamlToObject
 		 */
-		describe(".yamlToObject()", function(){
+		describe(".yamlToObject()", function() {
 			let data = "Wine: Red";
 			let expectedResults = {
 				Wine: "Red"
 			};
-			it("should produce JSON", function(){
-				assert.deepEqual(loader.Loader.yamlToObject(data), expectedResults);
+			it("should produce JSON", function() {
+				assert.deepEqual(Loader.yamlToObject(data), expectedResults);
 			});
 		});
 
@@ -161,44 +184,65 @@ export function testLoader(){
 				constructorError: "Invalid intialization entry type - trucks"
 			}
 		];
-		loaders.forEach(function(element){
-			describe(element.name, function(){
+		loaders.forEach(function(element) {
+			describe(element.name, function() {
 				let loaderTest;
 				let constructorErrorOk;
-				before(function(done){
-					loaderTest = new loader.Loader(element.rootDir, element.dir, element.file, load => {
-						if(element.hasOwnProperty("constructorError")){
-							constructorErrorOk = assert.rejects(load, function(error){
-								return ((error instanceof Error) && error.message === "Invalid intialization entry type - trucks");
-							});
-						} else {
-							constructorErrorOk = assert.doesNotReject(load);
+				before(function(done) {
+					loaderTest = new Loader(
+						element.rootDir,
+						element.dir,
+						element.file,
+						load => {
+							if (element.hasOwnProperty("constructorError")) {
+								constructorErrorOk = assert.rejects(load, function(error) {
+									return (
+										error instanceof Error &&
+										error.message ===
+											"Invalid intialization entry type - trucks"
+									);
+								});
+							} else {
+								constructorErrorOk = assert.doesNotReject(load);
+							}
+							done();
 						}
-						done();
-					});
+					);
 				});
 
 				/**
 				 * Constructor should either reject or not.
 				 */
-				describe("constructor", function(){
-					it("should " + (element.hasOwnProperty("constructorError") ? "reject with" + element.hasOwnProperty("constructorError") : "not reject"), function(){
-						return assert.doesNotReject(constructorErrorOk);
-					});
+				describe("constructor", function() {
+					it(
+						"should " +
+							(element.hasOwnProperty("constructorError")
+								? "reject with" + element.hasOwnProperty("constructorError")
+								: "not reject"),
+						function() {
+							return assert.doesNotReject(constructorErrorOk);
+						}
+					);
 				});
 
 				/**
 				 * Checks for instance grandchildren values.
 				 */
-				if(element.hasOwnProperty("grandChildrenCompare")){
-					if(element.grandChildrenCompare.length > 0){
-						element.grandChildrenCompare.forEach(function(compare){
-							describe("#" + compare.child + "." + compare.grandChild, function() {
-								it("should be " + compare.value, function(done) {
-									assert.strictEqual(loaderTest[compare.child][compare.grandChild], compare.value);
-									done();
-								});
-							});
+				if (element.hasOwnProperty("grandChildrenCompare")) {
+					if (element.grandChildrenCompare.length > 0) {
+						element.grandChildrenCompare.forEach(function(compare) {
+							describe(
+								"#" + compare.child + "." + compare.grandChild,
+								function() {
+									it("should be " + compare.value, function(done) {
+										assert.strictEqual(
+											loaderTest[compare.child][compare.grandChild],
+											compare.value
+										);
+										done();
+									});
+								}
+							);
 						});
 					}
 				}
@@ -206,36 +250,62 @@ export function testLoader(){
 				/**
 				 * Checks for instance greatgrandchildren values.
 				 */
-				if(element.hasOwnProperty("greatGrandChildrenCompare")){
-					if(element.greatGrandChildrenCompare.length > 0){
-						element.greatGrandChildrenCompare.forEach(function(compare){
-							describe("#" + compare.child + "." + compare.grandChild + "." + compare.greatGrandChild, function() {
-								it("should be " + compare.value, function(done) {
-									assert.strictEqual(loaderTest[compare.child][compare.grandChild][compare.greatGrandChild], compare.value);
-									done();
-								});
-							});
+				if (element.hasOwnProperty("greatGrandChildrenCompare")) {
+					if (element.greatGrandChildrenCompare.length > 0) {
+						element.greatGrandChildrenCompare.forEach(function(compare) {
+							describe(
+								"#" +
+									compare.child +
+									"." +
+									compare.grandChild +
+									"." +
+									compare.greatGrandChild,
+								function() {
+									it("should be " + compare.value, function(done) {
+										assert.strictEqual(
+											loaderTest[compare.child][compare.grandChild][
+												compare.greatGrandChild
+											],
+											compare.value
+										);
+										done();
+									});
+								}
+							);
 						});
 					}
 				}
 
 				/**
 				 * Tests the list function for:
-				 * 
+				 *
 				 * - List length consistency
 				 * - Rejection with inconsistent args
 				 */
-				describe(".list(\"" + element.rootDir + "\", \"" + element.dir + "\")", function(){
-					it("should have a length of " + element.filesAndFoldersAmount.toString() + "with args", function(done) {
-						loader.Loader.list(element.rootDir, element.dir).then(function(result){
-							assert.strictEqual(result.length, element.filesAndFoldersAmount);
-							done();
+				describe(
+					'.list("' + element.rootDir + '", "' + element.dir + '")',
+					function() {
+						it(
+							"should have a length of " +
+								element.filesAndFoldersAmount.toString() +
+								"with args",
+							function(done) {
+								Loader.list(element.rootDir, element.dir).then(function(
+									result
+								) {
+									assert.strictEqual(
+										result.length,
+										element.filesAndFoldersAmount
+									);
+									done();
+								});
+							}
+						);
+						it("should reject with args", function() {
+							assert.rejects(Loader.list(element.rootDir, "Some text."));
 						});
-					});
-					it("should reject with args", function() {
-						assert.rejects(loader.Loader.list(element.rootDir, "Some text."));
-					});
-				});
+					}
+				);
 
 				/**
 				 * Tests the toRelative function with:
@@ -243,13 +313,28 @@ export function testLoader(){
 				 * - Single argument
 				 * - Array as argument
 				 */
-				describe(".toRelative()", function(){
+				describe(".toRelative()", function() {
 					let absolutePath = element.rootDir + path.sep + element.dir; // Absolute path from root
-					it("should be equal to \"" + element.dir + "\" with args (\"" + element.rootDir + "\", \"" + absolutePath + "\")", function(){
-						assert.strictEqual(loader.Loader.toRelative(element.rootDir, absolutePath), element.dir);
-					});
-					it("should work with array", function(){
-						assert.deepEqual(loader.Loader.toRelative(element.rootDir, [absolutePath, absolutePath]), [element.dir, element.dir]);
+					it(
+						'should be equal to "' +
+							element.dir +
+							'" with args ("' +
+							element.rootDir +
+							'", "' +
+							absolutePath +
+							'")',
+						function() {
+							assert.strictEqual(
+								Loader.toRelative(element.rootDir, absolutePath),
+								element.dir
+							);
+						}
+					);
+					it("should work with array", function() {
+						assert.deepEqual(
+							Loader.toRelative(element.rootDir, [absolutePath, absolutePath]),
+							[element.dir, element.dir]
+						);
 					});
 				});
 
@@ -259,15 +344,24 @@ export function testLoader(){
 				 * - Single argument
 				 * - Array as argument
 				 */
-				describe(".join(\"" + element.rootDir + "\", \"" + element.dir + "\")", function(){
-					let expectedPath = element.rootDir + path.sep + element.dir;
-					it("should be equal to " + expectedPath, function(){
-						assert.strictEqual(loader.Loader.join(element.rootDir, element.dir), expectedPath);
-					});
-					it("should work with array", function(){
-						assert.deepEqual(loader.Loader.join(element.rootDir, [element.dir, element.dir]), [expectedPath, expectedPath]);
-					});
-				});
+				describe(
+					'.join("' + element.rootDir + '", "' + element.dir + '")',
+					function() {
+						let expectedPath = element.rootDir + path.sep + element.dir;
+						it("should be equal to " + expectedPath, function() {
+							assert.strictEqual(
+								Loader.join(element.rootDir, element.dir),
+								expectedPath
+							);
+						});
+						it("should work with array", function() {
+							assert.deepEqual(
+								Loader.join(element.rootDir, [element.dir, element.dir]),
+								[expectedPath, expectedPath]
+							);
+						});
+					}
+				);
 
 				/**
 				 * Tests the isFile for:
@@ -276,27 +370,69 @@ export function testLoader(){
 				 * - Not being a file for a directory
 				 * - Not being a file for non-existant file
 				 */
-				describe(".isFile(\"" + element.rootDir + "\", \"" + element.dir + "\", \"" + element.rawFilename + "\")", function(){
-					let isFile = loader.Loader.isFile(element.rootDir + path.sep + element.dir + path.sep + element.rawFilename);
-					it("should be a file with args(\"" + element.rootDir + path.sep + element.dir + path.sep + element.rawFilename + "\")", function(done){
-						isFile.then(function(result){
-							assert.strictEqual(result, true);
-							done();
-						});
-					});
-					it("should not be a directory with args (\"" + element.rootDir + path.sep + element.dir + "\")", function(done){
-						loader.Loader.isFile(element.rootDir + path.sep + element.dir).then(function(result){
-							assert.strictEqual(result, false);
-							done();
-						});
-					});
-					it("should not be a directory with args (\"" + element.rootDir + path.sep + nonExistentFileOrDir + "\")", function(done){
-						loader.Loader.isFile(element.rootDir + path.sep + nonExistentFileOrDir).then(function(result){
-							assert.strictEqual(result, false);
-							done();
-						});
-					});
-				});
+				describe(
+					'.isFile("' +
+						element.rootDir +
+						'", "' +
+						element.dir +
+						'", "' +
+						element.rawFilename +
+						'")',
+					function() {
+						let isFile = Loader.isFile(
+							element.rootDir +
+								path.sep +
+								element.dir +
+								path.sep +
+								element.rawFilename
+						);
+						it(
+							'should be a file with args("' +
+								element.rootDir +
+								path.sep +
+								element.dir +
+								path.sep +
+								element.rawFilename +
+								'")',
+							function(done) {
+								isFile.then(function(result) {
+									assert.strictEqual(result, true);
+									done();
+								});
+							}
+						);
+						it(
+							'should not be a directory with args ("' +
+								element.rootDir +
+								path.sep +
+								element.dir +
+								'")',
+							function(done) {
+								Loader.isFile(element.rootDir + path.sep + element.dir).then(
+									function(result) {
+										assert.strictEqual(result, false);
+										done();
+									}
+								);
+							}
+						);
+						it(
+							'should not be a directory with args ("' +
+								element.rootDir +
+								path.sep +
+								nonExistentFileOrDir +
+								'")',
+							function(done) {
+								Loader.isFile(
+									element.rootDir + path.sep + nonExistentFileOrDir
+								).then(function(result) {
+									assert.strictEqual(result, false);
+									done();
+								});
+							}
+						);
+					}
+				);
 
 				/**
 				 * Tests the isDir function with:
@@ -305,27 +441,55 @@ export function testLoader(){
 				 * - A file
 				 * - A non-existant directory
 				 */
-				describe(".isDir()" , function(){
-					it("should be a directory with args (\"" + element.rootDir + "\", \"" + element.dir + "\")", function(done){
-						loader.Loader.isDir(element.rootDir, element.dir).then(function(result){
-							assert.strictEqual(result, true);
-							done();
-						});
-					});
+				describe(".isDir()", function() {
+					it(
+						'should be a directory with args ("' +
+							element.rootDir +
+							'", "' +
+							element.dir +
+							'")',
+						function(done) {
+							Loader.isDir(element.rootDir, element.dir).then(function(result) {
+								assert.strictEqual(result, true);
+								done();
+							});
+						}
+					);
 
-					it("should not be a directory with args (\"" + element.rootDir + "\", \"" + element.dir + path.sep + element.rawFilename + "\")", function(done){
-						loader.Loader.isDir(element.rootDir, loader.Loader.join(element.dir, element.rawFilename)).then(function(result){
-							assert.strictEqual(result, false);
-							done();
-						});
-					});
+					it(
+						'should not be a directory with args ("' +
+							element.rootDir +
+							'", "' +
+							element.dir +
+							path.sep +
+							element.rawFilename +
+							'")',
+						function(done) {
+							Loader.isDir(
+								element.rootDir,
+								Loader.join(element.dir, element.rawFilename)
+							).then(function(result) {
+								assert.strictEqual(result, false);
+								done();
+							});
+						}
+					);
 
-					it("should not be a directory with args (\"" + element.rootDir + "\", \"" + nonExistentFileOrDir + "\")", function(done){
-						loader.Loader.isDir(element.rootDir, nonExistentFileOrDir).then(function(result){
-							assert.strictEqual(result, false);
-							done();
-						});
-					});
+					it(
+						'should not be a directory with args ("' +
+							element.rootDir +
+							'", "' +
+							nonExistentFileOrDir +
+							'")',
+						function(done) {
+							Loader.isDir(element.rootDir, nonExistentFileOrDir).then(function(
+								result
+							) {
+								assert.strictEqual(result, false);
+								done();
+							});
+						}
+					);
 				});
 			});
 		});
@@ -333,4 +497,4 @@ export function testLoader(){
 }
 module.exports = {
 	testLoader
-}
+};

@@ -32,7 +32,7 @@ rules:
   # Disallow the unary operators ++ and --.
   # Always.
   no-plusplus: off
-  
+
   # Suggest using const.
   # Managed by ESLint.
   prefer-const: off
@@ -40,7 +40,7 @@ rules:
   # Import Sorting.
   # Sort everything.
   sort-imports: 2
-  
+
   # Require object keys to be sorted.
   # Sort everything.
   sort-keys: 2

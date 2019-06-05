@@ -11,7 +11,7 @@ import * as fs from "fs";
 import * as yaml from "js-yaml";
 import * as path from "path";
 
-import {LoaderError} from "./loaderError";
+import { LoaderError } from "./loaderError";
 
 /**
  * Constructor callback.
@@ -20,7 +20,7 @@ import {LoaderError} from "./loaderError";
 export type ConstructorCallback = (done: Promise<void>) => void;
 
 /** Required by system to perform file initialization. */
-export class Loader{
+export class Loader {
 	/**
 	 * Extracts relative path from rootDir to target.
 	 *
@@ -37,12 +37,15 @@ export class Loader{
 	 * @param target File/folder name|names.
 	 * @returns Relative path|paths.
 	 */
-	public static toRelative(dir: string, target: string | Array<string>): string | Array<string>{
-		if (Array.isArray(target)){
+	public static toRelative(
+		dir: string,
+		target: string | Array<string>
+	): string | Array<string> {
+		if (Array.isArray(target)) {
 			let results: Array<string> = new Array() as Array<string>; // Prepare the return array
 
 			// Populate return array
-			target.forEach(function(targetMember: string): void{
+			target.forEach(function(targetMember: string): void {
 				results.push(path.relative(dir, targetMember));
 			});
 
@@ -61,23 +64,41 @@ export class Loader{
 	 * @param callback Callback to call with Promise of completion.
 	 * @throws [[LoaderError]] Will throw `unexpected_constructor`
 	 */
-	public constructor(rootDir?: string, arg_relativeInitDir?: string, arg_initFilename?: string, callback?: ConstructorCallback){
+	public constructor(
+		rootDir: string | null,
+		arg_relativeInitDir: string | null,
+		arg_initFilename: string | null,
+		callback: ConstructorCallback | null
+	) {
 		/** A dummy constructor. */
-		function dummyConstructor(){}/* eslint-disable-line no-empty-function */// Empty because dummy
+		function dummyConstructor() {} /* eslint-disable-line no-empty-function */ // Empty because dummy
 
 		/** The standard constructor. */
 		var standardConstructor = () => {
 			// Initialization recursion; The error handling of the callback will happen asynchronously
-			callback(initRecursion(rootDir, arg_relativeInitDir, arg_initFilename, this, true));
+			callback(
+				initRecursion(
+					rootDir,
+					arg_relativeInitDir,
+					arg_initFilename,
+					this,
+					true
+				)
+			);
 		};
 
 		// Determine which constructor to use.
 		let previousIsNull: boolean | null = null;
-		for (var a = 0; a < arguments.length; a++){
-			if (a === 0){
-				previousIsNull = arguments[a] === null; /* eslint-disable-line prefer-rest-params */
-			} else if (previousIsNull !== (arguments[a] === null)){ /* eslint-disable-line prefer-rest-params */
-				throw new LoaderError("unexpected_constructor", "Null and String arguments found while deciding the constructor method.");
+		for (var a = 0; a < arguments.length; a++) {
+			if (a === 0) {
+				previousIsNull =
+					arguments[a] === null; /* eslint-disable-line prefer-rest-params */
+			} else if (previousIsNull !== (arguments[a] === null)) {
+				/* eslint-disable-line prefer-rest-params */
+				throw new LoaderError(
+					"unexpected_constructor",
+					"Null and String arguments found while deciding the constructor method."
+				);
 			}
 		}
 
@@ -86,7 +107,7 @@ export class Loader{
 			The execution path for neither true, false or null is removed, since there is no way to reach it.
 			It is important to check as "=== false", as we are dealing with null as well.
 		*/
-		if(previousIsNull === false){
+		if (previousIsNull === false) {
 			standardConstructor();
 		} else {
 			dummyConstructor();
@@ -120,10 +141,14 @@ export class Loader{
 	 * @param file Full file name.
 	 * @returns File contents.
 	 */
-	static getFile(rootDir:string, relativeDir:string, file:string):Promise<Buffer>{
-		return new Promise(function(resolve, reject){
-			fs.readFile(path.join(rootDir, relativeDir, file), function(err, data){
-				if (err){
+	static getFile(
+		rootDir: string,
+		relativeDir: string,
+		file: string
+	): Promise<Buffer> {
+		return new Promise(function(resolve, reject) {
+			fs.readFile(path.join(rootDir, relativeDir, file), function(err, data) {
+				if (err) {
 					reject(err);
 				} else {
 					resolve(data);
@@ -147,11 +172,13 @@ export class Loader{
 	 * @param pathArrays File/folder name|names.
 	 * @returns Absolute path|paths.
 	 */
-	static join(...pathArrays: Array<string | Array<string>>): string | Array<string>{
+	static join(
+		...pathArrays: Array<string | Array<string>>
+	): string | Array<string> {
 		// Determine maximum pathArray length & construct metadata
 		var maxLength: number = 0;
-		var arraysMeta: Array<{isArray: boolean, length:number}> = new Array();
-		pathArrays.forEach(function(pathArray){
+		var arraysMeta: Array<{ isArray: boolean; length: number }> = new Array();
+		pathArrays.forEach(function(pathArray) {
 			let isArray: boolean = Array.isArray(pathArray);
 			let length: number = isArray ? pathArray.length : 1;
 
@@ -162,33 +189,38 @@ export class Loader{
 			});
 
 			// Compare maxLength
-			if(length > maxLength){
+			if (length > maxLength) {
 				maxLength = length;
 			}
 		});
 
 		// Special case, when args provided were exclusively empty arrays
-		if(maxLength === 0) {
+		if (maxLength === 0) {
 			return "";
 		}
 
 		// Loop
-		let filter: Array<{isArray: boolean, length:number}> = arraysMeta.filter(function(array){
-			return array.isArray;
-		});
-		if(filter.length === 0){
+		let filter: Array<{ isArray: boolean; length: number }> = arraysMeta.filter(
+			function(array) {
+				return array.isArray;
+			}
+		);
+		if (filter.length === 0) {
 			// Return a string if no arrays
-			return path.join(...<Array<string>>pathArrays); // Casting due to inability of compiler to detect that there are no other types possible
-		} else { // In case of arrays present
+			return path.join(...(<Array<string>>pathArrays)); // Casting due to inability of compiler to detect that there are no other types possible
+		} else {
+			// In case of arrays present
 			var results: Array<string> = new Array(); // Prepare the return array
-			for(let i = 0; i < maxLength; i++){
+			for (let i = 0; i < maxLength; i++) {
 				let joinData: Array<string> = new Array();
-				pathArrays.forEach(function(pathArray, index){
+				pathArrays.forEach(function(pathArray, index) {
 					let toPush: string | null = null;
-					let {length}: {isArray: boolean, length: number} = arraysMeta[index];
-					if(arraysMeta[index].isArray){
-						if(length < i + 1){
-							if(length > 0){
+					let { length }: { isArray: boolean; length: number } = arraysMeta[
+						index
+					];
+					if (arraysMeta[index].isArray) {
+						if (length < i + 1) {
+							if (length > 0) {
 								toPush = pathArray[length];
 							}
 						} else {
@@ -197,7 +229,7 @@ export class Loader{
 					} else {
 						toPush = <string>pathArray; // Casting due to inability of compiler to detect that there are no other types possible
 					}
-					if(toPush !== null){
+					if (toPush !== null) {
 						joinData.push(toPush);
 					}
 				});
@@ -227,10 +259,10 @@ export class Loader{
 	 * @param rawPath Full filepath.
 	 * @returns Returns `true` if a file, `false` if not.
 	 */
-	static isFile(rawPath: string): Promise<boolean>{
-		return new Promise(function(resolve){
-			fs.stat(rawPath, function(err, stats){
-				if (err){
+	static isFile(rawPath: string): Promise<boolean> {
+		return new Promise(function(resolve) {
+			fs.stat(rawPath, function(err, stats) {
+				if (err) {
 					resolve(false);
 				} else {
 					resolve(!stats.isDirectory());
@@ -260,10 +292,10 @@ export class Loader{
 	 * @param relativeDir Relative directory to root.
 	 * @returns Returns `true` if a directory, `false` if not.
 	 */
-	static isDir(rootDir:string, relativeDir:string): Promise<boolean>{
-		return new Promise(function(resolve){
-			fs.stat(path.join(rootDir, relativeDir), function(err, stats){
-				if (err){
+	static isDir(rootDir: string, relativeDir: string): Promise<boolean> {
+		return new Promise(function(resolve) {
+			fs.stat(path.join(rootDir, relativeDir), function(err, stats) {
+				if (err) {
 					resolve(false);
 				} else {
 					resolve(stats.isDirectory());
@@ -292,10 +324,10 @@ export class Loader{
 	 * @param relativeDir Relative directory.
 	 * @returns Array with contents; Rejects with errors from [fs.readdir](https://nodejs.org/api/fs.html#fs_fs_readdir_path_options_callback).
 	 */
-	static list(rootDir: string, relativeDir: string): Promise<Array<string>>{
-		return new Promise(function(resolve, reject){
-			fs.readdir(path.join(rootDir, relativeDir), function(err, files){
-				if (err){
+	static list(rootDir: string, relativeDir: string): Promise<Array<string>> {
+		return new Promise(function(resolve, reject) {
+			fs.readdir(path.join(rootDir, relativeDir), function(err, files) {
+				if (err) {
 					reject(err);
 				} else {
 					resolve(files);
@@ -319,7 +351,7 @@ export class Loader{
 	 * @param string YAML string.
 	 * @returns Javascript object.
 	 */
-	static yamlToObject(string: string):any{
+	static yamlToObject(string: string): any {
 		return yaml.load(string);
 	}
 }
@@ -414,13 +446,13 @@ async function initRecursion(
 	rootDir: string,
 	relativePath: string,
 	initFilename: string,
-	targetObject:any,
+	targetObject: any,
 	extend: boolean
-){
+) {
 	// Initialize the initialization file
 	let init = await initSettings(rootDir, relativePath, initFilename);
 	// Return if no extending
-	if(!extend) {
+	if (!extend) {
 		Object.assign(targetObject, init);
 		return;
 	}
@@ -431,51 +463,56 @@ async function initRecursion(
 			file: string = key,
 			pathIsAbsolute: boolean = true,
 			extend: boolean = false;
-		switch (typeof init[key]){
+		switch (typeof init[key]) {
 			case "string": {
-				if (init[key] != ""){
+				if (init[key] != "") {
 					file = init[key];
 				}
 				break;
 			}
 
 			case "object": {
-				if(init[key] !== null){ // Custom properties
+				if (init[key] !== null) {
+					// Custom properties
 					// Check if property is set or assume default
-					let checkDefaultStringDirective: (property: string) => boolean = function (property) {
-						if (init[key].hasOwnProperty(property)){
-							if ((typeof init[key][property]) === "string"){
+					let checkDefaultStringDirective: (
+						property: string
+					) => boolean = function(property) {
+						if (init[key].hasOwnProperty(property)) {
+							if (typeof init[key][property] === "string") {
 								if (init[key][property] != "") {
 									return true;
 								}
 							}
 						}
 						return false;
-					}
+					};
 
-					let checkDefaultBooleanDirective: (property: string) => boolean = function (property) {
-						if (init[key].hasOwnProperty(property)){
-							if ((typeof init[key][property]) === "boolean"){
+					let checkDefaultBooleanDirective: (
+						property: string
+					) => boolean = function(property) {
+						if (init[key].hasOwnProperty(property)) {
+							if (typeof init[key][property] === "boolean") {
 								return true;
 							}
 						}
 						return false;
-					}
+					};
 
 					// Set the "extension" values
-					if (checkDefaultStringDirective("folder")){
-						({folder} = init[key]);
+					if (checkDefaultStringDirective("folder")) {
+						({ folder } = init[key]);
 					}
-					if (checkDefaultStringDirective("file")){
-						({file} = init[key]);
+					if (checkDefaultStringDirective("file")) {
+						({ file } = init[key]);
 					}
-					if (checkDefaultStringDirective("path")){
-						if(init[key].path == "relative") {
+					if (checkDefaultStringDirective("path")) {
+						if (init[key].path == "relative") {
 							pathIsAbsolute = false;
 						}
 					}
-					if (checkDefaultBooleanDirective("extend")){
-						if(init[key].extend == true) {
+					if (checkDefaultBooleanDirective("extend")) {
+						if (init[key].extend == true) {
 							extend = true;
 						}
 					}
@@ -484,13 +521,13 @@ async function initRecursion(
 			} // <== case "object"
 
 			default:
-			throw new Error("Invalid intialization entry type - " + key);
+				throw new Error("Invalid intialization entry type - " + key);
 		}
 		await initRecursion(
 			rootDir,
 			pathIsAbsolute ? folder : path.join(relativePath, folder),
 			file,
-			targetObject[key] = {},
+			(targetObject[key] = {}),
 			extend
 		);
 	}
@@ -514,14 +551,14 @@ async function initSettings(
 	rootDir: string,
 	relativeDir: string,
 	filename: string // Filename, without extention; If null, then varname will be used instead
-){
-    try {
-        // Set the global object from an argument of varname to data from YAML file with path constructed from varname; or filename, if filename provided
-        return await loadYaml(rootDir, relativeDir, filename);
-    } catch (err) {
-        // Error thrown for now. Because the caller handling of the systemErrorLevel variable does not exist yet.
-        throw(err);
-    }
+) {
+	try {
+		// Set the global object from an argument of varname to data from YAML file with path constructed from varname; or filename, if filename provided
+		return await loadYaml(rootDir, relativeDir, filename);
+	} catch (err) {
+		// Error thrown for now. Because the caller handling of the systemErrorLevel variable does not exist yet.
+		throw err;
+	}
 }
 
 /**
@@ -537,11 +574,15 @@ async function initSettings(
  * @param filename Filename, with or without extension.
  * @returns Javascript object.
  */
-export async function loadYaml(rootDir: string, relativeDir: string, filename: string){
+export async function loadYaml(
+	rootDir: string,
+	relativeDir: string,
+	filename: string
+) {
 	var fileExtension: string = ".yml"; // Making a variable for interpreted language like this would not even save any memory, but it feels right
 
 	// Add file extension if absent
-	if(!filename.endsWith(fileExtension)){
+	if (!filename.endsWith(fileExtension)) {
 		filename += fileExtension;
 	}
 
@@ -550,6 +591,6 @@ export async function loadYaml(rootDir: string, relativeDir: string, filename: s
 		var contents: Buffer = await Loader.getFile(rootDir, relativeDir, filename);
 		return yaml.load(contents.toString());
 	} catch (err) {
-		throw(err);
+		throw err;
 	}
 }
