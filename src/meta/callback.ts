@@ -1,4 +1,7 @@
-// meta/callback.ts
+/*
+	File: meta/callback.ts
+	cpuabuse.com
+*/
 
 /**
  * Callback for asynchronous constructors.

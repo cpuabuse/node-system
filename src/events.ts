@@ -1,4 +1,8 @@
-// src/events.ts
+/*
+	File: src/events.ts
+	cpuabuse.com
+*/
+
 /**
  * Contains list of events used in system.
  *

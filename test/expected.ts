@@ -1,7 +1,12 @@
-// test/expected.ts
 /*
-	Contains constants for comparing against in testing.
+	File: test/expected.ts
+	cpuabuse.com
 */
+
+/**
+ * Contains constants for comparing against in testing.
+ */
+
 "use strict";
 
 const flowerShopInit = `events:

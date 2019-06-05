@@ -1,19 +1,17 @@
 /**
  * System is intended more than anything, for centralized managment.
- * @module system
  */
 import { AtomicLock } from "./atomic";
 import { BehaviorInterface } from "./behavior";
 import { Loader } from "./loader";
 import { LoaderError } from "./loaderError";
-import { OptionsInterface } from "./subsystems/system.info.options";
 export { AtomicLock };
 /** An interface to describe the resolve argument of promise executor. */
 export declare type Resolve = (value?: void | PromiseLike<void> | undefined) => void;
 export declare type Reject = (reason?: any) => void;
 export declare type Executor = (resolve: Resolve, reject: Reject) => void;
 /** System options. */
-export interface ISystemArgs {
+export interface IOptions {
     /** System instace internal ID. */
     id: string;
     /** Initialization file filename. */
@@ -71,7 +69,11 @@ export declare class System extends Loader {
      * @param behaviors - Behaviors to add.
      * @param onError - Callback for error handling during delayed execution after loader has loaded. Takes error string as an argument.
      */
-    constructor(options: OptionsInterface, behaviors: BehaviorInterface, onError: IErrorCallback | null);
+    constructor({ options, behaviors, onError }: {
+        options: IOptions;
+        behaviors: BehaviorInterface;
+        onError: (IErrorCallback | null);
+    });
     /**
      * Checks options argument for missing incorrect property types
      * @param options System options argument

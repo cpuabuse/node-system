@@ -1,7 +1,12 @@
-// src/subsystem.ts
 /*
-	Used for constructing subsystems within system.
+	File: src/subsystem.ts
+	cpuabuse.com
 */
+
+/**
+ * Used for constructing subsystems within system.
+ */
+
 import {AtomicLock} from "./atomic";
 import {System} from "./system"; /* eslint-disable-line no-unused-vars */// ESLint type import detection bug
 

@@ -1,7 +1,10 @@
-// File: system/system.js
+/*
+	File: system/system.js
+	cpuabuse.com
+*/
+
 /**
  * System is intended more than anything, for centralized managment.
- * @module system
  */
 
 // Imports
@@ -12,7 +15,6 @@ import * as events from "./events";
 import {Loader, loadYaml} from "./loader"; // Auxiliary system lib
 import {LoaderError} from "./loaderError";
 import {ISubsystem, Subsystem} from "./subsystem"; /* eslint-disable-line no-unused-vars */// ESLint type import detection bug
-import {OptionsInterface} from "./subsystems/system.info.options"; /* eslint-disable-line no-unused-vars */// ESLint type import detection bug
 
 // Re-export
 export {AtomicLock};
@@ -23,7 +25,7 @@ export type Reject = (reason?: any) => void;
 export type Executor = (resolve: Resolve, reject: Reject) => void;
 
 /** System options. */
-export interface ISystemArgs{
+export interface IOptions{
 	/** System instace internal ID. */
 	id: string;
 
@@ -284,7 +286,7 @@ export class System extends Loader{
 	 * @param behaviors - Behaviors to add.
 	 * @param onError - Callback for error handling during delayed execution after loader has loaded. Takes error string as an argument.
 	 */
-	public constructor(options: OptionsInterface, behaviors: BehaviorInterface, onError: IErrorCallback | null){ /* eslint-disable-line constructor-super */// Rule bugs out
+	public constructor({options, behaviors, onError}: {options: IOptions, behaviors: BehaviorInterface, onError: (IErrorCallback | null)}){ /* eslint-disable-line constructor-super */// Rule bugs out
 		/**
 		 * Process the loader error.
 		 * Due to the design of the System constructor, this is supposed to be called only once during the constructor execution, no matter the failure.
@@ -495,7 +497,8 @@ export class System extends Loader{
 											this.system.subsystem[subsystem] = new subsystemClass({ /* eslint-disable-line new-cap */// It is an argument
 												args: systemArgs,
 												systemContext: this,
-												vars: subsystemsProperty.vars});
+												vars: subsystemsProperty.vars
+											});
 										}).catch(function(): void{
 											throw new LoaderError("loader_fail", "Could not load defined subsystems.");
 										});

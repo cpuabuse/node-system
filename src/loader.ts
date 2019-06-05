@@ -1,7 +1,12 @@
-// File: src/loader.ts
+/*
+	File: src/loader.ts
+	cpuabuse.com
+*/
+
 /**
  * Contains methods necessary to initialize the system and work with file system.
  */
+
 import * as fs from "fs";
 import * as yaml from "js-yaml";
 import * as path from "path";

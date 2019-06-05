@@ -1,4 +1,8 @@
-// File: test/test.ts
+/*
+	File: test/test.ts
+	cpuabuse.com
+*/
+
 /**
  * Performs basic tests.
  * If error is thrown, node will exit with code 1, otherwise 0.
