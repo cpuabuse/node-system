@@ -6,10 +6,14 @@ plugins:
   - "@typescript-eslint"
   - prettier
 extends:
+  - eslint:recommended
   - airbnb
-  - plugin:prettier/recommended
+  - prettier
 parserOptions:
   ecmaVersion: 2019
   sourceType: module
   ecmaFeatures:
     impliedStrict: true
+rules:
+  indent: off
+  prettier/prettier: error
