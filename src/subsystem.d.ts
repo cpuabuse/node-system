@@ -1,3 +1,6 @@
+/**
+ * Used for constructing subsystems within system.
+ */
 import { AtomicLock } from "./atomic";
 import { System } from "./system";
 export interface ISubsystem extends Subsystem {
@@ -18,7 +21,7 @@ export interface ConstructorArgs {
  * @typedef SubsystemMethod
  * @property {string} name Name of a function.
  * @property {Function} fn Function body, taking arbitrary arguments.
-*/
+ */
 export declare type SubsystemMethod = {
     name: string;
     fn: Function;

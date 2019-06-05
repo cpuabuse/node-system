@@ -1,17 +1,22 @@
-/**
- * System is intended more than anything, for centralized managment.
- */
-import { AtomicLock } from "./atomic";
 import { BehaviorInterface } from "./behavior";
 import { Loader } from "./loader";
 import { LoaderError } from "./loaderError";
+import { AtomicLock } from "./atomic";
 export { AtomicLock };
 /** An interface to describe the resolve argument of promise executor. */
-export declare type Resolve = (value?: void | PromiseLike<void> | undefined) => void;
-export declare type Reject = (reason?: any) => void;
-export declare type Executor = (resolve: Resolve, reject: Reject) => void;
+export interface Resolve {
+    (value?: void | PromiseLike<void> | undefined): void;
+}
+/** An interface to describe the reject argument of promise executor. */
+export interface Reject {
+    (reason?: any): void;
+}
+/** An interface to describe the promise executor. */
+export interface Executor {
+    (resolve: Resolve, reject: Reject): void;
+}
 /** System options. */
-export interface IOptions {
+export interface Options {
     /** System instace internal ID. */
     id: string;
     /** Initialization file filename. */
@@ -24,7 +29,7 @@ export interface IOptions {
     rootDir: string;
 }
 /** Error callback. */
-export interface IErrorCallback {
+export interface ErrorCallback {
     (error: LoaderError): void;
 }
 /**
@@ -32,18 +37,18 @@ export interface IErrorCallback {
  * @param filterContext Information on the item to be filtered.
  * @returns Promise, containing boolean result.
  */
-export interface IFilter {
+export interface Filter {
     (filterContext: FilterContext): Promise<boolean>;
 }
 /** Filter context. */
-declare type FilterContext = {
+interface FilterContext {
     /** Parent directory of the filtered item. */
     dir: string;
     /** Path to the filtered item */
     item: string;
     /** Name of the filtered item */
     itemName: string;
-};
+}
 /**
  * Provides wide range of functionality for file loading and event exchange.
  * Throws standard error if failed to perform basic initializations, or system failure that cannot be reported otherwise has occured.
@@ -53,6 +58,7 @@ declare type FilterContext = {
  * // TODO: @event module:system.System#events#systemLoad
  */
 export declare class System extends Loader {
+    /** Error list. */
     private readonly errors?;
     /**
      * Events to be populated by the loader.
@@ -70,9 +76,9 @@ export declare class System extends Loader {
      * @param onError - Callback for error handling during delayed execution after loader has loaded. Takes error string as an argument.
      */
     constructor({ options, behaviors, onError }: {
-        options: IOptions;
         behaviors: BehaviorInterface;
-        onError: (IErrorCallback | null);
+        onError: ErrorCallback | null;
+        options: Options;
     });
     /**
      * Checks options argument for missing incorrect property types

@@ -1,7 +1,4 @@
 /**
- * Atomic operations.
- */
-/**
  * Creates an instance of AtomicLock.
  * Single thread only, queue present.
  */

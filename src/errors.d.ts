@@ -1,4 +1,10 @@
 /**
+ * Contains list of errors used in system.
+ */
+/**
+ * Contains list of errors used in system.
+ */
+/**
  * @instance
  * @type {module:system~SystemError}
  * @member behavior_does_not_exist

@@ -15,5 +15,36 @@ parserOptions:
   ecmaFeatures:
     impliedStrict: true
 rules:
-  indent: off
   prettier/prettier: error
+
+  # Enforce consistent indentation.
+  # Managed by prettier.
+  indent: off
+
+  # Disallow Array constructors.
+  # Let programmer decide.
+  no-array-constructor: off
+
+  # Disallow Object constructors.
+  # Let programmer decide.
+  no-new-object: off
+
+  # Disallow the unary operators ++ and --.
+  # Always.
+  no-plusplus: off
+  
+  # Suggest using const.
+  # Managed by ESLint.
+  prefer-const: off
+
+  # Import Sorting.
+  # Sort everything.
+  sort-imports: 2
+  
+  # Require object keys to be sorted.
+  # Sort everything.
+  sort-keys: 2
+
+  # Variable Sorting.
+  # Sort everything
+  sort-vars: 2

@@ -1,3 +1,6 @@
+/**
+ * Provides errors for the system.
+ */
 /** Extended system error class. */
 export declare class SystemError extends Error {
     /** Error code. */

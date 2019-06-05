@@ -1,3 +1,6 @@
+/**
+ * Used for storing system options.
+ */
 import { ConstructorArgs } from "../subsystem";
 import Info from "./system.info";
 import { ISystemArgs } from "../system";
