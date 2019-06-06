@@ -44,7 +44,9 @@ type Method = {
 
 export class Subsystem extends AtomicLock {
 	system: System;
+
 	method: Method;
+
 	data: any;
 
 	constructor(

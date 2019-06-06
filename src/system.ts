@@ -374,7 +374,7 @@ export class System extends Loader {
 			// Throw an error if failure
 			if (System.checkOptionsFailure(options)) {
 				// Call a dummy superconstructor
-				super();
+				super(null, null, null, null);
 
 				// Report an error
 				throw new LoaderError(
@@ -658,13 +658,13 @@ export class System extends Loader {
 													`./subsystems/${(subsystemsProperty.type as unknown) as string}`
 												)
 													.then(
-														(subsystemClass: OptionsInterface): void => {
+														(subsystemClass: ISubsystem): void => {
 															let systemArgs: {
 																/* eslint-disable-next-line camelcase */
-																system_args?: OptionsInterface;
+																system_args?: Options;
 															} = new Object() as {
 																/* eslint-disable-next-line camelcase */
-																system_args?: OptionsInterface;
+																system_args?: Options;
 															}; /* eslint-disable-line camelcase */ // Variables defined in yml file
 															if (
 																isProperLoaderObject(
@@ -678,17 +678,15 @@ export class System extends Loader {
 																		any
 																	>).includes("system_args")
 																) {
-																	/* eslint-disable-line no-extra-parens */ // Parens are necessary
-																	systemArgs[
-																		"system_args" /* tslint:disable-line no-string-literal */
-																	] = options as ISubsystem;
+																	/* eslint-disable-next-line dot-notation */ /* tslint:disable-next-line no-string-literal */ // Parens are necessary
+																	systemArgs["system_args"] = options;
 																}
 															}
 
 															this.system.subsystem[
 																subsystem
+																/* eslint-disable-next-line new-cap */ // It is an argument
 															] = new subsystemClass({
-																/* eslint-disable-line new-cap */ // It is an argument
 																args: systemArgs,
 																systemContext: this,
 																vars: subsystemsProperty.vars
@@ -707,8 +705,8 @@ export class System extends Loader {
 								}
 								if (
 									!(
-										this.hasOwnProperty("events") &&
-										this.hasOwnProperty("behaviors")
+										Object.prototype.hasOwnProperty.call(this, "events") &&
+										Object.prototype.hasOwnProperty.call(this, "behaviors")
 									)
 								) {
 									// Make sure basic system carcass was initialized

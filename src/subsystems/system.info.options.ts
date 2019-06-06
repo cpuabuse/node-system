@@ -7,29 +7,31 @@
  * Used for storing system options.
  */
 
-import {ConstructorArgs} from "../subsystem"; /* eslint-disable-line no-unused-vars */// ESLint type import detection bug
+import { ConstructorArgs } from "../subsystem"; /* eslint-disable-line no-unused-vars */ // ESLint type import detection bug
 import Info from "./system.info";
-import {LoaderError} from "../loaderError";
-import {ISystemArgs} from "../system"; /* eslint-disable-line no-unused-vars */// ESLint type import detection bug
+import { LoaderError } from "../loaderError";
+import { Options as SystemOptions } from "../system"; /* eslint-disable-line no-unused-vars */ // ESLint type import detection bug
 
-interface OptionsVars{
+interface OptionsVars {
 	homepage: string;
-};/* eslint-disable-line no-extra-semi */// ESLint inteface no-extra-semi bug
-export interface OptionsInterface extends ISystemArgs, OptionsVars{};/* eslint-disable-line no-extra-semi */// ESLint inteface no-extra-semi bug
+} /* eslint-disable-line no-extra-semi */ // ESLint inteface no-extra-semi bug
+export interface OptionsInterface
+	extends SystemOptions,
+		OptionsVars {} /* eslint-disable-line no-extra-semi */ // ESLint inteface no-extra-semi bug
 
-export default class Options extends Info{
-	constructor(args:ConstructorArgs){
+export default class Options extends Info {
+	constructor(args: ConstructorArgs) {
 		// Set options to be read
-		if (args.args !== null){
-			if(args.args.hasOwnProperty("system_args")){
+		if (args.args !== null) {
+			if (args.args.hasOwnProperty("system_args")) {
 				// Assign system option args
-				let options = <SystemArgs>args.args["system_args"];
+				let options = <SystemOptions>args.args["system_args"];
 
 				// Check options failure
-				if(!checkOptionsFailure(options)){
-					let vars:OptionsInterface = {
+				if (!checkOptionsFailure(options)) {
+					let vars: OptionsInterface = {
 						...options,
-						...<OptionsVars>args.vars
+						...(<OptionsVars>args.vars)
 					};
 
 					// Call superclass constructor
@@ -53,7 +55,10 @@ export default class Options extends Info{
 		});
 
 		// Report an error
-		throw new LoaderError("system_options_failure", "The options provided to the system constructor are inconsistent.");
+		throw new LoaderError(
+			"system_options_failure",
+			"The options provided to the system constructor are inconsistent."
+		);
 	}
 }
 
@@ -63,36 +68,45 @@ export default class Options extends Info{
  * @returns {boolean} Returns true if the arguments is corrupt; false if OK
  * @example <caption>Usage</caption>
  * var options = {
-*   id: "stars",
-*   rootDir: "test",
-*   relativeInitDir: "stars",
-*   initFilename: "stars.yml",
-*   logging: "off"
-* };
-*
-* if (System.checkOptionsFailure(options)){
-*   throw new Error ("Options inconsistent.");
-* }
-*/
-function checkOptionsFailure(options:SystemArgs){
+ *   id: "stars",
+ *   rootDir: "test",
+ *   relativeInitDir: "stars",
+ *   initFilename: "stars.yml",
+ *   logging: "off"
+ * };
+ *
+ * if (System.checkOptionsFailure(options)){
+ *   throw new Error ("Options inconsistent.");
+ * }
+ */
+function checkOptionsFailure(options: SystemArgs) {
 	let failed = false;
 
-	if(options){
+	if (options) {
 		// Checks boolean
-		if(!options.hasOwnProperty("logging")){
+		if (!options.hasOwnProperty("logging")) {
 			failed = true;
-		} else if(typeof options.logging !== "string"){
+		} else if (typeof options.logging !== "string") {
 			failed = true;
-		} else if(!(["off", "console", "file", "queue"].includes(options.logging))){
+		} else if (!["off", "console", "file", "queue"].includes(options.logging)) {
 			failed = true;
 		}
 
 		// Checks strings
-		let stringOptions:("id" | "rootDir" | "relativeInitDir" | "initFilename")[] = ["id","rootDir","relativeInitDir","initFilename"];
-		stringOptions.forEach(function(element){
-			if(!options.hasOwnProperty(element)){
+		let stringOptions: (
+			| "id"
+			| "rootDir"
+			| "relativeInitDir"
+			| "initFilename")[] = [
+			"id",
+			"rootDir",
+			"relativeInitDir",
+			"initFilename"
+		];
+		stringOptions.forEach(function(element) {
+			if (!options.hasOwnProperty(element)) {
 				failed = true;
-			} else if(typeof options[element] !== "string"){
+			} else if (typeof options[element] !== "string") {
 				failed = true;
 			}
 		});
