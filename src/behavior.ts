@@ -1,7 +1,12 @@
-// File: src/behaviors.ts
+/*	
+	File: src/behaviors.ts
+	cpuabuse.com
+*/
+
 /**
  * Manages system behaviors.
  */
+
 import {AtomicLock} from "./atomic";
 import {EventEmitter} from "events";
 import {System} from "./system";

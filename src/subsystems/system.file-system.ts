@@ -1,4 +1,8 @@
-// src/subsystems/system.file.ts
+/*
+    File: src/subsystems/system.file.ts
+    cpuabuse.com
+*/
+
 "use strict";
 
 import * as path from "path";

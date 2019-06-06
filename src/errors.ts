@@ -1,7 +1,11 @@
-// src/errors.ts
-/*
-	Contains list of errors used in system.
+/*	
+	File: src/errors.ts
+	cpuabuse.com
 */
+
+/** 
+ * Contains list of errors used in system.
+ */
 
 /**
  * @instance

@@ -1,4 +1,8 @@
-// src/system-file.ts
+/*	
+	File: src/system-file.ts
+	cpuabuse.com
+*/
+
 "use strict";
 const loader = require("loader.js");
 const path = require("path");
@@ -9,6 +13,7 @@ const path = require("path");
  * @inner
  * @memberof module:system
  */
+
 class FsObject{
 	/**
 	 * Creates an instance of FsObject.

@@ -1,9 +1,12 @@
-// test/test-loader.ts
+/*	
+	File: test/test-loader.ts
+	cpuabuse.com
+*/
+
 /**
  * Performs basic tests.
  * If error is thrown, node will exit with code 1, otherwise 0.
-*/
-
+ */
 
 // Set eslint to ingore describe and it for assert
 /* global describe:true */

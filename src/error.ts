@@ -1,7 +1,11 @@
-// src/error.ts
-/*
-	Provides errors for the system.
+/*	
+	File: src/error.ts
+	cpuabuse.com
 */
+
+/** 
+ * Provides errors for the system.
+ */
 
 /** Extended system error class. */
 export class SystemError extends Error{
