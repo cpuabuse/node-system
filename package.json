@@ -8,10 +8,10 @@
   "scripts": {
     "coverage": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly",
     "build": "tsc",
-    "docs": "typedoc --ignoreCompilerErrors",
+    "docs": "typedoc",
     "mocha": "mocha",
     "postinstall": "npm run build",
-    "pretest": "npm run build",
+    "pretest": "npm run build & npm run docs",
     "test": "npm run mocha"
   },
   "repository": {
@@ -45,7 +45,6 @@
     "typescript": "^3.5.1"
   },
   "pre-commit": [
-    "mocha",
-    "docs"
+    "test"
   ]
 }

@@ -15,9 +15,7 @@ import { Options as SystemOptions } from "../system"; /* eslint-disable-line no-
 interface OptionsVars {
 	homepage: string;
 } /* eslint-disable-line no-extra-semi */ // ESLint inteface no-extra-semi bug
-export interface OptionsInterface
-	extends SystemOptions,
-		OptionsVars {} /* eslint-disable-line no-extra-semi */ // ESLint inteface no-extra-semi bug
+export interface OptionsInterface extends SystemOptions, OptionsVars {} /* eslint-disable-line no-extra-semi */ // ESLint inteface no-extra-semi bug
 
 export default class Options extends Info {
 	constructor(args: ConstructorArgs) {
@@ -55,10 +53,7 @@ export default class Options extends Info {
 		});
 
 		// Report an error
-		throw new LoaderError(
-			"system_options_failure",
-			"The options provided to the system constructor are inconsistent."
-		);
+		throw new LoaderError("system_options_failure", "The options provided to the system constructor are inconsistent.");
 	}
 }
 
@@ -79,7 +74,7 @@ export default class Options extends Info {
  *   throw new Error ("Options inconsistent.");
  * }
  */
-function checkOptionsFailure(options: SystemArgs) {
+function checkOptionsFailure(options: SystemOptions) {
 	let failed = false;
 
 	if (options) {
@@ -93,11 +88,7 @@ function checkOptionsFailure(options: SystemArgs) {
 		}
 
 		// Checks strings
-		let stringOptions: (
-			| "id"
-			| "rootDir"
-			| "relativeInitDir"
-			| "initFilename")[] = [
+		let stringOptions: ("id" | "rootDir" | "relativeInitDir" | "initFilename")[] = [
 			"id",
 			"rootDir",
 			"relativeInitDir",

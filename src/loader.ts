@@ -37,10 +37,7 @@ export class Loader {
 	 * @param target File/folder name|names.
 	 * @returns Relative path|paths.
 	 */
-	public static toRelative(
-		dir: string,
-		target: string | Array<string>
-	): string | Array<string> {
+	public static toRelative(dir: string, target: string | Array<string>): string | Array<string> {
 		if (Array.isArray(target)) {
 			let results: Array<string> = new Array() as Array<string>; // Prepare the return array
 
@@ -76,23 +73,15 @@ export class Loader {
 		/** The standard constructor. */
 		var standardConstructor = () => {
 			// Initialization recursion; The error handling of the callback will happen asynchronously
-			callback(
-				initRecursion(
-					rootDir,
-					arg_relativeInitDir,
-					arg_initFilename,
-					this,
-					true
-				)
-			);
+			// @ts-ignore
+			callback(initRecursion(rootDir as string, arg_relativeInitDir as string, arg_initFilename, this, true));
 		};
 
 		// Determine which constructor to use.
 		let previousIsNull: boolean | null = null;
-		for (var a = 0; a < arguments.length; a++) {
+		for (let a = 0; a < arguments.length; a++) {
 			if (a === 0) {
-				previousIsNull =
-					arguments[a] === null; /* eslint-disable-line prefer-rest-params */
+				previousIsNull = arguments[a] === null; /* eslint-disable-line prefer-rest-params */
 			} else if (previousIsNull !== (arguments[a] === null)) {
 				/* eslint-disable-line prefer-rest-params */
 				throw new LoaderError(
@@ -141,11 +130,7 @@ export class Loader {
 	 * @param file Full file name.
 	 * @returns File contents.
 	 */
-	static getFile(
-		rootDir: string,
-		relativeDir: string,
-		file: string
-	): Promise<Buffer> {
+	static getFile(rootDir: string, relativeDir: string, file: string): Promise<Buffer> {
 		return new Promise(function(resolve, reject) {
 			fs.readFile(path.join(rootDir, relativeDir, file), function(err, data) {
 				if (err) {
@@ -172,9 +157,7 @@ export class Loader {
 	 * @param pathArrays File/folder name|names.
 	 * @returns Absolute path|paths.
 	 */
-	static join(
-		...pathArrays: Array<string | Array<string>>
-	): string | Array<string> {
+	static join(...pathArrays: Array<string | Array<string>>): string | Array<string> {
 		// Determine maximum pathArray length & construct metadata
 		var maxLength: number = 0;
 		var arraysMeta: Array<{ isArray: boolean; length: number }> = new Array();
@@ -200,11 +183,9 @@ export class Loader {
 		}
 
 		// Loop
-		let filter: Array<{ isArray: boolean; length: number }> = arraysMeta.filter(
-			function(array) {
-				return array.isArray;
-			}
-		);
+		let filter: Array<{ isArray: boolean; length: number }> = arraysMeta.filter(function(array) {
+			return array.isArray;
+		});
 		if (filter.length === 0) {
 			// Return a string if no arrays
 			return path.join(...(<Array<string>>pathArrays)); // Casting due to inability of compiler to detect that there are no other types possible
@@ -215,9 +196,7 @@ export class Loader {
 				let joinData: Array<string> = new Array();
 				pathArrays.forEach(function(pathArray, index) {
 					let toPush: string | null = null;
-					let { length }: { isArray: boolean; length: number } = arraysMeta[
-						index
-					];
+					let { length }: { isArray: boolean; length: number } = arraysMeta[index];
 					if (arraysMeta[index].isArray) {
 						if (length < i + 1) {
 							if (length > 0) {
@@ -475,9 +454,7 @@ async function initRecursion(
 				if (init[key] !== null) {
 					// Custom properties
 					// Check if property is set or assume default
-					let checkDefaultStringDirective: (
-						property: string
-					) => boolean = function(property) {
+					let checkDefaultStringDirective: (property: string) => boolean = function(property) {
 						if (init[key].hasOwnProperty(property)) {
 							if (typeof init[key][property] === "string") {
 								if (init[key][property] != "") {
@@ -488,9 +465,7 @@ async function initRecursion(
 						return false;
 					};
 
-					let checkDefaultBooleanDirective: (
-						property: string
-					) => boolean = function(property) {
+					let checkDefaultBooleanDirective: (property: string) => boolean = function(property) {
 						if (init[key].hasOwnProperty(property)) {
 							if (typeof init[key][property] === "boolean") {
 								return true;
@@ -574,11 +549,7 @@ async function initSettings(
  * @param filename Filename, with or without extension.
  * @returns Javascript object.
  */
-export async function loadYaml(
-	rootDir: string,
-	relativeDir: string,
-	filename: string
-) {
+export async function loadYaml(rootDir: string, relativeDir: string, filename: string) {
 	var fileExtension: string = ".yml"; // Making a variable for interpreted language like this would not even save any memory, but it feels right
 
 	// Add file extension if absent

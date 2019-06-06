@@ -58,28 +58,20 @@ interface FilterContext {
  * // TODO: @event module:system.System#events#systemLoad
  */
 export declare class System extends Loader {
-    /** Error list. */
-    private readonly errors?;
     /**
-     * Events to be populated by the loader.
-     * System by itself does not deal with events, it only confirms that the events were initialized. Although, if the events are fired, and failure to fire event is set to throw, or undocumented events encountered, it would throw errors.
+     * Access stderr
+     * @param {string} text
+     * @example <caption>Usage</caption>
+     * system.System.error("Not enough resources.");
      */
-    private readonly events?;
-    /** Contains subsystem data. */
-    private readonly subsystems;
-    /** Contains system info. */
-    private system;
+    private static error;
     /**
-     * The constructor will perform necessary preparations, so that failures can be processed with system events. Up until these preparations are complete, the failure will result in thrown standard Error.
-     * @param options System options.
-     * @param behaviors - Behaviors to add.
-     * @param onError - Callback for error handling during delayed execution after loader has loaded. Takes error string as an argument.
+     * Access stdout
+     * @param {string} text
+     * @example <caption>Usage</caption>
+     * system.System.log("Resources loaded.");
      */
-    constructor({ options, behaviors, onError }: {
-        behaviors: BehaviorInterface;
-        onError: ErrorCallback | null;
-        options: Options;
-    });
+    private static log;
     /**
      * Checks options argument for missing incorrect property types
      * @param options System options argument
@@ -97,7 +89,32 @@ export declare class System extends Loader {
      *   throw new Error ("Options inconsistent.");
      * }
      */
-    static checkOptionsFailure(options: any): boolean;
+    private static checkOptionsFailure;
+    /** Error list. */
+    private readonly errors;
+    /**
+     * Events to be populated by the loader.
+     * System by itself does not deal with events, it only confirms that the events were initialized. Although, if the events are fired, and failure to fire event is set to throw, or undocumented events encountered, it would throw errors.
+     */
+    private readonly events;
+    private readonly behaviors;
+    /** Contains subsystem data. */
+    private readonly subsystems;
+    /** Contains system info. */
+    private system;
+    /**
+     * The constructor will perform necessary preparations, so that failures can be processed with system events. Up until these preparations are complete, the failure will result in thrown standard Error.
+     * @param options System options.
+     * @param behaviors - Behaviors to add.
+     * @param onError - Callback for error handling during delayed execution after loader has loaded. Takes error string as an argument.
+     */
+    constructor({ options, behaviors, onError }: {
+        behaviors: Array<{
+            [key: string]: BehaviorInterface;
+        }>;
+        onError: ErrorCallback | null;
+        options: Options;
+    });
     /**
      * Adds an error to the System dynamically
      * @instance
@@ -118,7 +135,7 @@ export declare class System extends Loader {
      *
      * labInventory.addError(code, message);
      */
-    addError(code: any, message: any): void;
+    private addError;
     /**
      * Adds behaviors to the system, and fires post-addtion events.
      * Firstly, this function attempts to add the behaviors.
@@ -148,7 +165,7 @@ export declare class System extends Loader {
      *   console.log("Behavior added.");
      * });
      */
-    addBehaviors(behaviors: any): Promise<void>;
+    private addBehaviors;
     /**
      * Log message from the System context
      * @instance
@@ -167,7 +184,7 @@ export declare class System extends Loader {
      * var labInventory = new System(options);
      * labInventory.log(text);
      */
-    log(text: any): void;
+    private log;
     /**
      * Log an error  message from the System context
      * @instance
@@ -186,7 +203,7 @@ export declare class System extends Loader {
      * var labInventory = new System(options);
      * labInventory.error(text);
      */
-    error(text: any): void;
+    private error;
     /**
      * Fires a system event
      * @instance
@@ -206,7 +223,7 @@ export declare class System extends Loader {
      * var labInventory = new System(options);
      * labInventory.fire("system_load_aux", "Auxiliary system loaded.");
      */
-    fire(name: any, message: any): void;
+    private fire;
     /**
      * Emit an event as a behavior.
      * @instance
@@ -221,7 +238,7 @@ export declare class System extends Loader {
      *   // ...
      * }
      */
-    behave(event: any): void;
+    private behave;
     /**
      * Adds a behavior bound to "this".
      * @instance
@@ -241,19 +258,5 @@ export declare class System extends Loader {
      *   console.log("Auxiliary system loaded - " + that.system.id);
      * });
      */
-    on(event: any, callback: any): void;
-    /**
-     * Access stderr
-     * @param {string} text
-     * @example <caption>Usage</caption>
-     * system.System.error("Not enough resources.");
-     */
-    static error(text: any): void;
-    /**
-     * Access stdout
-     * @param {string} text
-     * @example <caption>Usage</caption>
-     * system.System.log("Resources loaded.");
-     */
-    static log(text: any): void;
+    private on;
 }

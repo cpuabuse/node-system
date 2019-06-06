@@ -9,10 +9,7 @@
 
 // Imports
 import * as events from "./events";
-import {
-	Behavior,
-	BehaviorInterface /* eslint-disable-line no-unused-vars */
-} from "./behavior";
+import { Behavior, BehaviorInterface /* eslint-disable-line no-unused-vars */ } from "./behavior";
 import {
 	ISubsystem /* eslint-disable-line no-unused-vars */,
 	Subsystem /* eslint-disable-line no-unused-vars */
@@ -20,9 +17,7 @@ import {
 import { Loader, loadYaml } from "./loader"; // Auxiliary system lib
 import { AtomicLock } from "./atomic";
 import { LoaderError } from "./loaderError";
-import {
-	OptionsInterface /* eslint-disable-line no-unused-vars */
-} from "./subsystems/system.info.options";
+import { OptionsInterface /* eslint-disable-line no-unused-vars */ } from "./subsystems/system.info.options";
 import { SystemError } from "./error";
 
 // Re-export
@@ -170,12 +165,7 @@ interface ISystemProperty {
 		 * @param file Filename.
 		 * @returns Promise, containing string with file contents.
 		 */
-		getFile(
-			dir: string,
-			file: string,
-			cacheTtl: number,
-			force: boolean
-		): Promise<Buffer>;
+		getFile(dir: string, file: string, cacheTtl: number, force: boolean): Promise<Buffer>;
 
 		/**
 		 * Get contents of yaml file relative to system root directory.
@@ -192,10 +182,7 @@ interface ISystemProperty {
 		 * @param target File/folder path to rootDir.
 		 * @returns Promise, containing string path.
 		 */
-		join(
-			dir: string | Array<string>,
-			file: string | Array<string>
-		): Promise<string | Array<string>>;
+		join(dir: string | Array<string>, file: string | Array<string>): Promise<string | Array<string>>;
 
 		/**
 		 * List the contents of the folder, relative to system root directory.
@@ -257,11 +244,7 @@ interface LoaderProperty {
 }
 
 /** Checks that the data initialized by the loader is proper for the objects. */
-function isProperLoaderObject(
-	object: { [key: string]: any },
-	property: string,
-	type: string
-): boolean {
+function isProperLoaderObject(object: { [key: string]: any }, property: string, type: string): boolean {
 	let proper: boolean = false;
 
 	if (Object.prototype.hasOwnProperty.call(object, property)) {
@@ -302,8 +285,80 @@ function isProperLoaderObject(
  * // TODO: @event module:system.System#events#systemLoad
  */
 export class System extends Loader {
+	/**
+	 * Access stderr
+	 * @param {string} text
+	 * @example <caption>Usage</caption>
+	 * system.System.error("Not enough resources.");
+	 */
+	private static error(text: string): void {
+		/* eslint-disable-next-line no-console */
+		console.error(`\x1b[31m[Error]\x1b[0m ${text}`);
+	}
+
+	/**
+	 * Access stdout
+	 * @param {string} text
+	 * @example <caption>Usage</caption>
+	 * system.System.log("Resources loaded.");
+	 */
+	private static log(text: string): void {
+		/* eslint-disable-next-line no-console */
+		console.log(`\x1b[32m[OK]\x1b[0m ${text}`);
+	}
+
+	/**
+	 * Checks options argument for missing incorrect property types
+	 * @param options System options argument
+	 * @returns Returns true if the arguments is corrupt; false if OK
+	 * @example <caption>Usage</caption>
+	 * var options = {
+	 *   id: "stars",
+	 *   rootDir: "test",
+	 *   relativeInitDir: "stars",
+	 *   initFilename: "stars.yml",
+	 *   logging: "off"
+	 * };
+	 *
+	 * if (System.checkOptionsFailure(options)){
+	 *   throw new Error ("Options inconsistent.");
+	 * }
+	 */
+	private static checkOptionsFailure(options: Options): boolean {
+		let failed: boolean = false;
+
+		if (options) {
+			// Checks boolean
+			if (!Object.prototype.hasOwnProperty.call(options, "logging")) {
+				failed = true;
+			} else if (typeof options.logging !== "string") {
+				failed = true;
+			} else if (!["off", "console", "file", "queue"].includes(options.logging)) {
+				failed = true;
+			}
+
+			// Checks strings
+			let stringOptions: Array<"id" | "rootDir" | "relativeInitDir" | "initFilename"> = [
+				"id",
+				"rootDir",
+				"relativeInitDir",
+				"initFilename"
+			];
+			stringOptions.forEach(function(element: "id" | "rootDir" | "relativeInitDir" | "initFilename"): void {
+				if (!Object.prototype.hasOwnProperty.call(options, element)) {
+					failed = true;
+				} else if (typeof options[element] !== "string") {
+					failed = true;
+				}
+			});
+		} else {
+			failed = true;
+		}
+		return failed;
+	}
+
 	/** Error list. */
-	private readonly errors?: {
+	private readonly errors!: {
 		[key: string]: {
 			/** Error message. */
 			message?: string;
@@ -314,16 +369,22 @@ export class System extends Loader {
 	 * Events to be populated by the loader.
 	 * System by itself does not deal with events, it only confirms that the events were initialized. Although, if the events are fired, and failure to fire event is set to throw, or undocumented events encountered, it would throw errors.
 	 */
-	private readonly events?: {
+	private readonly events!: {
 		[key: string]: {
 			/** Behavior present? */
-			behavior?: boolean;
+			behavior: boolean;
 
 			/** Report an error? */
-			error?: string;
+			error: string;
 
 			/** Log it? */
-			log?: string;
+			log: string;
+		};
+	};
+
+	private readonly behaviors!: {
+		[key: string]: {
+			text: string;
 		};
 	};
 
@@ -345,7 +406,7 @@ export class System extends Loader {
 		behaviors,
 		onError
 	}: {
-		behaviors: BehaviorInterface;
+		behaviors: Array<{ [key: string]: BehaviorInterface }>;
 		onError: ErrorCallback | null;
 		options: Options;
 	}) {
@@ -362,10 +423,7 @@ export class System extends Loader {
 				onError(
 					error instanceof LoaderError
 						? error
-						: new LoaderError(
-								"other_error",
-								"Other error in System constructor has been rethrown as Loader Error."
-						  )
+						: new LoaderError("other_error", "Other error in System constructor has been rethrown as Loader Error.")
 				);
 			}
 		}
@@ -415,44 +473,28 @@ export class System extends Loader {
 										filter: {
 											isDir: (filterContext: FilterContext): Promise<boolean> =>
 												Loader.isDir(this.system.rootDir, filterContext.item),
-											isFile: (
-												filterContext: FilterContext
-											): Promise<boolean> =>
-												Loader.isFile(Loader.join(
-													this.system.rootDir,
-													Loader.join(
-														filterContext.dir,
-														filterContext.itemName
-													) as string
-												) as string) // Only two arguments make string always
+											isFile: (filterContext: FilterContext): Promise<boolean> =>
+												Loader.isFile(Loader.join(this.system.rootDir, Loader.join(
+													filterContext.dir,
+													filterContext.itemName
+												) as string) as string) // Only two arguments make string always
 										},
-										getFile: async (
-											dir: string,
-											file: string,
-											cacheTtl: number,
-											force: boolean
-										): Promise<Buffer> => {
+										getFile: async (dir: string, file: string, cacheTtl: number, force: boolean): Promise<Buffer> => {
 											// Construct a path
-											const pathToFile: string = Loader.join(
-												dir,
-												file
-											) as string; // Only two arguments make string always
+											const pathToFile: string = Loader.join(dir, file) as string; // Only two arguments make string always
 
 											// Assign
-											const { index, files } = this.system.file.cache;
+											const {
+												index,
+												files
+											}: { files: FileObject[]; index: { [key: string]: FileObject } } = this.system.file.cache;
 
 											// Physically getting the file
-											const pGetFile: () => Promise<Buffer> = (): Promise<
-												Buffer
-											> =>
+											const pGetFile: () => Promise<Buffer> = (): Promise<Buffer> =>
 												(async (): Promise<Buffer> => {
 													/* eslint-disable-line func-style */ // Can't have arrow style function declaration
 													try {
-														return await Loader.getFile(
-															this.system.rootDir,
-															dir,
-															file
-														);
+														return await Loader.getFile(this.system.rootDir, dir, file);
 													} catch (error) {
 														// TODO: this.fire("file_system_error");
 														throw this.system.error.file_system_error;
@@ -470,20 +512,12 @@ export class System extends Loader {
 											}
 											if (maxFiles > 0) {
 												// Find expiration time and current time
-												const currentTimeStamp: number = Math.trunc(
-													new Date().getTime() / milliSecondsInSeconds
-												);
-												const expirationTimeStamp: number =
-													currentTimeStamp + cacheTtl;
+												const currentTimeStamp: number = Math.trunc(new Date().getTime() / milliSecondsInSeconds);
+												const expirationTimeStamp: number = currentTimeStamp + cacheTtl;
 
 												// Find if file is cached
 												let cached: boolean = false;
-												if (
-													Object.prototype.hasOwnProperty.call(
-														index,
-														pathToFile
-													)
-												) {
+												if (Object.prototype.hasOwnProperty.call(index, pathToFile)) {
 													cached = true;
 												}
 
@@ -499,9 +533,7 @@ export class System extends Loader {
 														}
 													} else {
 														// New ttl
-														if (
-															index[pathToFile].expires > expirationTimeStamp
-														) {
+														if (index[pathToFile].expires > expirationTimeStamp) {
 															index[pathToFile].expires = expirationTimeStamp;
 														}
 														index[pathToFile].cacheTtl = cacheTtl;
@@ -519,9 +551,7 @@ export class System extends Loader {
 														// Update indices
 														/* tslint:disable-next-line no-dynamic-delete */
 														delete index[files[0].rIndex];
-														if (
-															Object.keys(index[files[0].rIndex]).length === 0
-														) {
+														if (Object.keys(index[files[0].rIndex]).length === 0) {
 															/* tslint:disable-next-line no-dynamic-delete */
 															delete index[files[0].rIndex];
 														}
@@ -554,28 +584,15 @@ export class System extends Loader {
 											// Return
 											return pGetFile();
 										},
-										getYaml: (dir: string, file: string): Promise<string> =>
-											loadYaml(this.system.rootDir, dir, file),
-										async join(
-											rootDir: string,
-											target: string | Array<string>
-										): Promise<string | Array<string>> {
+										getYaml: (dir: string, file: string): Promise<string> => loadYaml(this.system.rootDir, dir, file),
+										async join(rootDir: string, target: string | Array<string>): Promise<string | Array<string>> {
 											/* eslint-disable-line require-await */ // We want file methods to produce same type output
 											return Loader.join(rootDir, target);
 										},
-										list: async (
-											dir: string,
-											filter: Filter | null
-										): Promise<Array<string>> => {
+										list: async (dir: string, filter: Filter | null): Promise<Array<string>> => {
 											let filteredItems: Array<string>; // Return array
-											let itemNames: Array<string> = await Loader.list(
-												this.system.rootDir,
-												dir
-											); // Wait for folder contets
-											let items: Array<string> = (await this.system.file.join(
-												dir,
-												itemNames
-											)) as Array<string>; // The return will be always be an array
+											let itemNames: Array<string> = await Loader.list(this.system.rootDir, dir); // Wait for folder contets
+											let items: Array<string> = (await this.system.file.join(dir, itemNames)) as Array<string>; // The return will be always be an array
 
 											// Was the filter even specified?
 											if (filter === null) {
@@ -583,9 +600,7 @@ export class System extends Loader {
 											} else {
 												filteredItems = new Array() as Array<string>; // Prepare return object
 												let { length }: Array<string> = items; // Cache length
-												let filterMatches: Array<
-													Promise<boolean>
-												> = new Array(); // Operations dataholder; Contains Promises
+												let filterMatches: Array<Promise<boolean>> = new Array(); // Operations dataholder; Contains Promises
 
 												// Filter and populate promises
 												for (let i: number = 0; i < length; i++) {
@@ -620,15 +635,9 @@ export class System extends Loader {
 												let filePath: string = Loader.join(dir, file) as string; // Only two arguments make string always
 
 												// Return
-												return Loader.join(
-													this.system.rootDir,
-													filePath
-												) as string;
+												return Loader.join(this.system.rootDir, filePath) as string;
 											})(),
-										async toRelative(
-											rootDir: string,
-											target: string
-										): Promise<string> {
+										async toRelative(rootDir: string, target: string): Promise<string> {
 											/* eslint-disable-line require-await */ // We want file methods to produce same type output
 											return Loader.toRelative(rootDir, target) as string; // Only two arguments make string always
 										}
@@ -640,23 +649,13 @@ export class System extends Loader {
 							try {
 								// Initialize subsystems
 								if (isProperLoaderObject(this, "subsystems", "object")) {
-									let subsystems: LoaderProperty = this
-										.subsystems as LoaderProperty;
+									let subsystems: LoaderProperty = this.subsystems as LoaderProperty;
 									/* eslint-disable-next-line no-restricted-syntax */
 									for (let subsystem in subsystems) {
 										if (isProperLoaderObject(subsystems, subsystem, "object")) {
-											let subsystemsProperty: LoaderProperty =
-												subsystems[subsystem];
-											if (
-												isProperLoaderObject(
-													subsystemsProperty,
-													"type",
-													"string"
-												)
-											) {
-												import(
-													`./subsystems/${(subsystemsProperty.type as unknown) as string}`
-												)
+											let subsystemsProperty: LoaderProperty = subsystems[subsystem];
+											if (isProperLoaderObject(subsystemsProperty, "type", "string")) {
+												import(`./subsystems/${(subsystemsProperty.type as unknown) as string}`)
 													.then(
 														(subsystemClass: ISubsystem): void => {
 															let systemArgs: {
@@ -666,18 +665,8 @@ export class System extends Loader {
 																/* eslint-disable-next-line camelcase */
 																system_args?: Options;
 															}; /* eslint-disable-line camelcase */ // Variables defined in yml file
-															if (
-																isProperLoaderObject(
-																	subsystemsProperty,
-																	"args",
-																	"array"
-																)
-															) {
-																if (
-																	((subsystemsProperty.args as unknown) as Array<
-																		any
-																	>).includes("system_args")
-																) {
+															if (isProperLoaderObject(subsystemsProperty, "args", "array")) {
+																if (((subsystemsProperty.args as unknown) as Array<any>).includes("system_args")) {
 																	/* eslint-disable-next-line dot-notation */ /* tslint:disable-next-line no-string-literal */ // Parens are necessary
 																	systemArgs["system_args"] = options;
 																}
@@ -694,10 +683,7 @@ export class System extends Loader {
 														}
 													)
 													.catch(function(): void {
-														throw new LoaderError(
-															"loader_fail",
-															"Could not load defined subsystems."
-														);
+														throw new LoaderError("loader_fail", "Could not load defined subsystems.");
 													});
 											}
 										}
@@ -710,36 +696,36 @@ export class System extends Loader {
 									)
 								) {
 									// Make sure basic system carcass was initialized
-									throw new LoaderError(
-										"loader_fail",
-										"Mandatory initialization files are missing."
-									);
+									throw new LoaderError("loader_fail", "Mandatory initialization files are missing.");
 								}
 
 								// Initialize the events
-								for (let err in this.errors) {
-									// Will skip garbled errors
-									if (typeof this.errors[err] === "object") {
-										/* tslint:disable-line strict-type-predicates */ // It is an argument
-										// Set default error message for absent message
-										let message: string = "Error message not set.";
-										if (this.errors[err].hasOwnProperty("message")) {
-											if (typeof this.errors[err].message === "string") {
-												if (this.errors[err].message !== "") {
-													({ message } = this.errors[err] as {
-														message: string;
-													});
+								if (isProperLoaderObject(this, "errors", "object")) {
+									Object.keys(this.errors as object).forEach(
+										(err: string): void => {
+											// Will skip garbled errors
+											if (typeof this.errors[err] === "object") {
+												/* tslint:disable-line strict-type-predicates */ // It is an argument
+												// Set default error message for absent message
+												let message: string = "Error message not set.";
+												if (Object.prototype.hasOwnProperty.call(this.errors[err], "message")) {
+													if (typeof this.errors[err].message === "string") {
+														if (this.errors[err].message !== "") {
+															({ message } = this.errors[err] as {
+																message: string;
+															});
+														}
+													}
 												}
+												this.addError(err, message);
 											}
 										}
-										this.addError(err, message);
-									}
+									);
 								}
-
 								// Initialize the behaviors; If behaviors not provided as argument, it is OK; Not immediate, since the load.then() code will execute after the instance finish initializing.
 								if (behaviors) {
 									this.addBehaviors(behaviors).then(() =>
-										this.fire(events.systemLoad)
+										this.fire(events.systemLoad, "Behaviors initialized during system loading.")
 									);
 								} else {
 									this.fire(events.systemLoad, "System loading complete.");
@@ -765,53 +751,6 @@ export class System extends Loader {
 	} // <== constructor
 
 	/**
-	 * Checks options argument for missing incorrect property types
-	 * @param options System options argument
-	 * @returns Returns true if the arguments is corrupt; false if OK
-	 * @example <caption>Usage</caption>
-	 * var options = {
-	 *   id: "stars",
-	 *   rootDir: "test",
-	 *   relativeInitDir: "stars",
-	 *   initFilename: "stars.yml",
-	 *   logging: "off"
-	 * };
-	 *
-	 * if (System.checkOptionsFailure(options)){
-	 *   throw new Error ("Options inconsistent.");
-	 * }
-	 */
-	static checkOptionsFailure(options) {
-		let failed = false;
-
-		if (options) {
-			// Checks boolean
-			if (!options.hasOwnProperty("logging")) {
-				failed = true;
-			} else if (typeof options.logging !== "string") {
-				failed = true;
-			} else if (
-				!["off", "console", "file", "queue"].includes(options.logging)
-			) {
-				failed = true;
-			}
-
-			// Checks strings
-			let stringOptions = ["id", "rootDir", "relativeInitDir", "initFilename"];
-			stringOptions.forEach(function(element) {
-				if (!options.hasOwnProperty(element)) {
-					failed = true;
-				} else if (typeof options[element] !== "string") {
-					failed = true;
-				}
-			});
-		} else {
-			failed = true;
-		}
-		return failed;
-	}
-
-	/**
 	 * Adds an error to the System dynamically
 	 * @instance
 	 * @param {string} code Error code
@@ -831,8 +770,8 @@ export class System extends Loader {
 	 *
 	 * labInventory.addError(code, message);
 	 */
-	addError(code, message) {
-		if (this.system.error.hasOwnProperty(code)) {
+	private addError(code: string, message: string): void {
+		if (Object.prototype.hasOwnProperty.call(this.system.error, code)) {
 			// Fire an error event that error already exists
 			this.fire(events.errorExists, "Error to be added already exists.");
 		} else {
@@ -869,7 +808,7 @@ export class System extends Loader {
 	 *   console.log("Behavior added.");
 	 * });
 	 */
-	async addBehaviors(behaviors) {
+	private async addBehaviors(behaviors: Array<{ [key: string]: BehaviorInterface }>): Promise<void> {
 		if (Array.isArray(behaviors)) {
 			// Sanity check - is an array
 			if (behaviors.length > 0) {
@@ -877,51 +816,49 @@ export class System extends Loader {
 				// Loop - attachment
 				await Promise.all(
 					behaviors
-						.map(element => {
-							if (typeof element === "object") {
-								let properties = Object.getOwnPropertyNames(element);
-								if (properties.length == 1) {
-									let [key] = properties;
-									let value = element[key];
-									if (typeof key === "string") {
-										if (key.length > 0 && typeof value === "function") {
+						.map(
+							(element: {
+								[key: string]: BehaviorInterface;
+							}): { behaviorAdded: Promise<string> | null; key: string } | null => {
+								if (typeof element === "object") {
+									let properties: Array<string> = Object.getOwnPropertyNames(element);
+									if (properties.length === 1) {
+										let [key]: Array<string> = properties;
+										let value: BehaviorInterface = element[key];
+										if (typeof key === "string") {
+											if (key.length > 0 && typeof value === "function") {
+												return {
+													behaviorAdded: this.system.behavior.addBehavior(key, () => value(this)),
+													key
+												};
+											}
 											return {
-												behaviorAdded: this.system.behavior.addBehavior(
-													key,
-													() => value(this)
-												),
+												behaviorAdded: null,
 												key
 											};
 										}
-										return {
-											behaviorAdded: null,
-											key
-										};
 									}
 								}
+								return null;
 							}
-							return null;
-						})
-						.map(element => {
-							// Loop - post-attachment event fire
-							if (element === null) {
-								this.fire(
-									events.behaviorAttachFail,
-									"Behavior could not be added."
-								);
-								return Promise.resolve();
-							} else if (element.behaviorAdded) {
-								this.fire(events.behaviorAttach, element.key);
-								return element.behaviorAdded;
-							}
+						)
+						.map(
+							(element: { behaviorAdded: Promise<string> | null; key: string } | null): Promise<string | void> => {
+								// Loop - post-attachment event fire
+								if (element === null) {
+									this.fire(events.behaviorAttachFail, "Behavior could not be added.");
+									return Promise.resolve();
+								}
+								if (element.behaviorAdded) {
+									this.fire(events.behaviorAttach, element.key);
+									return element.behaviorAdded;
+								}
 
-							// Behavior not added
-							this.fire(
-								events.behaviorAttachRequestFail,
-								"Event not described."
-							);
-							return Promise.resolve();
-						})
+								// Behavior not added
+								this.fire(events.behaviorAttachRequestFail, "Event not described.");
+								return Promise.resolve();
+							}
+						)
 				);
 
 				// Terminate if successfully processed arrays
@@ -951,14 +888,14 @@ export class System extends Loader {
 	 * var labInventory = new System(options);
 	 * labInventory.log(text);
 	 */
-	log(text) {
+	private log(text: string): void {
 		if (typeof text === "string") {
 			if (this.system.logging === "console") {
-				System.log(this.system.id + ": " + text);
+				System.log(`${this.system.id}: ${text}`);
 			}
 		} else {
 			// TODO: fix report text etc
-			this.fire("type_error", typeof text + " not string.");
+			this.fire("type_error", `${typeof text} not string.`);
 		}
 	} // <== log
 
@@ -980,14 +917,14 @@ export class System extends Loader {
 	 * var labInventory = new System(options);
 	 * labInventory.error(text);
 	 */
-	error(text) {
+	private error(text: string): void {
 		if (typeof text === "string") {
 			if (this.system.logging === "console") {
-				System.error(this.system.id + ": " + text);
+				System.error(`${this.system.id}: ${text}`);
 			}
 		} else {
 			// TODO: fix report text etc
-			this.fire("type_error", typeof text + " not string.");
+			this.fire("type_error", `${typeof text} not string.`);
 		}
 	} // <== log
 
@@ -1010,21 +947,19 @@ export class System extends Loader {
 	 * var labInventory = new System(options);
 	 * labInventory.fire("system_load_aux", "Auxiliary system loaded.");
 	 */
-	fire(name, message) {
-		const eventAbsent = "event_absent";
-		const errorHell = "error_hell";
+	private fire(name: string, message: string): void {
+		const eventAbsent: string = "event_absent";
+		const errorHell: string = "error_hell";
+
+		let msg: string = message;
 
 		try {
-			let event;
+			let event: { behavior?: boolean | undefined; error?: string | undefined; log?: string | undefined };
 
 			// Verify event exists
-			if (!this.events.hasOwnProperty(name)) {
+			if (!Object.prototype.hasOwnProperty.call(this.events, name)) {
 				// throw new system error
-				throw new SystemError(
-					this,
-					eventAbsent,
-					"Could not fire an event that is not described."
-				);
+				throw new SystemError(eventAbsent, "Could not fire an event that is not described.");
 			}
 
 			// Locate event
@@ -1032,17 +967,17 @@ export class System extends Loader {
 
 			// Assign the message, as it is technically optional
 			if (!message) {
-				message = name;
+				msg = name;
 			}
 
 			// Log
 			if (event.log) {
-				this.log(event.log + " - " + message);
+				this.log(`${event.log} - ${msg}`);
 			}
 
 			// Error
 			if (event.error) {
-				this.error(name, message);
+				this.error(`${name} - ${msg}`);
 			}
 
 			// Behavior
@@ -1051,19 +986,19 @@ export class System extends Loader {
 			}
 			// Callback
 		} catch (error) {
-			let noFail = true;
-			if (name == events.eventFail) {
+			let noFail: boolean = true;
+			if (name === events.eventFail) {
 				noFail = false;
 			}
-			if (name == eventAbsent) {
+			if (name === eventAbsent) {
 				if (SystemError.isSystemError(error)) {
-					if (error.code == eventAbsent) {
+					if (error.code === eventAbsent) {
 						noFail = false;
 					}
 				}
 			}
 			if (noFail) {
-				this.fire(events.eventFail);
+				this.fire(events.eventFail, "Event has failed");
 			} else {
 				throw errorHell;
 			}
@@ -1084,11 +1019,11 @@ export class System extends Loader {
 	 *   // ...
 	 * }
 	 */
-	behave(event) {
+	private behave(event: string): void {
 		try {
-			this.log("Behavior - " + this.behaviors[event].text);
+			this.log(`Behavior - ${this.behaviors[event].text}`);
 		} catch (error) {
-			this.log("Behavior - Undocumented behavior - " + event);
+			this.log(`Behavior - Undocumented behavior - ${event}`);
 		}
 		this.system.behavior.behave(event);
 	}
@@ -1112,29 +1047,9 @@ export class System extends Loader {
 	 *   console.log("Auxiliary system loaded - " + that.system.id);
 	 * });
 	 */
-	on(event, callback) {
-		let behavior = {};
-		behavior[event] = () => callback(this);
-		this.addBehaviors(behavior);
-	}
-
-	/**
-	 * Access stderr
-	 * @param {string} text
-	 * @example <caption>Usage</caption>
-	 * system.System.error("Not enough resources.");
-	 */
-	static error(text) {
-		console.error("\x1b[31m[Error]\x1b[0m " + text);
-	}
-
-	/**
-	 * Access stdout
-	 * @param {string} text
-	 * @example <caption>Usage</caption>
-	 * system.System.log("Resources loaded.");
-	 */
-	static log(text) {
-		console.log("\x1b[32m[OK]\x1b[0m " + text);
+	private on(event: string, callback: (system: System) => void): void {
+		let behavior: { [key: string]: BehaviorInterface } = new Object() as { [key: string]: BehaviorInterface };
+		behavior[event] = (): void => callback(this);
+		this.addBehaviors([behavior]);
 	}
 }
