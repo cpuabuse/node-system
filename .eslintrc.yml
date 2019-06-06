@@ -6,7 +6,6 @@ plugins:
   - "@typescript-eslint"
   - prettier
 extends:
-  - eslint:recommended
   - airbnb
   - prettier
 parserOptions:
@@ -21,6 +20,14 @@ rules:
   # Managed by prettier.
   indent: off
 
+  # When there is only a single export from a module, prefer using default export over named export.
+  # To have persistent imports there is no need for arbitrary default imports as modules will grow.
+  import/prefer-default-export: off
+
+  # Require or disallow named function expressions.
+  # Too many anonymous functions to manage.
+  func-names: off
+
   # Disallow Array constructors.
   # Let programmer decide.
   no-array-constructor: off
@@ -34,12 +41,8 @@ rules:
   no-plusplus: off
 
   # Suggest using const.
-  # Managed by ESLint.
+  # Let programmer decide.
   prefer-const: off
-
-  # Import Sorting.
-  # Sort everything.
-  sort-imports: 2
 
   # Require object keys to be sorted.
   # Sort everything.

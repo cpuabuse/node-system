@@ -18,8 +18,8 @@ import {
 	Subsystem /* eslint-disable-line no-unused-vars */
 } from "./subsystem";
 import { Loader, loadYaml } from "./loader"; // Auxiliary system lib
-import { LoaderError } from "./loaderError";
 import { AtomicLock } from "./atomic";
+import { LoaderError } from "./loaderError";
 import {
 	OptionsInterface /* eslint-disable-line no-unused-vars */
 } from "./subsystems/system.info.options";

@@ -1,14 +1,6 @@
 extends:
-- tslint:all
+  - tslint:recommended
 rules:
-  # Requires using either ‘T[]’ or ‘Array' for arrays.
-  # Easier to read.
-  array-type: false
-
-  # An interface or literal type with just a call signature can be written as a function type.
-  # Preferring interfaces over types for function types.
-  callable-types: false
-
   # Enforces JSDoc comments for important items be filled out.
   # Rule is annoying for literal types, so everything but "properties".
   completed-docs:
@@ -23,50 +15,16 @@ rules:
     - types
     - variables
 
-  # Enforces using explicit += 1 or -= 1 operators.
-  # Always.
-  increment-decrement: false
-
-  # Enforces indentation with tabs or spaces.
-  # Using tabs, false as managed by prettier.
-  indent: false
-
-  # Requires interface names to begin with a capital ‘I’.
-  # Not used by convention.
-  interface-name: false
-
-  # Requires lines to be under a certain max length.
-  # Wrap text.
-  max-line-length: false
-
-  # Requires that chained method calls be broken apart onto separate lines.
-  # Following airbnb.
-  newline-per-chained-call: false
-
-  # Disallows traditional (non-arrow) function expressions.
-  # We use normal function by default.
-  only-arrow-functions: false
-
-  # Requires that import statements be alphabetized and grouped.
-  # Managed by ESLint
-  ordered-imports: false
-
-  # Disallows usages of any as a type declaration.
-  # Not limitting programming.
-  no-any: false
-  
-  # Disallows explicit type declarations for variables or parameters initialized to a number, string, or boolean.
-  # We want as much definity as possible.
-  no-inferrable-types: false
-
-  # Forbids an object literal to appear in a type assertion expression. Casting to any or to unknown is still allowed.
-  # We want to use it.
-  no-object-literal-type-assertion: false
-  
-  # Requires that variable declarations use const instead of let and var if possible.
-  # Managed by ESLint.
-  prefer-const: false
-
-  # Requires or disallows trailing commas in array and object literals, destructuring assignments, function typings, named imports and exports and function parameters.
-  # No tralining commas.
-  trailing-comma: false
+  # Requires type definitions to exist.
+  # We want all types.
+  typedef:
+    - true
+    - call-signature
+    - arrow-call-signature
+    - parameter
+    - arrow-parameter
+    - property-declaration
+    - variable-declaration
+    - member-variable-declaration
+    - object-destructuring
+    - array-destructuring

@@ -1,7 +1,7 @@
 import { BehaviorInterface } from "./behavior";
 import { Loader } from "./loader";
-import { LoaderError } from "./loaderError";
 import { AtomicLock } from "./atomic";
+import { LoaderError } from "./loaderError";
 export { AtomicLock };
 /** An interface to describe the resolve argument of promise executor. */
 export interface Resolve {
