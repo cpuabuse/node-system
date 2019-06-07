@@ -10,6 +10,7 @@
     "build": "tsc",
     "docs": "typedoc",
     "mocha": "mocha",
+    "nojekyll": "nodetouch docs/.nojekyll",
     "postinstall": "npm run build",
     "pretest": "npm run build & npm run docs",
     "test": "npm run mocha"
@@ -40,6 +41,7 @@
     "mocha": "^6.1.4",
     "pre-commit": "^1.2.2",
     "prettier": "^1.17.1",
+    "touch": "^3.1.0",
     "tslint": "^5.17.0",
     "typedoc": "^0.14.2",
     "typescript": "^3.5.1"

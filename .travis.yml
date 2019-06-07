@@ -4,6 +4,7 @@ node_js:
   - '11'
   - '10'
 os:
+  - windows
   - linux
   - osx
 jobs:
@@ -29,7 +30,7 @@ jobs:
       cat ./coverage/lcov.info | node ./node_modules/coveralls/bin/coveralls.js
   - name: docs
     node_js: '12'
-    script: npm run docs
+    script: npm run docs & npm run nojekyll
     deploy:
       provider: pages
       local_dir: docs/
