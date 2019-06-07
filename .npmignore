@@ -1,13 +1,15 @@
+*.hidden.*
 *.js
+*.js.map
 .eslintrc.yml
 .gitattributes
 .gitignore
 .npmignore
 .travis.yml
 CODEOWNERS
+docs/*
 issue_template.md
+node_modules/*
 package-lock.json
 pull_request_template.md
 tslint.yml
-node_modules/*
-docs/*

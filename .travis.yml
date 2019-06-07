@@ -9,18 +9,6 @@ os:
   - windows
 jobs:
   include:
-  - stage: TS test
-  language: node_js
-  node_js:
-    - '12'
-    - '11'
-    - '10'
-  os:
-    - linux
-    - osx
-    - windows
-  script:
-    - npm run ts-test
   - stage: Post test
     name: npm next release
     deploy:

@@ -201,7 +201,7 @@ export function testSystem() {
 				},
 				rawInitFilename: "init.yml",
 				initContents: expected.exampleInit,
-				rootDirFileAmount: 21,
+				rootDirFileAmount: 28,
 				rootDirFolderAmount: 7
 			},
 			{
@@ -215,7 +215,7 @@ export function testSystem() {
 				},
 				rawInitFilename: "init.yml",
 				initContents: expected.flowerShopInit,
-				rootDirFileAmount: 21,
+				rootDirFileAmount: 28,
 				rootDirFolderAmount: 7,
 				error: {
 					errorInstances: ["all_flowers_gone"],
