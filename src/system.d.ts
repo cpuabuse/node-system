@@ -59,20 +59,6 @@ interface FilterContext {
  */
 export declare class System extends Loader {
     /**
-     * Access stderr
-     * @param {string} text
-     * @example <caption>Usage</caption>
-     * system.System.error("Not enough resources.");
-     */
-    private static error;
-    /**
-     * Access stdout
-     * @param {string} text
-     * @example <caption>Usage</caption>
-     * system.System.log("Resources loaded.");
-     */
-    private static log;
-    /**
      * Checks options argument for missing incorrect property types
      * @param options System options argument
      * @returns Returns true if the arguments is corrupt; false if OK
@@ -89,7 +75,21 @@ export declare class System extends Loader {
      *   throw new Error ("Options inconsistent.");
      * }
      */
-    private static checkOptionsFailure;
+    static checkOptionsFailure(options: Options): boolean;
+    /**
+     * Access stderr
+     * @param {string} text
+     * @example <caption>Usage</caption>
+     * system.System.error("Not enough resources.");
+     */
+    private static error;
+    /**
+     * Access stdout
+     * @param {string} text
+     * @example <caption>Usage</caption>
+     * system.System.log("Resources loaded.");
+     */
+    private static log;
     /** Error list. */
     private readonly errors;
     /**
@@ -111,10 +111,14 @@ export declare class System extends Loader {
     constructor({ options, behaviors, onError }: {
         behaviors: Array<{
             [key: string]: BehaviorInterface;
-        }>;
+        }> | null;
         onError: ErrorCallback | null;
         options: Options;
     });
+    /** Test error logging. */
+    testError(): void;
+    /** Test logging. */
+    testLog(): void;
     /**
      * Adds an error to the System dynamically
      * @instance

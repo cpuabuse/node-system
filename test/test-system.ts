@@ -15,12 +15,13 @@
 /* global it:true */
 /* global before:true */
 
-const system = require("../src/system.js");
-const systemError = require("../src/error.js");
-const loaderError = require("../src/loaderError.js");
-const expected = require("./expected.js");
-const assert = require("assert");
-const path = require("path");
+import * as system from "../src/system";
+import * as systemError from "../src/error";
+import * as loaderError from "../src/loaderError";
+import * as expected from "./expected";
+import * as assert from "assert";
+import * as path from "path";
+
 const nonExistentFileOrDir = "Non-existent file or directory";
 
 /**
@@ -43,14 +44,34 @@ export function testSystem() {
 		 */
 		describe("constructor", function() {
 			it("should still execute with inappropriate options and no ways to report an error", function() {
-				new system.System({}); /* eslint-disable-line no-new */ // "new System" is only used for side-effects of testing
+				new system.System({} as {
+					behaviors: Array<{
+						[key: string]: {
+							(that: system.System): void;
+						};
+					}> | null;
+					onError: system.ErrorCallback | null;
+					options: system.Options;
+				}); /* eslint-disable-line no-new */ // "new System" is only used for side-effects of testing
 			});
 			it("should execute with inappropriate options and error reporting not being a function", function() {
-				new system.System({ options: null, behaviors: null, onError: "notFunction" }); /* eslint-disable-line no-new */ // "new System" is only used for side-effects of testing
+				new system.System({
+					options: (null as unknown) as system.Options,
+					behaviors: null,
+					onError: ("notFunction" as unknown) as system.ErrorCallback
+				} as {
+					behaviors: Array<{
+						[key: string]: {
+							(that: system.System): void;
+						};
+					}> | null;
+					onError: system.ErrorCallback | null;
+					options: system.Options;
+				}); /* eslint-disable-line no-new */ // "new System" is only used for side-effects of testing
 			});
 			it("should fail with inappropriate options", function(done) {
 				new system.System({
-					options: null,
+					options: (null as unknown) as system.Options,
 					behaviors: null,
 					onError: function(error: any) {
 						/* eslint-disable-line no-new */ // "new System" is only used for side-effects of testing
@@ -152,7 +173,8 @@ export function testSystem() {
 									done();
 								}
 							}
-						]
+						],
+						onError: (null as unknown) as system.ErrorCallback
 					});
 				});
 				it("should not generate inappropriately defined errors", function() {
@@ -217,7 +239,32 @@ export function testSystem() {
 									resolve();
 								}
 							}
-						]
+						],
+						onError: (null as unknown) as system.ErrorCallback
+					});
+				});
+
+				/**
+				 * Tests static log function.
+				 * Inevitably produces console output.
+				 * @function log
+				 * @memberof module:system~test.System
+				 */
+				describe(".testLog()", function() {
+					it("should print a test message to console", function() {
+						systemTest.testLog("Test");
+					});
+				});
+
+				/**
+				 * Tests static error function.
+				 * Inevitably produces console output.
+				 * @function error
+				 * @memberof module:system~test.System
+				 */
+				describe(".testError()", function() {
+					it("should print a test error message to console", function() {
+						systemTest.testError("Test");
 					});
 				});
 
@@ -416,7 +463,7 @@ export function testSystem() {
 									element.error.stringErrors.forEach(function(error) {
 										describe(error, function() {
 											it("should not be SystemError", function(done: any) {
-												if (!systemError.SystemError.isSystemError(error)) {
+												if (!systemError.SystemError.isSystemError((error as unknown) as systemError.SystemError)) {
 													done();
 												}
 											});
@@ -539,32 +586,8 @@ export function testSystem() {
 			];
 			optionsArray.forEach(function(options) {
 				it("should fail with " + options.errorDescription, function() {
-					assert.strictEqual(system.System.checkOptionsFailure(options.options), true);
+					assert.strictEqual(system.System.checkOptionsFailure(options.options as system.Options), true);
 				});
-			});
-		});
-
-		/**
-		 * Tests static log function.
-		 * Inevitably produces console output.
-		 * @function log
-		 * @memberof module:system~test.System
-		 */
-		describe(".log()", function() {
-			it("should print a test message to console", function() {
-				system.System.log("Test");
-			});
-		});
-
-		/**
-		 * Tests static error function.
-		 * Inevitably produces console output.
-		 * @function error
-		 * @memberof module:system~test.System
-		 */
-		describe(".error()", function() {
-			it("should print a test error message to console", function() {
-				system.System.error("Test");
 			});
 		});
 	});

@@ -9,6 +9,8 @@ export declare class AtomicLock {
     private locked;
     /** Counter for current amount of instances in a queue. */
     private maxCount;
+    /** Public getter for testing purposes. */
+    readonly isLocked: boolean;
     /**
      * Lock an atomic lock.
      *

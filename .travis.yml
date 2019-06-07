@@ -4,14 +4,25 @@ node_js:
   - '11'
   - '10'
 os:
-  - windows
   - linux
   - osx
+  - windows
 jobs:
   include:
+  - stage: TS test
+  language: node_js
+  node_js:
+    - '12'
+    - '11'
+    - '10'
+  os:
+    - linux
+    - osx
+    - windows
+  script:
+    - npm run ts-test
   - stage: Post test
     name: npm next release
-    node_js: '12'
     deploy:
       email: cpuabuse@gmail.com
       provider: npm
@@ -22,15 +33,15 @@ jobs:
         tags: true
       tag: next
   - name: coverage
-    node_js: '12'
     script:
     - |-
       # Coverage
       npm run coverage
       cat ./coverage/lcov.info | node ./node_modules/coveralls/bin/coveralls.js
   - name: docs
-    node_js: '12'
-    script: npm run docs & npm run nojekyll
+    script: |
+      npm run docs
+      npm run docs-deploy
     deploy:
       provider: pages
       local_dir: docs/

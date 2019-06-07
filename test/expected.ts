@@ -7,9 +7,7 @@
  * Contains constants for comparing against in testing.
  */
 
-"use strict";
-
-const flowerShopInit = `events:
+export const flowerShopInit = `events:
 data:
   file: flowers
   path: relative
@@ -21,11 +19,6 @@ branch:
   extend: true
 subsystems:
   extend: true`;
-const exampleInit = `behaviors:
+export const exampleInit = `behaviors:
 errors:
 events:`;
-
-module.exports = {
-	flowerShopInit,
-	exampleInit
-}

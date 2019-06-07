@@ -19,8 +19,8 @@
 /* global describe:true */
 /* global it:true */
 
-const system = require("../src/system.js");
-const assert = require("assert");
+import * as system from "../src/system";
+import * as assert from "assert";
 const waitTime = 200;
 
 /**
@@ -28,38 +28,38 @@ const waitTime = 200;
  * @member AtomicLock
  * @memberof module:system~test
  */
-export function testAtomicLock(){
+export function testAtomicLock() {
 	describe("AtomicLock", function() {
 		// Assing variables
 		let atomicLock = new system.AtomicLock();
 
-		describe("initial state", function(){
-			it("should be unlocked", function(){
-				assert.strictEqual(atomicLock.locked, false);
+		describe("initial state", function() {
+			it("should be unlocked", function() {
+				assert.strictEqual(atomicLock.isLocked, false);
 			});
 		});
 
-		describe("locked state", function(){
-			it("should be locked", function(done){
-				atomicLock.lock().then(function(){
-					assert.strictEqual(atomicLock.locked, true);
+		describe("locked state", function() {
+			it("should be locked", function(done) {
+				atomicLock.lock().then(function() {
+					assert.strictEqual(atomicLock.isLocked, true);
 					done();
 				});
 			});
 		});
 
-		describe("lock while locked", function(){
-			it("should lock after timed release", function(done){
-				setTimeout(function(){
+		describe("lock while locked", function() {
+			it("should lock after timed release", function(done) {
+				setTimeout(function() {
 					atomicLock.release();
 				}, waitTime);
 				atomicLock.lock().then(() => done());
-				assert.strictEqual(atomicLock.locked, true);
-			})
-		})
+				assert.strictEqual(atomicLock.isLocked, true);
+			});
+		});
 	});
 }
 
 module.exports = {
 	testAtomicLock
-}
+};

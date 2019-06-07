@@ -7,13 +7,22 @@
   "license": "UNLICENSED",
   "scripts": {
     "coverage": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly",
+    "prebuild": "echo Building JS files...",
     "build": "tsc",
+    "predocs": "echo Building documentation...",
     "docs": "typedoc",
+    "premocha": "echo Running tests...",
     "mocha": "mocha",
+    "prenojekyll": "echo Touching .nojekyll file...",
     "nojekyll": "nodetouch docs/.nojekyll",
-    "postinstall": "npm run build",
-    "pretest": "npm run build & npm run docs",
-    "test": "npm run mocha"
+    "prets-mocha": "echo Running native TypeScript tests...",
+    "ts-mocha": "mocha --require ts-node/register test/test.ts",
+    "predocs-deploy": "npm run nojekyll",
+    "docs-deploy": "echo Nothing to do...",
+    "prepare": "npm run build",
+    "pretest": "npm run build",
+    "test": "npm run mocha",
+    "ts-test": "npm run ts-mocha"
   },
   "repository": {
     "type": "git",
@@ -42,6 +51,7 @@
     "pre-commit": "^1.2.2",
     "prettier": "^1.17.1",
     "touch": "^3.1.0",
+    "ts-node": "^8.2.0",
     "tslint": "^5.17.0",
     "typedoc": "^0.14.2",
     "typescript": "^3.5.1"

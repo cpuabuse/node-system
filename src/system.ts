@@ -286,28 +286,6 @@ function isProperLoaderObject(object: { [key: string]: any }, property: string, 
  */
 export class System extends Loader {
 	/**
-	 * Access stderr
-	 * @param {string} text
-	 * @example <caption>Usage</caption>
-	 * system.System.error("Not enough resources.");
-	 */
-	private static error(text: string): void {
-		/* eslint-disable-next-line no-console */
-		console.error(`\x1b[31m[Error]\x1b[0m ${text}`);
-	}
-
-	/**
-	 * Access stdout
-	 * @param {string} text
-	 * @example <caption>Usage</caption>
-	 * system.System.log("Resources loaded.");
-	 */
-	private static log(text: string): void {
-		/* eslint-disable-next-line no-console */
-		console.log(`\x1b[32m[OK]\x1b[0m ${text}`);
-	}
-
-	/**
 	 * Checks options argument for missing incorrect property types
 	 * @param options System options argument
 	 * @returns Returns true if the arguments is corrupt; false if OK
@@ -324,7 +302,7 @@ export class System extends Loader {
 	 *   throw new Error ("Options inconsistent.");
 	 * }
 	 */
-	private static checkOptionsFailure(options: Options): boolean {
+	public static checkOptionsFailure(options: Options): boolean {
 		let failed: boolean = false;
 
 		if (options) {
@@ -355,6 +333,28 @@ export class System extends Loader {
 			failed = true;
 		}
 		return failed;
+	}
+
+	/**
+	 * Access stderr
+	 * @param {string} text
+	 * @example <caption>Usage</caption>
+	 * system.System.error("Not enough resources.");
+	 */
+	private static error(text: string): void {
+		/* eslint-disable-next-line no-console */
+		console.error(`\x1b[31m[Error]\x1b[0m ${text}`);
+	}
+
+	/**
+	 * Access stdout
+	 * @param {string} text
+	 * @example <caption>Usage</caption>
+	 * system.System.log("Resources loaded.");
+	 */
+	private static log(text: string): void {
+		/* eslint-disable-next-line no-console */
+		console.log(`\x1b[32m[OK]\x1b[0m ${text}`);
 	}
 
 	/** Error list. */
@@ -406,7 +406,7 @@ export class System extends Loader {
 		behaviors,
 		onError
 	}: {
-		behaviors: Array<{ [key: string]: BehaviorInterface }>;
+		behaviors: Array<{ [key: string]: BehaviorInterface }> | null;
 		onError: ErrorCallback | null;
 		options: Options;
 	}) {
@@ -749,6 +749,16 @@ export class System extends Loader {
 			processLoaderError(error);
 		}
 	} // <== constructor
+
+	/** Test error logging. */
+	public testError(): void {
+		this.error("Test");
+	}
+
+	/** Test logging. */
+	public testLog(): void {
+		this.log("Test");
+	}
 
 	/**
 	 * Adds an error to the System dynamically

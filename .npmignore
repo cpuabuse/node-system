@@ -1,5 +1,13 @@
-node_modules/*
-package-lock.json
-*.hidden.*
-.travis.yml
+*.js
+.eslintrc.yml
+.gitattributes
 .gitignore
+.npmignore
+.travis.yml
+CODEOWNERS
+issue_template.md
+package-lock.json
+pull_request_template.md
+tslint.yml
+node_modules/*
+docs/*

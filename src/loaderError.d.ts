@@ -10,5 +10,5 @@ export declare class LoaderError extends Error {
      * @param code Error code
      * @param message Error message
      */
-    constructor(code: string, message: string);
+    constructor(code?: string, message?: string);
 }
