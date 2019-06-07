@@ -7,8 +7,6 @@ os:
   - windows
   - linux
   - osx
-script:
-  - git config core.autocrlf false & git add --renormalize .
 jobs:
   include:
   - stage: Post test
