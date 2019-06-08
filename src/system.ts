@@ -657,7 +657,7 @@ export class System extends Loader {
 											if (isProperLoaderObject(subsystemsProperty, "type", "string")) {
 												import(`./subsystems/${(subsystemsProperty.type as unknown) as string}`)
 													.then(
-														(subsystemClass: ISubsystem): void => {
+														(subsystemModule: { default: ISubsystem }): void => {
 															let systemArgs: {
 																/* eslint-disable-next-line camelcase */
 																system_args?: Options;
@@ -675,7 +675,7 @@ export class System extends Loader {
 															this.system.subsystem[
 																subsystem
 																/* eslint-disable-next-line new-cap */ // It is an argument
-															] = new subsystemClass({
+															] = new subsystemModule.default({
 																args: systemArgs,
 																systemContext: this,
 																vars: subsystemsProperty.vars

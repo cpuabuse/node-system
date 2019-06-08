@@ -106,5 +106,3 @@ function checkOptionsFailure(options: SystemOptions) {
 	}
 	return failed;
 }
-
-module.exports = Options;
