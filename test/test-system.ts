@@ -8,26 +8,22 @@
  * If error is thrown, node will exit with code 1, otherwise 0.
  */
 
-"use strict";
-
 // Set eslint to ingore describe and it for assert
 /* global describe:true */
 /* global it:true */
 /* global before:true */
 
+import * as assert from "assert";
+import * as path from "path";
 import * as system from "../src/system";
 import * as systemError from "../src/error";
 import * as loaderError from "../src/loaderError";
 import * as expected from "./expected";
-import * as assert from "assert";
-import * as path from "path";
 
 const nonExistentFileOrDir = "Non-existent file or directory";
 
 /**
  * Tests of System class.
- * @member System
- * @memberof module:system~test
  */
 export function testSystem() {
 	describe("System", function() {
@@ -200,6 +196,7 @@ export function testSystem() {
 					logging: "off"
 				},
 				rawInitFilename: "init.yml",
+				initYamlContents: expected.exampleYamlInit,
 				initContents: expected.exampleInit,
 				rootDirFileAmount: 28,
 				rootDirFolderAmount: 7
@@ -214,6 +211,7 @@ export function testSystem() {
 					logging: "off"
 				},
 				rawInitFilename: "init.yml",
+				initYamlContents: expected.flowerShopYamlInit,
 				initContents: expected.flowerShopInit,
 				rootDirFileAmount: 28,
 				rootDirFolderAmount: 7,
@@ -241,6 +239,19 @@ export function testSystem() {
 							}
 						],
 						onError: (null as unknown) as system.ErrorCallback
+					});
+				});
+
+				/** Test getYaml function. */
+				describe(".getYaml()", function() {
+					it("should read correct YAML", function() {
+						let promise: Promise<string> = systemTest.system.file.getYaml(
+							element.options.relativeInitDir,
+							element.options.initFilename
+						);
+						promise.then(function(result: string): void {
+							assert.deepStrictEqual(result, element.initYamlContents);
+						});
 					});
 				});
 

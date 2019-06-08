@@ -19,6 +19,28 @@ branch:
   extend: true
 subsystems:
   extend: true`;
+export const flowerShopYamlInit = {
+	behaviors: null,
+	branch: {
+		extend: true
+	},
+	data: {
+		extend: false,
+		file: "flowers",
+		folder: "data",
+		path: "relative"
+	},
+	errors: null,
+	events: null,
+	subsystems: {
+		extend: true
+	}
+};
 export const exampleInit = `behaviors:
 errors:
 events:`;
+export const exampleYamlInit = {
+	behaviors: null,
+	errors: null,
+	events: null
+};
