@@ -1,12 +1,12 @@
 language: node_js
 node_js:
-  - '12'
-  - '11'
-  - '10'
+- '12'
+- '11'
+- '10'
 os:
-  - linux
-  - osx
-  - windows
+- linux
+- osx
+- windows
 jobs:
   include:
   - stage: Post test
@@ -39,3 +39,6 @@ jobs:
       keep_history: true
       on:
         branch: master
+notifications:
+  slack:
+    secure: 1AgdwupATTv0RN7DVNsFu83Dtx8fjHlFtxw9K4cQ8Zu/VASytbbbvFAy7AfBLFAfIVsFQcy5iPtYzMzV1EkBlyE4SwFz37ieWFZ02y6d2AshM3AOspV635zaMUgUmrtowW/X09O8nIRvqoXhwtWUuxBhGqoDOpQRyshQlHOlIz0PoQLyscRf9H2zjzQp9uV8t+L7LGddGmKVWS5mGqe/eG35pR6KrMgPDGEOePu93f2YwvkvT0cSmaFM1xQQyhZorbFPPoIojTcIyFfWpo+Xrfftflz26PkilR1/bvjm+C7rB90UeDx14wncxGqsEbC9LmvptjxvxMqEHUuAFwpKHqZq17cgDC6jN1NH+VqXFAA9BujWLnDlxFgdGS181RreFcfHOEcwtBucnjZ94Ke+8qj3k78QdD2g0waZxQ93g97dyaGUkOW1xxQiQWXENGBDAS5vIskCxlo772vyZzde9jW5BDA5fzkSULksZ/5Q1OHuOVRcbSzBwDrd1daaoqkzINBSwgQu01cwtnBYEGcAPZ+nntVbFTASMMfY+B21Wy+biwYXlEn/9cwbXF9EP52rsez2p/WgjjcX2Seln61oYhRAGfBqBrrDrGVngeCpPu2wKA8qDVXfNSi4BvUjDW4YNrhP1u/38MQjZK4hTGJ6jrdlYPghi6PTnUAJp2gFEww=
