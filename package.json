@@ -8,7 +8,7 @@
   "scripts": {
     "coverage": "echo Running coverage... && nyc --reporter lcovonly --reporter=text-summary --reporter=text --extension=.ts npm run ts-mocha",
     "build": "echo Building JS files... && tsc",
-    "docs": "echo Building documentation... && typedoc",
+    "docs": "echo Building documentation... && typedoc --ignoreCompilerErrors",
     "mocha": "echo Running tests... && mocha",
     "nojekyll": "echo Touching .nojekyll file... && nodetouch docs/.nojekyll",
     "prets-mocha": "echo Clearing cache... && tsc --noEmit",
@@ -41,7 +41,7 @@
     "mocha": "^6.1.4",
     "nyc": "^14.1.1",
     "pre-commit": "^1.2.2",
-    "prettier": "^1.17.1",
+    "prettier": "^1.18.2",
     "touch": "^3.1.0",
     "ts-node": "^8.2.0",
     "tslint": "^5.17.0",
