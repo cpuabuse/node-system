@@ -38,4 +38,4 @@ jobs:
         secure: 4P2I/wayczxVSmDT+hKIizsufuztbgXnFCzFXU0ILd9373JqSYUYKgNL8XA5SshBlBI8rk1qfsN6aXVXJeY6K70dwm3u3no0oOhKyLjSZToi/vCpjTHQ5T9MDGm/HkeSHQbyn/EX5bd/ko348UuwpLj5FCXg8glyyIcji/nBjdTelLae7ftftUXA2fRmGWmR2WjerqPiIMW56EB5HES3sYDP9aEGWe8L2tmPjKycc+J0imKGtih13VOahDK5uRqLypFxQovBtcqRWDkDbB/jgwYER1DXb3CV3tVnLp6noKHENJ/WKgAjVEj7d+tW/t0D8+pwx+Y3hF6RHNVfaIC/11MWgfot9qDPgxHCHgbXT28lI46zchQyfURLZ0A6it1RAPTtIL0EsS5hy2YTkH7kN6jRC6Z5GR/non1zOn25+dhiPLiYS9auZviWMfnv++y8KqUO+Fi9Xye5tetHADqpqZxmf3ivPleZvcInsb/ECGulF4wVGg13tWAsz3b9PGesuzt5T+cXqP2c+phePzKSZjXDv8uELp3ioV6yZ6qSDqNoGDEwgKx3COTl5tXpGeHj6tJz8G2Bfs3OqgPvLoKreU5dyz7SKqRoLJUS/STIcMSufgZ6uYjZ/cUGgTgHtw2fjflsNDixq1wuNDue40m1w82ikAG0z28iVIlNPtYuWNE=
       keep_history: true
       on:
-        branch: dev
+        branch: master
