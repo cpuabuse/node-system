@@ -208,7 +208,7 @@ export function testSystem() {
 					rootDir: "test",
 					relativeInitDir: "flowerShop",
 					initFilename: "init",
-					logging: "off"
+					logging: "console" // Test console logging
 				},
 				rawInitFilename: "init.yml",
 				initYamlContents: expected.flowerShopYamlInit,

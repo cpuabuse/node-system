@@ -1,7 +1,9 @@
-*d.ts
+*.d.ts
 *.hidden.*
 *.js
 *.js.map
-docs/*
-node_modules/*
+.nyc_output
+coverage
+docs
+node_modules
 package-lock.json

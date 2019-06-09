@@ -899,13 +899,8 @@ export class System extends Loader {
 	 * labInventory.log(text);
 	 */
 	private log(text: string): void {
-		if (typeof text === "string") {
-			if (this.system.logging === "console") {
-				System.log(`${this.system.id}: ${text}`);
-			}
-		} else {
-			// TODO: fix report text etc
-			this.fire("type_error", `${typeof text} not string.`);
+		if (this.system.logging === "console") {
+			System.log(`${this.system.id}: ${text}`);
 		}
 	} // <== log
 
@@ -928,13 +923,8 @@ export class System extends Loader {
 	 * labInventory.error(text);
 	 */
 	private error(text: string): void {
-		if (typeof text === "string") {
-			if (this.system.logging === "console") {
-				System.error(`${this.system.id}: ${text}`);
-			}
-		} else {
-			// TODO: fix report text etc
-			this.fire("type_error", `${typeof text} not string.`);
+		if (this.system.logging === "console") {
+			System.error(`${this.system.id}: ${text}`);
 		}
 	} // <== log
 

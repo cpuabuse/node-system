@@ -6,12 +6,12 @@
   "types": "src/system.d.ts",
   "license": "UNLICENSED",
   "scripts": {
-    "coverage": "echo Running coverage... && nyc --reporter lcovonly --reporter=text-summary --reporter=text --extension=.ts npm run ts-mocha",
+    "coverage": "echo Running coverage... && nyc --reporter=lcovonly --reporter=text-summary --reporter=text --extension=.ts npm run ts-mocha",
     "build": "echo Building JS files... && tsc",
     "docs": "echo Building documentation... && typedoc --ignoreCompilerErrors",
     "mocha": "echo Running tests... && mocha",
     "nojekyll": "echo Touching .nojekyll file... && nodetouch docs/.nojekyll",
-    "prets-mocha": "echo Clearing cache... && tsc --noEmit",
+    "prets-mocha": "echo Clearing cache... && tsc",
     "ts-mocha": "echo Running native TypeScript tests... && mocha --require ts-node/register test/test.ts",
     "prepare": "npm run build",
     "test": "npm run ts-mocha && npm run mocha"
