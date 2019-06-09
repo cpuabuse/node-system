@@ -4,7 +4,7 @@
 */
 
 "use strict";
-import { System } from "./system";
+import { System } from "./system/system";
 import { stringify } from "querystring";
 const loader = require("loader.js");
 const path = require("path");

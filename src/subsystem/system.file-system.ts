@@ -3,11 +3,16 @@
 	cpuabuse.com
 */
 
-"use strict";
+/** Works with files. */
+import { Subsystem, ConstructorArgs } from "../system/subsystem"; /* eslint-disable-line no-unused-vars */ // ESLint bug
 
-import * as path from "path";
-import {Subsystem} from "../subsystem";
+/** Class to work with files. */
+export default class FileSystem extends Subsystem {
+	/** Contains files & file meta-data. */
+	private files: any;
 
-class FileSystem extends Subsystem{
-	
+	constructor(args: ConstructorArgs) {
+		super(args.systemContext, null);
+		this.files = args.vars;
+	}
 }
