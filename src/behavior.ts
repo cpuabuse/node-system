@@ -7,9 +7,9 @@
  * Manages system behaviors.
  */
 
-import {AtomicLock} from "./atomic";
-import {EventEmitter} from "events";
-import {System} from "./system";
+import { AtomicLock } from "./system/atomic";
+import { EventEmitter } from "events";
+import { System } from "./system/system";
 
 /** Behavior creation error, returned by [[Behavior.addBehavior]]. */
 export const behaviorCreationError: string = "behavior_creation_error";
@@ -26,7 +26,7 @@ export const behaviorCreationError: string = "behavior_creation_error";
  * }
  * ```
  */
-export interface BehaviorInterface{
+export interface BehaviorInterface {
 	(that: System): void;
 }
 
@@ -36,7 +36,7 @@ type BehaviorIndex = {
 };
 
 /** System behavior class. */
-export class Behavior extends EventEmitter{
+export class Behavior extends EventEmitter {
 	/** Atomic lock to perform counter increments. */
 	atomicLock: AtomicLock;
 
@@ -50,7 +50,7 @@ export class Behavior extends EventEmitter{
 	nextBehaviorCounter: number = 0;
 
 	/** Initializes system behavior. */
-	constructor(){
+	constructor() {
 		// Call superclass's constructor
 		super();
 
@@ -80,10 +80,13 @@ export class Behavior extends EventEmitter{
 	 * @param callback Behavior callback function
 	 * @returns ID of the behavior; `behaviorCreationError` if creation failed
 	 */
-	async addBehavior(name: string, callback: Function): Promise<string>{
-		if(typeof name === "string"){ // Name must be string
-			if(typeof callback === "function"){ // Callback must be a function
-				if(this.nextBehaviorCounter < this.getMaxListeners()){ // Overflow protection
+	async addBehavior(name: string, callback: Function): Promise<string> {
+		if (typeof name === "string") {
+			// Name must be string
+			if (typeof callback === "function") {
+				// Callback must be a function
+				if (this.nextBehaviorCounter < this.getMaxListeners()) {
+					// Overflow protection
 					// Lock
 					await this.atomicLock.lock();
 
@@ -91,7 +94,7 @@ export class Behavior extends EventEmitter{
 					let id: string = (this.nextBehaviorCounter++).toString();
 
 					// If no behavior with such name existed before, initialize an array for it
-					if(!this.behaviorId.hasOwnProperty(name)){
+					if (!this.behaviorId.hasOwnProperty(name)) {
 						this.behaviorId[name] = new Array();
 					}
 
@@ -133,9 +136,9 @@ export class Behavior extends EventEmitter{
 	 * ```
 	 * @param name Behavior name
 	 */
-	behave(name: string): void{
-		if(typeof name === "string"){
-			if(this.behaviorId.hasOwnProperty(name)){
+	behave(name: string): void {
+		if (typeof name === "string") {
+			if (this.behaviorId.hasOwnProperty(name)) {
 				this.behaviorId[name].forEach(event => {
 					this.emit(event);
 				});

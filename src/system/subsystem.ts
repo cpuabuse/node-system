@@ -18,7 +18,7 @@ export interface ISubsystem extends Subsystem {
 export interface ConstructorArgs {
 	/** Context of a parent system. */
 	systemContext: System;
-	args: null | {
+	args: {
 		system_args?: any;
 	};
 	/** Arbitrary arguments from a file. */
@@ -49,10 +49,7 @@ export class Subsystem extends AtomicLock {
 
 	data: any;
 
-	constructor(
-		systemContext: System,
-		subsystemMethods: Array<SubsystemMethod> | null
-	) {
+	constructor(systemContext: System, subsystemMethods: Array<SubsystemMethod> | null) {
 		super();
 
 		// Set reference to system

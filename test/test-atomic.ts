@@ -19,7 +19,7 @@
 /* global describe:true */
 /* global it:true */
 
-import * as system from "../src/system";
+import * as system from "../src/system/system";
 import * as assert from "assert";
 const waitTime = 200;
 

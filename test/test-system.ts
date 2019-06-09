@@ -15,7 +15,7 @@
 
 import * as assert from "assert";
 import * as path from "path";
-import * as system from "../src/system";
+import * as system from "../src/system/system";
 import * as systemError from "../src/error";
 import * as loaderError from "../src/loaderError";
 import * as expected from "./expected";

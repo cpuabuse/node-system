@@ -8,17 +8,17 @@
  */
 
 // Imports
-import * as events from "./events";
-import { Behavior, BehaviorInterface /* eslint-disable-line no-unused-vars */ } from "./behavior";
+import * as events from "../events";
+import { Behavior, BehaviorInterface /* eslint-disable-line no-unused-vars */ } from "../behavior";
 import {
 	ISubsystem /* eslint-disable-line no-unused-vars */,
 	Subsystem /* eslint-disable-line no-unused-vars */
 } from "./subsystem";
-import { Loader, loadYaml } from "./loader"; // Auxiliary system lib
+import { Loader, loadYaml } from "../loader"; // Auxiliary system lib
 import { AtomicLock } from "./atomic";
-import { LoaderError } from "./loaderError";
-import { OptionsInterface /* eslint-disable-line no-unused-vars */ } from "./subsystems/system.info.options";
-import { SystemError } from "./error";
+import { LoaderError } from "../loaderError";
+import { OptionsInterface /* eslint-disable-line no-unused-vars */ } from "../subsystem/system.info.options";
+import { SystemError } from "../error";
 
 // Re-export
 export { AtomicLock };
@@ -655,7 +655,7 @@ export class System extends Loader {
 										if (isProperLoaderObject(subsystems, subsystem, "object")) {
 											let subsystemsProperty: LoaderProperty = subsystems[subsystem];
 											if (isProperLoaderObject(subsystemsProperty, "type", "string")) {
-												import(`./subsystems/${(subsystemsProperty.type as unknown) as string}`)
+												import(`../subsystem/${(subsystemsProperty.type as unknown) as string}`)
 													.then(
 														(subsystemModule: { default: ISubsystem }): void => {
 															let systemArgs: {
@@ -682,8 +682,8 @@ export class System extends Loader {
 															});
 														}
 													)
-													.catch(function(): void {
-														throw new LoaderError("loader_fail", "Could not load defined subsystems.");
+													.catch(function(err): void {
+														throw err;
 													});
 											}
 										}
