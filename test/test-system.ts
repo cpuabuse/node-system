@@ -256,7 +256,7 @@ export function testSystem() {
 					});
 				});
 
-				describe("#subSystem", function(): void {
+				describe("#subsystem", function(): void {
 					it("should initialise the sub-system", function(): void {
 						if (Object.prototype.hasOwnProperty.call(element, "checkSubsystemVars")) {
 							Object.keys(element.checkSubsystemVars as object).forEach(function(key: string): void {

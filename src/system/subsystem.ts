@@ -68,4 +68,27 @@ export class Subsystem extends AtomicLock {
 		// Create a dummy data property
 		this.data = null;
 	}
+
+	/**
+	 * Returns a copy of specified variable.
+	 * @param name Name of the property
+	 */
+	public get(name: string): any {
+		// Lock
+		this.lock();
+
+		// Defualt return value
+		let result: any; // Undefined
+
+		// Return copied object if target is object, else return the primitive itself
+		if (Object.keys(this.data).includes(name)) {
+			result = typeof this.data[name] === "object" ? Object.assign(new Object(), this.data[name]) : this.data[name];
+		}
+
+		// Unlock
+		this.release();
+
+		// Return result
+		return result;
+	}
 }

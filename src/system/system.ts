@@ -635,7 +635,10 @@ export class System extends Loader {
 												let filePath: string = Loader.join(dir, file) as string; // Only two arguments make string always
 
 												// Return
-												return Loader.join(this.system.rootDir, filePath) as string;
+												return Loader.join(
+													this.system.subsystem["system.info.options"].get("rootDir"),
+													filePath
+												) as string;
 											})(),
 										async toRelative(rootDir: string, target: string): Promise<string> {
 											/* eslint-disable-line require-await */ // We want file methods to produce same type output
