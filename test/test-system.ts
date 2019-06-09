@@ -219,12 +219,13 @@ export function testSystem() {
 					errorInstances: ["all_flowers_gone"],
 					stringErrors: ["carShopError"]
 				},
-				behaviorTest: true
+				behaviorTest: true,
+				checkSubsystemVars: { "local-fs": { a: "b", homepage: "https://github.com/cpuabuse/node-system" } }
 			}
 		];
 
 		systems.forEach(function(element) {
-			describe(element.options.id, function() {
+			describe(element.options.id, function(): void {
 				let systemTest: any; // Variable for the instance of the System class
 
 				// Promise that will resolve on system_load
@@ -243,8 +244,8 @@ export function testSystem() {
 				});
 
 				/** Test getYaml function. */
-				describe(".getYaml()", function() {
-					it("should read correct YAML", function() {
+				describe(".getYaml()", function(): void {
+					it("should read correct YAML", function(): void {
 						let promise: Promise<string> = systemTest.system.file.getYaml(
 							element.options.relativeInitDir,
 							element.options.initFilename
@@ -255,14 +256,25 @@ export function testSystem() {
 					});
 				});
 
+				describe("#subSystem", function(): void {
+					it("should initialise the sub-system", function(): void {
+						if (Object.prototype.hasOwnProperty.call(element, "checkSubsystemVars")) {
+							Object.keys(element.checkSubsystemVars as object).forEach(function(key: string): void {
+								let subsystemVars: any = systemTest.system.subsystem[key].files;
+								assert.deepStrictEqual(subsystemVars, (element.checkSubsystemVars as any)[key] as object);
+							});
+						}
+					});
+				});
+
 				/**
 				 * Tests static log function.
 				 * Inevitably produces console output.
 				 * @function log
 				 * @memberof module:system~test.System
 				 */
-				describe(".testLog()", function() {
-					it("should print a test message to console", function() {
+				describe(".testLog()", function(): void {
+					it("should print a test message to console", function(): void {
 						systemTest.testLog("Test");
 					});
 				});
@@ -273,8 +285,8 @@ export function testSystem() {
 				 * @function error
 				 * @memberof module:system~test.System
 				 */
-				describe(".testError()", function() {
-					it("should print a test error message to console", function() {
+				describe(".testError()", function(): void {
+					it("should print a test error message to console", function(): void {
 						systemTest.testError("Test");
 					});
 				});
