@@ -442,312 +442,301 @@ export class System extends Loader {
 			}
 
 			// First things first, call a loader, if loader has failed, there are no tools to report gracefully, so the errors from there will just go above
-			super(
-				options.rootDir,
-				options.relativeInitDir,
-				options.initFilename,
-				(load: Promise<void>): void => {
-					load
-						.then(
-							(): Promise<void> =>
-								(async (): Promise<void> => {
-									/* eslint-disable-line require-await */ // It is async by design, not by need
-									this.system = new Object() as ISystemProperty;
-									this.system.id = options.id;
-									this.system.rootDir = options.rootDir;
-									this.system.relativeInitDir = options.relativeInitDir;
-									this.system.initFilename = options.initFilename;
-									this.system.logging = options.logging;
-									this.system.subsystem = new Object() as {
-										[key: string]: Subsystem;
-									};
-									this.system.behavior = new Behavior();
-									this.system.error = new Object() as {
-										[key: string]: SystemError;
-									};
-									this.system.file = {
-										cache: {
-											files: [], // Array of actual files and reverse indices pointing from files to index
-											index: {} // Index pointing to files
-										},
-										filter: {
-											isDir: (filterContext: FilterContext): Promise<boolean> =>
-												Loader.isDir(this.system.rootDir, filterContext.item),
-											isFile: (filterContext: FilterContext): Promise<boolean> =>
-												Loader.isFile(Loader.join(this.system.rootDir, Loader.join(
-													filterContext.dir,
-													filterContext.itemName
-												) as string) as string) // Only two arguments make string always
-										},
-										getFile: async (dir: string, file: string, cacheTtl: number, force: boolean): Promise<Buffer> => {
-											// Construct a path
-											const pathToFile: string = Loader.join(dir, file) as string; // Only two arguments make string always
+			super(options.rootDir, options.relativeInitDir, options.initFilename, (load: Promise<void>): void => {
+				load
+					.then(
+						(): Promise<void> =>
+							(async (): Promise<void> => {
+								/* eslint-disable-line require-await */ // It is async by design, not by need
+								this.system = new Object() as ISystemProperty;
+								this.system.id = options.id;
+								this.system.rootDir = options.rootDir;
+								this.system.relativeInitDir = options.relativeInitDir;
+								this.system.initFilename = options.initFilename;
+								this.system.logging = options.logging;
+								this.system.subsystem = new Object() as {
+									[key: string]: Subsystem;
+								};
+								this.system.behavior = new Behavior();
+								this.system.error = new Object() as {
+									[key: string]: SystemError;
+								};
+								this.system.file = {
+									cache: {
+										files: [], // Array of actual files and reverse indices pointing from files to index
+										index: {} // Index pointing to files
+									},
+									filter: {
+										isDir: (filterContext: FilterContext): Promise<boolean> =>
+											Loader.isDir(this.system.rootDir, filterContext.item),
+										isFile: (filterContext: FilterContext): Promise<boolean> =>
+											Loader.isFile(Loader.join(this.system.rootDir, Loader.join(
+												filterContext.dir,
+												filterContext.itemName
+											) as string) as string) // Only two arguments make string always
+									},
+									getFile: async (dir: string, file: string, cacheTtl: number, force: boolean): Promise<Buffer> => {
+										// Construct a path
+										const pathToFile: string = Loader.join(dir, file) as string; // Only two arguments make string always
 
-											// Assign
-											const {
-												index,
-												files
-											}: { files: FileObject[]; index: { [key: string]: FileObject } } = this.system.file.cache;
+										// Assign
+										const {
+											index,
+											files
+										}: { files: FileObject[]; index: { [key: string]: FileObject } } = this.system.file.cache;
 
-											// Physically getting the file
-											const pGetFile: () => Promise<Buffer> = (): Promise<Buffer> =>
-												(async (): Promise<Buffer> => {
-													/* eslint-disable-line func-style */ // Can't have arrow style function declaration
-													try {
-														return await Loader.getFile(this.system.rootDir, dir, file);
-													} catch (error) {
-														// TODO: this.fire("file_system_error");
-														throw this.system.error.file_system_error;
-													}
-												})();
-
-											const maxFiles: number = 100;
-											const defaultCacheTtl: number = 86400;
-											const milliSecondsInSeconds: number = 1000; // The functionality is there for future, cacheTtl will be initialized from loader
-
-											// Set cache to default if not provided
-											/* tslint:disable-next-line strict-type-predicates */
-											if (cacheTtl === null) {
-												cacheTtl = defaultCacheTtl; /* tslint:disable-line no-parameter-reassignment */ /* eslint-disable-line no-param-reassign */ // The functionality is there for future, cacheTtl will be initialized from loader
-											}
-											if (maxFiles > 0) {
-												// Find expiration time and current time
-												const currentTimeStamp: number = Math.trunc(new Date().getTime() / milliSecondsInSeconds);
-												const expirationTimeStamp: number = currentTimeStamp + cacheTtl;
-
-												// Find if file is cached
-												let cached: boolean = false;
-												if (Object.prototype.hasOwnProperty.call(index, pathToFile)) {
-													cached = true;
+										// Physically getting the file
+										const pGetFile: () => Promise<Buffer> = (): Promise<Buffer> =>
+											(async (): Promise<Buffer> => {
+												/* eslint-disable-line func-style */ // Can't have arrow style function declaration
+												try {
+													return await Loader.getFile(this.system.rootDir, dir, file);
+												} catch (error) {
+													// TODO: this.fire("file_system_error");
+													throw this.system.error.file_system_error;
 												}
+											})();
 
-												// Process for cached
-												if (cached) {
-													if (index[pathToFile].cacheTtl === cacheTtl) {
-														// If expired; Not expired is anticipated to be the most used path
-														if (currentTimeStamp > index[pathToFile].expires) {
-															index[pathToFile].file = await pGetFile();
-															index[pathToFile].expires = expirationTimeStamp;
-														} else if (force) {
-															index[pathToFile].file = await pGetFile();
-														}
-													} else {
-														// New ttl
-														if (index[pathToFile].expires > expirationTimeStamp) {
-															index[pathToFile].expires = expirationTimeStamp;
-														}
-														index[pathToFile].cacheTtl = cacheTtl;
-														if (force) {
-															index[pathToFile].file = await pGetFile();
-														}
+										const maxFiles: number = 100;
+										const defaultCacheTtl: number = 86400;
+										const milliSecondsInSeconds: number = 1000; // The functionality is there for future, cacheTtl will be initialized from loader
+
+										// Set cache to default if not provided
+										/* tslint:disable-next-line strict-type-predicates */
+										if (cacheTtl === null) {
+											cacheTtl = defaultCacheTtl; /* tslint:disable-line no-parameter-reassignment */ /* eslint-disable-line no-param-reassign */ // The functionality is there for future, cacheTtl will be initialized from loader
+										}
+										if (maxFiles > 0) {
+											// Find expiration time and current time
+											const currentTimeStamp: number = Math.trunc(new Date().getTime() / milliSecondsInSeconds);
+											const expirationTimeStamp: number = currentTimeStamp + cacheTtl;
+
+											// Find if file is cached
+											let cached: boolean = false;
+											if (Object.prototype.hasOwnProperty.call(index, pathToFile)) {
+												cached = true;
+											}
+
+											// Process for cached
+											if (cached) {
+												if (index[pathToFile].cacheTtl === cacheTtl) {
+													// If expired; Not expired is anticipated to be the most used path
+													if (currentTimeStamp > index[pathToFile].expires) {
+														index[pathToFile].file = await pGetFile();
+														index[pathToFile].expires = expirationTimeStamp;
+													} else if (force) {
+														index[pathToFile].file = await pGetFile();
 													}
 												} else {
-													// <== if(cached)
-													let nextFile: number;
-													const filesLength: number = files.length;
+													// New ttl
+													if (index[pathToFile].expires > expirationTimeStamp) {
+														index[pathToFile].expires = expirationTimeStamp;
+													}
+													index[pathToFile].cacheTtl = cacheTtl;
+													if (force) {
+														index[pathToFile].file = await pGetFile();
+													}
+												}
+											} else {
+												// <== if(cached)
+												let nextFile: number;
+												const filesLength: number = files.length;
 
-													// Determine index and prepare space
-													if (filesLength >= maxFiles) {
-														// Update indices
+												// Determine index and prepare space
+												if (filesLength >= maxFiles) {
+													// Update indices
+													/* tslint:disable-next-line no-dynamic-delete */
+													delete index[files[0].rIndex];
+													if (Object.keys(index[files[0].rIndex]).length === 0) {
 														/* tslint:disable-next-line no-dynamic-delete */
 														delete index[files[0].rIndex];
-														if (Object.keys(index[files[0].rIndex]).length === 0) {
-															/* tslint:disable-next-line no-dynamic-delete */
-															delete index[files[0].rIndex];
-														}
-
-														// Shift the array
-														files.shift();
-
-														// Assign next file index
-														nextFile = maxFiles - 1;
-													} else {
-														nextFile = filesLength;
 													}
 
-													// Unshift the array
-													files.unshift({
-														cacheTtl,
-														expires: expirationTimeStamp,
-														file: await pGetFile()
-													} as FileObject);
+													// Shift the array
+													files.shift();
 
-													// Add indices
-													index[pathToFile] = files[nextFile];
-													files[nextFile].rIndex = pathToFile;
-												} // End: if(cached) {} else {...}
-
-												// Return
-												return index[pathToFile].file;
-											}
-
-											// Return
-											return pGetFile();
-										},
-										getYaml: (dir: string, file: string): Promise<string> => loadYaml(this.system.rootDir, dir, file),
-										async join(rootDir: string, target: string | Array<string>): Promise<string | Array<string>> {
-											/* eslint-disable-line require-await */ // We want file methods to produce same type output
-											return Loader.join(rootDir, target);
-										},
-										list: async (dir: string, filter: Filter | null): Promise<Array<string>> => {
-											let filteredItems: Array<string>; // Return array
-											let itemNames: Array<string> = await Loader.list(this.system.rootDir, dir); // Wait for folder contets
-											let items: Array<string> = (await this.system.file.join(dir, itemNames)) as Array<string>; // The return will be always be an array
-
-											// Was the filter even specified?
-											if (filter === null) {
-												filteredItems = itemNames;
-											} else {
-												filteredItems = new Array() as Array<string>; // Prepare return object
-												let { length }: Array<string> = items; // Cache length
-												let filterMatches: Array<Promise<boolean>> = new Array(); // Operations dataholder; Contains Promises
-
-												// Filter and populate promises
-												for (let i: number = 0; i < length; i++) {
-													// Declare and populate filter context
-													let filterContext: FilterContext = {
-														dir,
-														item: items[i],
-														itemName: itemNames[i]
-													};
-													filterMatches[i] = filter(filterContext);
+													// Assign next file index
+													nextFile = maxFiles - 1;
+												} else {
+													nextFile = filesLength;
 												}
 
-												// Work on results
-												await Promise.all(filterMatches).then(
-													(values: Array<boolean>): void => {
-														// Populate return object preserving the order
-														for (let i: number = 0; i < length; i++) {
-															if (values[i]) {
-																filteredItems.push(itemNames[i]);
-															}
+												// Unshift the array
+												files.unshift({
+													cacheTtl,
+													expires: expirationTimeStamp,
+													file: await pGetFile()
+												} as FileObject);
+
+												// Add indices
+												index[pathToFile] = files[nextFile];
+												files[nextFile].rIndex = pathToFile;
+											} // End: if(cached) {} else {...}
+
+											// Return
+											return index[pathToFile].file;
+										}
+
+										// Return
+										return pGetFile();
+									},
+									getYaml: (dir: string, file: string): Promise<string> => loadYaml(this.system.rootDir, dir, file),
+									async join(rootDir: string, target: string | Array<string>): Promise<string | Array<string>> {
+										/* eslint-disable-line require-await */ // We want file methods to produce same type output
+										return Loader.join(rootDir, target);
+									},
+									list: async (dir: string, filter: Filter | null): Promise<Array<string>> => {
+										let filteredItems: Array<string>; // Return array
+										let itemNames: Array<string> = await Loader.list(this.system.rootDir, dir); // Wait for folder contets
+										let items: Array<string> = (await this.system.file.join(dir, itemNames)) as Array<string>; // The return will be always be an array
+
+										// Was the filter even specified?
+										if (filter === null) {
+											filteredItems = itemNames;
+										} else {
+											filteredItems = new Array() as Array<string>; // Prepare return object
+											let { length }: Array<string> = items; // Cache length
+											let filterMatches: Array<Promise<boolean>> = new Array(); // Operations dataholder; Contains Promises
+
+											// Filter and populate promises
+											for (let i: number = 0; i < length; i++) {
+												// Declare and populate filter context
+												let filterContext: FilterContext = {
+													dir,
+													item: items[i],
+													itemName: itemNames[i]
+												};
+												filterMatches[i] = filter(filterContext);
+											}
+
+											// Work on results
+											await Promise.all(filterMatches).then((values: Array<boolean>): void => {
+												// Populate return object preserving the order
+												for (let i: number = 0; i < length; i++) {
+													if (values[i]) {
+														filteredItems.push(itemNames[i]);
+													}
+												}
+											});
+										}
+
+										// Finally - return filtered items
+										return filteredItems;
+									}, // <== list
+									toAbsolute: (dir: string, file: string): Promise<string> =>
+										(async (): Promise<string> => {
+											/* eslint-disable-line require-await */ // We want file methods to produce same type output
+											let filePath: string = Loader.join(dir, file) as string; // Only two arguments make string always
+
+											// Return
+											return Loader.join(
+												this.system.subsystem["system.info.options"].get("rootDir"),
+												filePath
+											) as string;
+										})(),
+									async toRelative(rootDir: string, target: string): Promise<string> {
+										/* eslint-disable-line require-await */ // We want file methods to produce same type output
+										return Loader.toRelative(rootDir, target) as string; // Only two arguments make string always
+									}
+								}; // <== file
+							})()
+					)
+					.then(() => {
+						// The following is code dependent on full initialization by static system initializer and Loader.
+						try {
+							// Initialize subsystems
+							if (isProperLoaderObject(this, "subsystems", "object")) {
+								let subsystems: LoaderProperty = this.subsystems as LoaderProperty;
+								/* eslint-disable-next-line no-restricted-syntax */
+								for (let subsystem in subsystems) {
+									if (isProperLoaderObject(subsystems, subsystem, "object")) {
+										let subsystemsProperty: LoaderProperty = subsystems[subsystem];
+										if (isProperLoaderObject(subsystemsProperty, "type", "string")) {
+											import(`../subsystem/${(subsystemsProperty.type as unknown) as string}`)
+												.then((subsystemModule: { default: ISubsystem }): void => {
+													let systemArgs: {
+														/* eslint-disable-next-line camelcase */
+														system_args?: Options;
+													} = new Object() as {
+														/* eslint-disable-next-line camelcase */
+														system_args?: Options;
+													}; /* eslint-disable-line camelcase */ // Variables defined in yml file
+													if (isProperLoaderObject(subsystemsProperty, "args", "array")) {
+														if (((subsystemsProperty.args as unknown) as Array<any>).includes("system_args")) {
+															/* eslint-disable-next-line dot-notation */ /* tslint:disable-next-line no-string-literal */ // Parens are necessary
+															systemArgs["system_args"] = options;
 														}
 													}
-												);
-											}
 
-											// Finally - return filtered items
-											return filteredItems;
-										}, // <== list
-										toAbsolute: (dir: string, file: string): Promise<string> =>
-											(async (): Promise<string> => {
-												/* eslint-disable-line require-await */ // We want file methods to produce same type output
-												let filePath: string = Loader.join(dir, file) as string; // Only two arguments make string always
-
-												// Return
-												return Loader.join(
-													this.system.subsystem["system.info.options"].get("rootDir"),
-													filePath
-												) as string;
-											})(),
-										async toRelative(rootDir: string, target: string): Promise<string> {
-											/* eslint-disable-line require-await */ // We want file methods to produce same type output
-											return Loader.toRelative(rootDir, target) as string; // Only two arguments make string always
-										}
-									}; // <== file
-								})()
-						)
-						.then(() => {
-							// The following is code dependent on full initialization by static system initializer and Loader.
-							try {
-								// Initialize subsystems
-								if (isProperLoaderObject(this, "subsystems", "object")) {
-									let subsystems: LoaderProperty = this.subsystems as LoaderProperty;
-									/* eslint-disable-next-line no-restricted-syntax */
-									for (let subsystem in subsystems) {
-										if (isProperLoaderObject(subsystems, subsystem, "object")) {
-											let subsystemsProperty: LoaderProperty = subsystems[subsystem];
-											if (isProperLoaderObject(subsystemsProperty, "type", "string")) {
-												import(`../subsystem/${(subsystemsProperty.type as unknown) as string}`)
-													.then(
-														(subsystemModule: { default: ISubsystem }): void => {
-															let systemArgs: {
-																/* eslint-disable-next-line camelcase */
-																system_args?: Options;
-															} = new Object() as {
-																/* eslint-disable-next-line camelcase */
-																system_args?: Options;
-															}; /* eslint-disable-line camelcase */ // Variables defined in yml file
-															if (isProperLoaderObject(subsystemsProperty, "args", "array")) {
-																if (((subsystemsProperty.args as unknown) as Array<any>).includes("system_args")) {
-																	/* eslint-disable-next-line dot-notation */ /* tslint:disable-next-line no-string-literal */ // Parens are necessary
-																	systemArgs["system_args"] = options;
-																}
-															}
-
-															this.system.subsystem[
-																subsystem
-																/* eslint-disable-next-line new-cap */ // It is an argument
-															] = new subsystemModule.default({
-																args: systemArgs,
-																systemContext: this,
-																vars: subsystemsProperty.vars
-															});
-														}
-													)
-													.catch(function(err): void {
-														throw err;
+													this.system.subsystem[
+														subsystem
+														/* eslint-disable-next-line new-cap */ // It is an argument
+													] = new subsystemModule.default({
+														args: systemArgs,
+														systemContext: this,
+														vars: subsystemsProperty.vars
 													});
-											}
+												})
+												.catch(function(): void {
+													throw new LoaderError("loader_fail", "Could not load defined subsystems.");
+												});
 										}
 									}
 								}
-								if (
-									!(
-										Object.prototype.hasOwnProperty.call(this, "events") &&
-										Object.prototype.hasOwnProperty.call(this, "behaviors")
-									)
-								) {
-									// Make sure basic system carcass was initialized
-									throw new LoaderError("loader_fail", "Mandatory initialization files are missing.");
-								}
+							}
+							if (
+								!(
+									Object.prototype.hasOwnProperty.call(this, "events") &&
+									Object.prototype.hasOwnProperty.call(this, "behaviors")
+								)
+							) {
+								// Make sure basic system carcass was initialized
+								throw new LoaderError("loader_fail", "Mandatory initialization files are missing.");
+							}
 
-								// Initialize the events
-								if (isProperLoaderObject(this, "errors", "object")) {
-									Object.keys(this.errors as object).forEach(
-										(err: string): void => {
-											// Will skip garbled errors
-											if (typeof this.errors[err] === "object") {
-												/* tslint:disable-line strict-type-predicates */ // It is an argument
-												// Set default error message for absent message
-												let message: string = "Error message not set.";
-												if (Object.prototype.hasOwnProperty.call(this.errors[err], "message")) {
-													if (typeof this.errors[err].message === "string") {
-														if (this.errors[err].message !== "") {
-															({ message } = this.errors[err] as {
-																message: string;
-															});
-														}
-													}
+							// Initialize the events
+							if (isProperLoaderObject(this, "errors", "object")) {
+								Object.keys(this.errors as object).forEach((err: string): void => {
+									// Will skip garbled errors
+									if (typeof this.errors[err] === "object") {
+										/* tslint:disable-line strict-type-predicates */ // It is an argument
+										// Set default error message for absent message
+										let message: string = "Error message not set.";
+										if (Object.prototype.hasOwnProperty.call(this.errors[err], "message")) {
+											if (typeof this.errors[err].message === "string") {
+												if (this.errors[err].message !== "") {
+													({ message } = this.errors[err] as {
+														message: string;
+													});
 												}
-												this.addError(err, message);
 											}
 										}
-									);
-								}
-								// Initialize the behaviors; If behaviors not provided as argument, it is OK; Not immediate, since the load.then() code will execute after the instance finish initializing.
-								if (behaviors) {
-									this.addBehaviors(behaviors).then(() =>
-										this.fire(events.systemLoad, "Behaviors initialized during system loading.")
-									);
-								} else {
-									this.fire(events.systemLoad, "System loading complete.");
-								}
-							} catch (error) {
-								processLoaderError(error);
+										this.addError(err, message);
+									}
+								});
 							}
-						})
-						.catch(function(): void {
-							// Errors returned from load or staticInitializationPromise
-							processLoaderError(
-								new LoaderError(
-									"functionality_error",
-									"There was an error in the loader functionality in constructor subroutines."
-								)
-							);
-						});
-				}
-			);
+							// Initialize the behaviors; If behaviors not provided as argument, it is OK; Not immediate, since the load.then() code will execute after the instance finish initializing.
+							if (behaviors) {
+								this.addBehaviors(behaviors).then(() =>
+									this.fire(events.systemLoad, "Behaviors initialized during system loading.")
+								);
+							} else {
+								this.fire(events.systemLoad, "System loading complete.");
+							}
+						} catch (error) {
+							processLoaderError(error);
+						}
+					})
+					.catch(function(): void {
+						// Errors returned from load or staticInitializationPromise
+						processLoaderError(
+							new LoaderError(
+								"functionality_error",
+								"There was an error in the loader functionality in constructor subroutines."
+							)
+						);
+					});
+			});
 		} catch (error) {
 			processLoaderError(error);
 		}
@@ -829,32 +818,31 @@ export class System extends Loader {
 				// Loop - attachment
 				await Promise.all(
 					behaviors
-						.map(
-							(element: {
-								[key: string]: BehaviorInterface;
-							}): { behaviorAdded: Promise<string> | null; key: string } | null => {
-								if (typeof element === "object") {
-									let properties: Array<string> = Object.getOwnPropertyNames(element);
-									if (properties.length === 1) {
-										let [key]: Array<string> = properties;
-										let value: BehaviorInterface = element[key];
-										if (typeof key === "string") {
-											if (key.length > 0 && typeof value === "function") {
-												return {
-													behaviorAdded: this.system.behavior.addBehavior(key, () => value(this)),
-													key
-												};
-											}
+						.map((element: { [key: string]: BehaviorInterface }): {
+							behaviorAdded: Promise<string> | null;
+							key: string;
+						} | null => {
+							if (typeof element === "object") {
+								let properties: Array<string> = Object.getOwnPropertyNames(element);
+								if (properties.length === 1) {
+									let [key]: Array<string> = properties;
+									let value: BehaviorInterface = element[key];
+									if (typeof key === "string") {
+										if (key.length > 0 && typeof value === "function") {
 											return {
-												behaviorAdded: null,
+												behaviorAdded: this.system.behavior.addBehavior(key, () => value(this)),
 												key
 											};
 										}
+										return {
+											behaviorAdded: null,
+											key
+										};
 									}
 								}
-								return null;
 							}
-						)
+							return null;
+						})
 						.map(
 							(element: { behaviorAdded: Promise<string> | null; key: string } | null): Promise<string | void> => {
 								// Loop - post-attachment event fire

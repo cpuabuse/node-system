@@ -199,8 +199,24 @@ export function testSystem() {
 				initYamlContents: expected.exampleYamlInit,
 				initContents: expected.exampleInit,
 				rootDirFileAmount: 28,
-				rootDirFolderAmount: 7
+				rootDirFolderAmount: 8
 			},
+			/* 			{
+				// Options without system arguments
+				options: {
+					id: "options-no-args",
+					rootDir: "test",
+					relativeInitDir: "options-no-args",
+					initFilename: "init",
+					logging: "off"
+				},
+				rawInitFilename: "init.yml",
+				initYamlContents: expected.exampleYamlInit,
+				initContents: expected.exampleInit,
+				rootDirFileAmount: 28,
+				rootDirFolderAmount: 8,
+				constructorError: "system_options_failure"
+			}, */
 			{
 				// Flower shop
 				options: {
@@ -214,7 +230,7 @@ export function testSystem() {
 				initYamlContents: expected.flowerShopYamlInit,
 				initContents: expected.flowerShopInit,
 				rootDirFileAmount: 28,
-				rootDirFolderAmount: 7,
+				rootDirFolderAmount: 8,
 				error: {
 					errorInstances: ["all_flowers_gone"],
 					stringErrors: ["carShopError"]
@@ -227,7 +243,7 @@ export function testSystem() {
 		systems.forEach(function(element) {
 			describe(element.options.id, function(): void {
 				let systemTest: any; // Variable for the instance of the System class
-
+				let constructorError: loaderError.LoaderError;
 				// Promise that will resolve on system_load
 				let systemTestLoad = new Promise(function(resolve) {
 					systemTest = new system.System({
@@ -239,7 +255,9 @@ export function testSystem() {
 								}
 							}
 						],
-						onError: (null as unknown) as system.ErrorCallback
+						onError(error: loaderError.LoaderError): void {
+							constructorError = error;
+						}
 					});
 				});
 
