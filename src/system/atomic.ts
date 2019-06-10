@@ -1,5 +1,5 @@
 /*
-	File: src/atomic.ts
+	File: src/system/atomic.ts
 	cpuabuse.com
 */
 

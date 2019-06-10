@@ -1,5 +1,5 @@
 /*
-	File: system/system.js
+	File: src/system/system.js
 	cpuabuse.com
 */
 
@@ -641,19 +641,20 @@ export class System extends Loader {
 								}; // <== file
 							})()
 					)
-					.then(() => {
+					.then(async () => {
 						// The following is code dependent on full initialization by static system initializer and Loader.
-						try {
-							// Initialize subsystems
-							if (isProperLoaderObject(this, "subsystems", "object")) {
-								let subsystems: LoaderProperty = this.subsystems as LoaderProperty;
-								/* eslint-disable-next-line no-restricted-syntax */
-								for (let subsystem in subsystems) {
-									if (isProperLoaderObject(subsystems, subsystem, "object")) {
-										let subsystemsProperty: LoaderProperty = subsystems[subsystem];
-										if (isProperLoaderObject(subsystemsProperty, "type", "string")) {
-											import(`../subsystem/${(subsystemsProperty.type as unknown) as string}`)
-												.then((subsystemModule: { default: ISubsystem }): void => {
+						// Initialize subsystems
+						if (isProperLoaderObject(this, "subsystems", "object")) {
+							let subsystems: LoaderProperty = this.subsystems as LoaderProperty;
+							let promises: Array<Promise<void>> = new Array();
+							/* eslint-disable-next-line no-restricted-syntax */
+							for (let subsystem in subsystems) {
+								if (isProperLoaderObject(subsystems, subsystem, "object")) {
+									let subsystemsProperty: LoaderProperty = subsystems[subsystem];
+									if (isProperLoaderObject(subsystemsProperty, "type", "string")) {
+										promises.push(
+											import(`../subsystem/${(subsystemsProperty.type as unknown) as string}`).then(
+												(subsystemModule: { default: ISubsystem }): void => {
 													let systemArgs: {
 														/* eslint-disable-next-line camelcase */
 														system_args?: Options;
@@ -676,64 +677,63 @@ export class System extends Loader {
 														systemContext: this,
 														vars: subsystemsProperty.vars
 													});
-												})
-												.catch(function(): void {
-													throw new LoaderError("loader_fail", "Could not load defined subsystems.");
-												});
-										}
+												}
+											)
+										);
 									}
 								}
 							}
-							if (
-								!(
-									Object.prototype.hasOwnProperty.call(this, "events") &&
-									Object.prototype.hasOwnProperty.call(this, "behaviors")
-								)
-							) {
-								// Make sure basic system carcass was initialized
-								throw new LoaderError("loader_fail", "Mandatory initialization files are missing.");
-							}
+							await Promise.all(promises);
+						}
+						if (
+							!(
+								Object.prototype.hasOwnProperty.call(this, "events") &&
+								Object.prototype.hasOwnProperty.call(this, "behaviors")
+							)
+						) {
+							// Make sure basic system carcass was initialized
+							throw new LoaderError("loader_fail", "Mandatory initialization files are missing.");
+						}
 
-							// Initialize the events
-							if (isProperLoaderObject(this, "errors", "object")) {
-								Object.keys(this.errors as object).forEach((err: string): void => {
-									// Will skip garbled errors
-									if (typeof this.errors[err] === "object") {
-										/* tslint:disable-line strict-type-predicates */ // It is an argument
-										// Set default error message for absent message
-										let message: string = "Error message not set.";
-										if (Object.prototype.hasOwnProperty.call(this.errors[err], "message")) {
-											if (typeof this.errors[err].message === "string") {
-												if (this.errors[err].message !== "") {
-													({ message } = this.errors[err] as {
-														message: string;
-													});
-												}
+						// Initialize the events
+						if (isProperLoaderObject(this, "errors", "object")) {
+							Object.keys(this.errors as object).forEach((err: string): void => {
+								// Will skip garbled errors
+								if (typeof this.errors[err] === "object") {
+									/* tslint:disable-line strict-type-predicates */ // It is an argument
+									// Set default error message for absent message
+									let message: string = "Error message not set.";
+									if (Object.prototype.hasOwnProperty.call(this.errors[err], "message")) {
+										if (typeof this.errors[err].message === "string") {
+											if (this.errors[err].message !== "") {
+												({ message } = this.errors[err] as {
+													message: string;
+												});
 											}
 										}
-										this.addError(err, message);
 									}
-								});
-							}
-							// Initialize the behaviors; If behaviors not provided as argument, it is OK; Not immediate, since the load.then() code will execute after the instance finish initializing.
-							if (behaviors) {
-								this.addBehaviors(behaviors).then(() =>
-									this.fire(events.systemLoad, "Behaviors initialized during system loading.")
-								);
-							} else {
-								this.fire(events.systemLoad, "System loading complete.");
-							}
-						} catch (error) {
-							processLoaderError(error);
+									this.addError(err, message);
+								}
+							});
+						}
+						// Initialize the behaviors; If behaviors not provided as argument, it is OK; Not immediate, since the load.then() code will execute after the instance finish initializing.
+						if (behaviors) {
+							this.addBehaviors(behaviors).then(() =>
+								this.fire(events.systemLoad, "Behaviors initialized during system loading.")
+							);
+						} else {
+							this.fire(events.systemLoad, "System loading complete.");
 						}
 					})
-					.catch(function(): void {
+					.catch(function(error: Error | LoaderError): void {
 						// Errors returned from load or staticInitializationPromise
 						processLoaderError(
-							new LoaderError(
-								"functionality_error",
-								"There was an error in the loader functionality in constructor subroutines."
-							)
+							error instanceof LoaderError
+								? error
+								: new LoaderError(
+										"functionality_error",
+										"There was an error in the loader functionality in constructor subroutines."
+								  )
 						);
 					});
 			});
