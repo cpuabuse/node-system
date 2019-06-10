@@ -1,6 +1,6 @@
 system.info.options:
   folder: subsystems
   path: relative
-local-fs:
+system.info.options-no-args:
   folder: subsystems
   path: relative
