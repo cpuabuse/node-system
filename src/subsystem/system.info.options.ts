@@ -7,7 +7,7 @@
  * Used for storing system options.
  */
 
-import { ConstructorArgs } from "../system/subsystem"; /* eslint-disable-line no-unused-vars */ // ESLint type import detection bug
+import { SubsystemExtensionArgs } from "../system/subsystem"; /* eslint-disable-line no-unused-vars */ // ESLint type import detection bug
 import Info from "./system.info";
 import { LoaderError } from "../loaderError";
 import { Options as SystemOptions } from "../system/system"; /* eslint-disable-line no-unused-vars */ // ESLint type import detection bug
@@ -18,7 +18,7 @@ interface OptionsVars {
 export interface OptionsInterface extends SystemOptions, OptionsVars {} /* eslint-disable-line no-extra-semi */ // ESLint inteface no-extra-semi bug
 
 export default class Options extends Info {
-	constructor(args: ConstructorArgs) {
+	constructor(args: SubsystemExtensionArgs) {
 		// Set options to be read
 		if (args.args.hasOwnProperty("system_args")) {
 			// Assign system option args

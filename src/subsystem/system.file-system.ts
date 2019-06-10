@@ -4,14 +4,17 @@
 */
 
 /** Works with files. */
-import { Subsystem, ConstructorArgs } from "../system/subsystem"; /* eslint-disable-line no-unused-vars */ // ESLint bug
+import {
+	Subsystem,
+	SubsystemExtensionArgs as Args /* eslint-disable-line no-unused-vars */ // ESLint bug
+} from "../system/subsystem";
 
 /** Class to work with files. */
 export default class FileSystem extends Subsystem {
 	/** Contains files & file meta-data. */
 	private files: any;
 
-	constructor(args: ConstructorArgs) {
+	constructor(args: Args) {
 		super(args.systemContext, null);
 		this.files = args.vars;
 	}

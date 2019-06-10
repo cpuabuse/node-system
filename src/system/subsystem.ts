@@ -1,5 +1,5 @@
 /*
-	File: src/subsystem.ts
+	File: src/system/subsystem.ts
 	cpuabuse.com
 */
 
@@ -11,11 +11,11 @@ import { AtomicLock } from "./atomic";
 import { System } from "./system"; /* eslint-disable-line no-unused-vars */ // ESLint type import detection bug
 
 export interface ISubsystem extends Subsystem {
-	new (args: ConstructorArgs): ISubsystem;
+	new (args: SubsystemExtensionArgs): ISubsystem;
 }
 
 /** Interface for subsystem constructor data exchange. */
-export interface ConstructorArgs {
+export interface SubsystemExtensionArgs {
 	/** Context of a parent system. */
 	systemContext: System;
 	args: {
