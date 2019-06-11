@@ -243,6 +243,13 @@ interface LoaderProperty {
 	[key: string]: LoaderProperty;
 }
 
+/** Arguments for the system. */
+interface SystemArgs {
+	behaviors: Array<{ [key: string]: BehaviorInterface }> | null;
+	onError: ErrorCallback | null;
+	options: Options;
+}
+
 /** Checks that the data initialized by the loader is proper for the objects. */
 function isProperLoaderObject(object: { [key: string]: any }, property: string, type: string): boolean {
 	let proper: boolean = false;
@@ -285,77 +292,11 @@ function isProperLoaderObject(object: { [key: string]: any }, property: string, 
  * // TODO: @event module:system.System#events#systemLoad
  */
 export class System extends Loader {
-	/**
-	 * Checks options argument for missing incorrect property types
-	 * @param options System options argument
-	 * @returns Returns true if the arguments is corrupt; false if OK
-	 * @example <caption>Usage</caption>
-	 * var options = {
-	 *   id: "stars",
-	 *   rootDir: "test",
-	 *   relativeInitDir: "stars",
-	 *   initFilename: "stars.yml",
-	 *   logging: "off"
-	 * };
-	 *
-	 * if (System.checkOptionsFailure(options)){
-	 *   throw new Error ("Options inconsistent.");
-	 * }
-	 */
-	public static checkOptionsFailure(options: Options): boolean {
-		let failed: boolean = false;
-
-		if (options) {
-			// Checks boolean
-			if (!Object.prototype.hasOwnProperty.call(options, "logging")) {
-				failed = true;
-			} else if (typeof options.logging !== "string") {
-				failed = true;
-			} else if (!["off", "console", "file", "queue"].includes(options.logging)) {
-				failed = true;
-			}
-
-			// Checks strings
-			let stringOptions: Array<"id" | "rootDir" | "relativeInitDir" | "initFilename"> = [
-				"id",
-				"rootDir",
-				"relativeInitDir",
-				"initFilename"
-			];
-			stringOptions.forEach(function(element: "id" | "rootDir" | "relativeInitDir" | "initFilename"): void {
-				if (!Object.prototype.hasOwnProperty.call(options, element)) {
-					failed = true;
-				} else if (typeof options[element] !== "string") {
-					failed = true;
-				}
-			});
-		} else {
-			failed = true;
-		}
-		return failed;
-	}
-
-	/**
-	 * Access stderr
-	 * @param {string} text
-	 * @example <caption>Usage</caption>
-	 * system.System.error("Not enough resources.");
-	 */
-	private static error(text: string): void {
-		/* eslint-disable-next-line no-console */
-		console.error(`\x1b[31m[Error]\x1b[0m ${text}`);
-	}
-
-	/**
-	 * Access stdout
-	 * @param {string} text
-	 * @example <caption>Usage</caption>
-	 * system.System.log("Resources loaded.");
-	 */
-	private static log(text: string): void {
-		/* eslint-disable-next-line no-console */
-		console.log(`\x1b[32m[OK]\x1b[0m ${text}`);
-	}
+	private readonly behaviors!: {
+		[key: string]: {
+			text: string;
+		};
+	};
 
 	/** Error list. */
 	private readonly errors!: {
@@ -379,12 +320,6 @@ export class System extends Loader {
 
 			/** Log it? */
 			log: string;
-		};
-	};
-
-	private readonly behaviors!: {
-		[key: string]: {
-			text: string;
 		};
 	};
 
@@ -657,15 +592,15 @@ export class System extends Loader {
 												(subsystemModule: { default: ISubsystem }): void => {
 													let systemArgs: {
 														/* eslint-disable-next-line camelcase */
-														system_args?: Options;
+														system_args?: SystemArgs;
 													} = new Object() as {
 														/* eslint-disable-next-line camelcase */
-														system_args?: Options;
+														system_args?: SystemArgs;
 													}; /* eslint-disable-line camelcase */ // Variables defined in yml file
 													if (isProperLoaderObject(subsystemsProperty, "args", "array")) {
 														if (((subsystemsProperty.args as unknown) as Array<any>).includes("system_args")) {
 															/* eslint-disable-next-line dot-notation */ /* tslint:disable-next-line no-string-literal */ // Parens are necessary
-															systemArgs["system_args"] = options;
+															systemArgs["system_args"] = { behaviors, onError, options };
 														}
 													}
 
@@ -742,6 +677,78 @@ export class System extends Loader {
 		}
 	} // <== constructor
 
+	/**
+	 * Checks options argument for missing incorrect property types
+	 * @param options System options argument
+	 * @returns Returns true if the arguments is corrupt; false if OK
+	 * @example <caption>Usage</caption>
+	 * var options = {
+	 *   id: "stars",
+	 *   rootDir: "test",
+	 *   relativeInitDir: "stars",
+	 *   initFilename: "stars.yml",
+	 *   logging: "off"
+	 * };
+	 *
+	 * if (System.checkOptionsFailure(options)){
+	 *   throw new Error ("Options inconsistent.");
+	 * }
+	 */
+	public static checkOptionsFailure(options: Options): boolean {
+		let failed: boolean = false;
+
+		if (options) {
+			// Checks boolean
+			if (!Object.prototype.hasOwnProperty.call(options, "logging")) {
+				failed = true;
+			} else if (typeof options.logging !== "string") {
+				failed = true;
+			} else if (!["off", "console", "file", "queue"].includes(options.logging)) {
+				failed = true;
+			}
+
+			// Checks strings
+			let stringOptions: Array<"id" | "rootDir" | "relativeInitDir" | "initFilename"> = [
+				"id",
+				"rootDir",
+				"relativeInitDir",
+				"initFilename"
+			];
+			stringOptions.forEach(function(element: "id" | "rootDir" | "relativeInitDir" | "initFilename"): void {
+				if (!Object.prototype.hasOwnProperty.call(options, element)) {
+					failed = true;
+				} else if (typeof options[element] !== "string") {
+					failed = true;
+				}
+			});
+		} else {
+			failed = true;
+		}
+		return failed;
+	}
+
+	/**
+	 * Access stderr
+	 * @param {string} text
+	 * @example <caption>Usage</caption>
+	 * system.System.error("Not enough resources.");
+	 */
+	private static error(text: string): void {
+		/* eslint-disable-next-line no-console */
+		console.error(`\x1b[31m[Error]\x1b[0m ${text}`);
+	}
+
+	/**
+	 * Access stdout
+	 * @param {string} text
+	 * @example <caption>Usage</caption>
+	 * system.System.log("Resources loaded.");
+	 */
+	private static log(text: string): void {
+		/* eslint-disable-next-line no-console */
+		console.log(`\x1b[32m[OK]\x1b[0m ${text}`);
+	}
+
 	/** Test error logging. */
 	public testError(): void {
 		this.error("Test");
@@ -750,35 +757,6 @@ export class System extends Loader {
 	/** Test logging. */
 	public testLog(): void {
 		this.log("Test");
-	}
-
-	/**
-	 * Adds an error to the System dynamically
-	 * @instance
-	 * @param {string} code Error code
-	 * @param {string} message Error description
-	 * @fires module:system.System#events#errorExists
-	 * @example <caption>Usage</caption>
-	 * code = "no_beakers"
-	 * message = "Beakers out of stock."
-	 * var options = {
-	 *   id: "lab_inventory",
-	 *   rootDir: "labs",
-	 *   relativeInitDir: "black_mesa",
-	 *   initFilename: "inventory.yml",
-	 *   logging: "console"
-	 * };
-	 * var labInventory = new System(options);
-	 *
-	 * labInventory.addError(code, message);
-	 */
-	private addError(code: string, message: string): void {
-		if (Object.prototype.hasOwnProperty.call(this.system.error, code)) {
-			// Fire an error event that error already exists
-			this.fire(events.errorExists, "Error to be added already exists.");
-		} else {
-			this.system.error[code] = new SystemError(code, message);
-		}
 	}
 
 	/**
@@ -872,28 +850,56 @@ export class System extends Loader {
 	} // <== addBehaviors
 
 	/**
-	 * Log message from the System context
+	 * Adds an error to the System dynamically
 	 * @instance
-	 * @param {string} text - Message
-	 * @fires module:system.System~type_error
+	 * @param {string} code Error code
+	 * @param {string} message Error description
+	 * @fires module:system.System#events#errorExists
 	 * @example <caption>Usage</caption>
+	 * code = "no_beakers"
+	 * message = "Beakers out of stock."
 	 * var options = {
 	 *   id: "lab_inventory",
 	 *   rootDir: "labs",
 	 *   relativeInitDir: "black_mesa",
 	 *   initFilename: "inventory.yml",
-	 *   loggomg: console
+	 *   logging: "console"
 	 * };
-	 * var text = "Lab Inventory working.";
-	 *
 	 * var labInventory = new System(options);
-	 * labInventory.log(text);
+	 *
+	 * labInventory.addError(code, message);
 	 */
-	private log(text: string): void {
-		if (this.system.logging === "console") {
-			System.log(`${this.system.id}: ${text}`);
+	private addError(code: string, message: string): void {
+		if (Object.prototype.hasOwnProperty.call(this.system.error, code)) {
+			// Fire an error event that error already exists
+			this.fire(events.errorExists, "Error to be added already exists.");
+		} else {
+			this.system.error[code] = new SystemError(code, message);
 		}
-	} // <== log
+	}
+
+	/**
+	 * Emit an event as a behavior.
+	 * @instance
+	 * @param {string} event Behavior name.
+	 * @example <caption>Usage</caption>
+	 * // From the lab inventory system context
+	 * {
+	 *   // ...
+	 *
+	 *   this.behave("system_load_aux");
+	 *
+	 *   // ...
+	 * }
+	 */
+	private behave(event: string): void {
+		try {
+			this.log(`Behavior - ${this.behaviors[event].text}`);
+		} catch (error) {
+			this.log(`Behavior - Undocumented behavior - ${event}`);
+		}
+		this.system.behavior.behave(event);
+	}
 
 	/**
 	 * Log an error  message from the System context
@@ -917,7 +923,7 @@ export class System extends Loader {
 		if (this.system.logging === "console") {
 			System.error(`${this.system.id}: ${text}`);
 		}
-	} // <== log
+	} // <== error
 
 	/**
 	 * Fires a system event
@@ -997,27 +1003,28 @@ export class System extends Loader {
 	} // <== fire
 
 	/**
-	 * Emit an event as a behavior.
+	 * Log message from the System context
 	 * @instance
-	 * @param {string} event Behavior name.
+	 * @param {string} text - Message
+	 * @fires module:system.System~type_error
 	 * @example <caption>Usage</caption>
-	 * // From the lab inventory system context
-	 * {
-	 *   // ...
+	 * var options = {
+	 *   id: "lab_inventory",
+	 *   rootDir: "labs",
+	 *   relativeInitDir: "black_mesa",
+	 *   initFilename: "inventory.yml",
+	 *   loggomg: console
+	 * };
+	 * var text = "Lab Inventory working.";
 	 *
-	 *   this.behave("system_load_aux");
-	 *
-	 *   // ...
-	 * }
+	 * var labInventory = new System(options);
+	 * labInventory.log(text);
 	 */
-	private behave(event: string): void {
-		try {
-			this.log(`Behavior - ${this.behaviors[event].text}`);
-		} catch (error) {
-			this.log(`Behavior - Undocumented behavior - ${event}`);
+	private log(text: string): void {
+		if (this.system.logging === "console") {
+			System.log(`${this.system.id}: ${text}`);
 		}
-		this.system.behavior.behave(event);
-	}
+	} // <== log
 
 	/**
 	 * Adds a behavior bound to "this".

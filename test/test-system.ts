@@ -170,7 +170,10 @@ export function testSystem() {
 								}
 							}
 						],
-						onError: (null as unknown) as system.ErrorCallback
+						onError(error: loaderError.LoaderError): void {
+							done();
+							throw error;
+						}
 					});
 				});
 				it("should not generate inappropriately defined errors", function() {
@@ -193,7 +196,7 @@ export function testSystem() {
 					rootDir: "test",
 					relativeInitDir: "example",
 					initFilename: "init",
-					logging: "off"
+					logging: "console" // Test console logging
 				},
 				rawInitFilename: "init.yml",
 				initYamlContents: expected.exampleYamlInit,
@@ -201,7 +204,7 @@ export function testSystem() {
 				rootDirFileAmount: 28,
 				rootDirFolderAmount: 8
 			},
-			/* 			{
+			{
 				// Options without system arguments
 				options: {
 					id: "options-no-args",
@@ -216,7 +219,7 @@ export function testSystem() {
 				rootDirFileAmount: 28,
 				rootDirFolderAmount: 8,
 				constructorError: "system_options_failure"
-			}, */
+			},
 			{
 				// Flower shop
 				options: {
@@ -224,7 +227,7 @@ export function testSystem() {
 					rootDir: "test",
 					relativeInitDir: "flowerShop",
 					initFilename: "init",
-					logging: "console" // Test console logging
+					logging: "off"
 				},
 				rawInitFilename: "init.yml",
 				initYamlContents: expected.flowerShopYamlInit,
@@ -257,313 +260,332 @@ export function testSystem() {
 						],
 						onError(error: loaderError.LoaderError): void {
 							constructorError = error;
+							resolve();
 						}
 					});
 				});
 
-				/** Test getYaml function. */
-				describe(".getYaml()", function(): void {
-					it("should read correct YAML", function(): void {
-						let promise: Promise<string> = systemTest.system.file.getYaml(
-							element.options.relativeInitDir,
-							element.options.initFilename
-						);
-						promise.then(function(result: string): void {
-							assert.deepStrictEqual(result, element.initYamlContents);
-						});
-					});
-				});
-
-				describe("#subsystem", function(): void {
-					it("should initialise the sub-system", function(): void {
-						if (Object.prototype.hasOwnProperty.call(element, "checkSubsystemVars")) {
-							Object.keys(element.checkSubsystemVars as object).forEach(function(key: string): void {
-								let subsystemVars: any = systemTest.system.subsystem[key].files;
-								assert.deepStrictEqual(subsystemVars, (element.checkSubsystemVars as any)[key] as object);
-							});
-						}
-					});
-				});
-
-				/**
-				 * Tests static log function.
-				 * Inevitably produces console output.
-				 * @function log
-				 * @memberof module:system~test.System
-				 */
-				describe(".testLog()", function(): void {
-					it("should print a test message to console", function(): void {
-						systemTest.testLog("Test");
-					});
-				});
-
-				/**
-				 * Tests static error function.
-				 * Inevitably produces console output.
-				 * @function error
-				 * @memberof module:system~test.System
-				 */
-				describe(".testError()", function(): void {
-					it("should print a test error message to console", function(): void {
-						systemTest.testError("Test");
-					});
-				});
-
-				before(function(done: any) {
-					systemTestLoad.then(function() {
+				/* Before */
+				before(function(done: () => void): void {
+					systemTestLoad.then(function(): void {
 						done();
 					});
 				});
 
-				// System property of System instance
-				describe("#system", function() {
-					// System instance ID
-					describe("id", function() {
-						it("should be " + element.options.id, function(done: any) {
-							assert.strictEqual(systemTest.system.id, element.options.id);
-							done();
+				if (element.constructorError === undefined) {
+					describe("constructor", function(): void {
+						it("should not execute onError callback", function(): void {
+							assert.equal(constructorError, undefined);
+						});
+					});
+
+					/** Test getYaml function. */
+					describe(".getYaml()", function(): void {
+						it("should read correct YAML", function(): void {
+							let promise: Promise<string> = systemTest.system.file.getYaml(
+								element.options.relativeInitDir,
+								element.options.initFilename
+							);
+							promise.then(function(result: string): void {
+								assert.deepStrictEqual(result, element.initYamlContents);
+							});
+						});
+					});
+
+					describe("#subsystem", function(): void {
+						it("should initialise the sub-system", function(): void {
+							if (Object.prototype.hasOwnProperty.call(element, "checkSubsystemVars")) {
+								Object.keys(element.checkSubsystemVars as object).forEach(function(key: string): void {
+									let subsystemVars: any = systemTest.system.subsystem[key].files;
+									assert.deepStrictEqual(subsystemVars, (element.checkSubsystemVars as any)[key] as object);
+								});
+							}
 						});
 					});
 
 					/**
-					 * Tests the getFile function.
-					 * @member getFile
+					 * Tests static log function.
+					 * Inevitably produces console output.
+					 * @function log
 					 * @memberof module:system~test.System
 					 */
-					describe(".file", function() {
-						describe(".getFile()", function() {
-							it(
-								'should get expected contents from file "' +
-									element.rawInitFilename +
-									'" with args ("' +
-									element.options.relativeInitDir +
-									'", "' +
-									element.rawInitFilename +
-									'")',
-								function(done: any) {
-									systemTest.system.file
-										.getFile(element.options.relativeInitDir, element.rawInitFilename)
-										.then(function(result: any) {
-											assert.strictEqual(result.toString(), element.initContents);
-											done();
-										});
-								}
-							);
-							it(
-								'should instantly get expected file from cache "' +
-									element.rawInitFilename +
-									'" with args ("' +
-									element.options.relativeInitDir +
-									'", "' +
-									element.rawInitFilename +
-									'")',
-								function(done: any) {
-									this.timeout(1); /* eslint-disable-line no-invalid-this */
-									systemTest.system.file
-										.getFile(element.options.relativeInitDir, element.rawInitFilename)
-										.then(function(result: any) {
-											assert.strictEqual(result.toString(), element.initContents);
-											done();
-										});
-								}
-							);
-							it(
-								'should produce an error with non-existent args ("' +
-									element.options.relativeInitDir +
-									'", "' +
-									nonExistentFileOrDir +
-									'")',
-								function(done) {
-									systemTest.system.file
-										.getFile(element.options.relativeInitDir, nonExistentFileOrDir)
-										.catch(function(error: any) {
-											assert.strictEqual(error, systemTest.system.error.file_system_error);
-											done();
-										});
-								}
-							);
-							it(
-								'should produce an error with folder args (".' +
-									path.sep +
-									'", "' +
-									element.options.relativeInitDir +
-									'")',
-								function(done) {
-									systemTest.system.file
-										.getFile("." + path.sep, element.options.relativeInitDir)
-										.catch(function(error: any) {
-											assert.strictEqual(error, systemTest.system.error.file_system_error);
-											done();
-										});
-								}
-							);
-						});
-						describe(".list()", function() {
-							let both = element.rootDirFileAmount + element.rootDirFolderAmount; // Expected amount of files and folders
-							it("should be " + element.rootDirFileAmount + ' with args ("' + path.sep + '", isFile())', function(
-								done
-							) {
-								systemTest.system.file
-									.list("." + path.sep, systemTest.system.file.filter.isFile)
-									.then(function(result: any) {
-										assert.strictEqual(result.length, element.rootDirFileAmount);
-										done();
-									});
-							});
-							it("should be " + element.rootDirFolderAmount + ' with args (".' + path.sep + '", isDir())', function(
-								done
-							) {
-								systemTest.system.file
-									.list("." + path.sep, systemTest.system.file.filter.isDir)
-									.then(function(result: any) {
-										assert.strictEqual(result.length, element.rootDirFolderAmount);
-										done();
-									});
-							});
-							it("should be " + both + ' with args (".' + path.sep + '", null)', function(done) {
-								systemTest.system.file.list("." + path.sep, null).then(function(result: any) {
-									assert.strictEqual(result.length, both);
-									done();
-								});
-							});
-						});
-						describe(".toAbsolute()", function() {
-							it(
-								'should be equal to "' +
-									element.options.rootDir +
-									path.sep +
-									element.options.relativeInitDir +
-									'" with args (".' +
-									path.sep +
-									'", "' +
-									element.options.relativeInitDir +
-									'")',
-								function(done) {
-									systemTest.system.file
-										.toAbsolute("." + path.sep, element.options.relativeInitDir)
-										.then(function(result: any) {
-											assert.strictEqual(result, element.options.rootDir + path.sep + element.options.relativeInitDir);
-											done();
-										});
-								}
-							);
-						});
-						describe(".toRelative()", function() {
-							it("should", function(done: any) {
-								systemTest.system.file
-									.toRelative(
-										element.options.relativeInitDir,
-										element.options.relativeInitDir + path.sep + element.rawInitFilename
-									)
-									.then(function(result: any) {
-										assert.strictEqual(result, element.rawInitFilename);
-										done();
-									});
-							});
+					describe(".testLog()", function(): void {
+						it("should print a test message to console", function(): void {
+							systemTest.testLog("Test");
 						});
 					});
 
-					/*
+					/**
+					 * Tests static error function.
+					 * Inevitably produces console output.
+					 * @function error
+					 * @memberof module:system~test.System
+					 */
+					describe(".testError()", function(): void {
+						it("should print a test error message to console", function(): void {
+							systemTest.testError("Test");
+						});
+					});
+
+					// System property of System instance
+					describe("#system", function() {
+						// System instance ID
+						describe("id", function() {
+							it("should be " + element.options.id, function(done: any) {
+								assert.strictEqual(systemTest.system.id, element.options.id);
+								done();
+							});
+						});
+
+						/**
+						 * Tests the getFile function.
+						 * @member getFile
+						 * @memberof module:system~test.System
+						 */
+						describe(".file", function() {
+							describe(".getFile()", function() {
+								it(
+									'should get expected contents from file "' +
+										element.rawInitFilename +
+										'" with args ("' +
+										element.options.relativeInitDir +
+										'", "' +
+										element.rawInitFilename +
+										'")',
+									function(done: any) {
+										systemTest.system.file
+											.getFile(element.options.relativeInitDir, element.rawInitFilename)
+											.then(function(result: any) {
+												assert.strictEqual(result.toString(), element.initContents);
+												done();
+											});
+									}
+								);
+								it(
+									'should instantly get expected file from cache "' +
+										element.rawInitFilename +
+										'" with args ("' +
+										element.options.relativeInitDir +
+										'", "' +
+										element.rawInitFilename +
+										'")',
+									function(done: any) {
+										this.timeout(1); /* eslint-disable-line no-invalid-this */
+										systemTest.system.file
+											.getFile(element.options.relativeInitDir, element.rawInitFilename)
+											.then(function(result: any) {
+												assert.strictEqual(result.toString(), element.initContents);
+												done();
+											});
+									}
+								);
+								it(
+									'should produce an error with non-existent args ("' +
+										element.options.relativeInitDir +
+										'", "' +
+										nonExistentFileOrDir +
+										'")',
+									function(done) {
+										systemTest.system.file
+											.getFile(element.options.relativeInitDir, nonExistentFileOrDir)
+											.catch(function(error: any) {
+												assert.strictEqual(error, systemTest.system.error.file_system_error);
+												done();
+											});
+									}
+								);
+								it(
+									'should produce an error with folder args (".' +
+										path.sep +
+										'", "' +
+										element.options.relativeInitDir +
+										'")',
+									function(done) {
+										systemTest.system.file
+											.getFile("." + path.sep, element.options.relativeInitDir)
+											.catch(function(error: any) {
+												assert.strictEqual(error, systemTest.system.error.file_system_error);
+												done();
+											});
+									}
+								);
+							});
+							describe(".list()", function() {
+								let both = element.rootDirFileAmount + element.rootDirFolderAmount; // Expected amount of files and folders
+								it("should be " + element.rootDirFileAmount + ' with args ("' + path.sep + '", isFile())', function(
+									done
+								) {
+									systemTest.system.file
+										.list("." + path.sep, systemTest.system.file.filter.isFile)
+										.then(function(result: any) {
+											assert.strictEqual(result.length, element.rootDirFileAmount);
+											done();
+										});
+								});
+								it("should be " + element.rootDirFolderAmount + ' with args (".' + path.sep + '", isDir())', function(
+									done
+								) {
+									systemTest.system.file
+										.list("." + path.sep, systemTest.system.file.filter.isDir)
+										.then(function(result: any) {
+											assert.strictEqual(result.length, element.rootDirFolderAmount);
+											done();
+										});
+								});
+								it("should be " + both + ' with args (".' + path.sep + '", null)', function(done) {
+									systemTest.system.file.list("." + path.sep, null).then(function(result: any) {
+										assert.strictEqual(result.length, both);
+										done();
+									});
+								});
+							});
+							describe(".toAbsolute()", function() {
+								it(
+									'should be equal to "' +
+										element.options.rootDir +
+										path.sep +
+										element.options.relativeInitDir +
+										'" with args (".' +
+										path.sep +
+										'", "' +
+										element.options.relativeInitDir +
+										'")',
+									function(done) {
+										systemTest.system.file
+											.toAbsolute("." + path.sep, element.options.relativeInitDir)
+											.then(function(result: any) {
+												assert.strictEqual(
+													result,
+													element.options.rootDir + path.sep + element.options.relativeInitDir
+												);
+												done();
+											});
+									}
+								);
+							});
+							describe(".toRelative()", function() {
+								it("should", function(done: any) {
+									systemTest.system.file
+										.toRelative(
+											element.options.relativeInitDir,
+											element.options.relativeInitDir + path.sep + element.rawInitFilename
+										)
+										.then(function(result: any) {
+											assert.strictEqual(result, element.rawInitFilename);
+											done();
+										});
+								});
+							});
+						});
+
+						/*
 						Perform test only on units that have the error property.
 						Iterate through "errorInstances" array, if present, and check that respective errors are indeed of type SystemError.
 						Iterate through "stringErrors" array, if present, and check that respective errors are not of type SystemError.
 					*/
-					if (element.hasOwnProperty("error")) {
-						describe("error", function() {
-							// @ts-ignore
-							if (element.error.hasOwnProperty("errorInstances")) {
-								describe("errorInstances", function() {
-									// @ts-ignore
-									element.error.errorInstances.forEach(function(error) {
-										describe(error, function() {
-											// It should be a SystemError
-											it("should be SystemError", function(done: any) {
-												if (systemError.SystemError.isSystemError(systemTest.system.error[error])) {
-													done();
-												}
-											});
-											it('should have code equal to "' + error + '"', function() {
-												assert.throws(
-													function() {
-														throw systemTest.system.error[error];
-													},
-													{
-														code: error
+						if (element.hasOwnProperty("error")) {
+							describe("error", function() {
+								// @ts-ignore
+								if (element.error.hasOwnProperty("errorInstances")) {
+									describe("errorInstances", function() {
+										// @ts-ignore
+										element.error.errorInstances.forEach(function(error) {
+											describe(error, function() {
+												// It should be a SystemError
+												it("should be SystemError", function(done: any) {
+													if (systemError.SystemError.isSystemError(systemTest.system.error[error])) {
+														done();
 													}
-												);
+												});
+												it('should have code equal to "' + error + '"', function() {
+													assert.throws(
+														function() {
+															throw systemTest.system.error[error];
+														},
+														{
+															code: error
+														}
+													);
+												});
 											});
 										});
 									});
-								});
-							}
+								}
 
-							// @ts-ignore
-							if (element.error.hasOwnProperty("stringErrors")) {
-								describe("stringErrors", function() {
-									// @ts-ignore
-									element.error.stringErrors.forEach(function(error) {
-										describe(error, function() {
-											it("should not be SystemError", function(done: any) {
-												if (!systemError.SystemError.isSystemError((error as unknown) as systemError.SystemError)) {
-													done();
-												}
+								// @ts-ignore
+								if (element.error.hasOwnProperty("stringErrors")) {
+									describe("stringErrors", function() {
+										// @ts-ignore
+										element.error.stringErrors.forEach(function(error) {
+											describe(error, function() {
+												it("should not be SystemError", function(done: any) {
+													if (!systemError.SystemError.isSystemError((error as unknown) as systemError.SystemError)) {
+														done();
+													}
+												});
 											});
 										});
 									});
-								});
-							}
-						});
-					}
-
-					/**
-					 * Tests the fire function.
-					 * @member fire
-					 * @memberof module:system~test.System
-					 */
-					describe(".fire()", function() {
-						it("should not produce an error, if fired with a name that does not exist", function() {
-							systemTest.fire("name_does_not_exist", "An event that does not exist has been fired.");
-						});
-					});
-
-					if (element.hasOwnProperty("behaviorTest")) {
-						if (element.behaviorTest) {
-							/**
-							 * Tests the addBehaviors function.
-							 * @member addBehaviors
-							 * @memberof module:system~test.System
-							 */
-							describe(".addBehaviors()", function() {
-								before(function(done) {
-									systemTest
-										.addBehaviors([
-											{
-												behavior_attach_request_fail() {
-													systemTest.done();
-												}
-											}
-										])
-										.then(function() {
-											done();
-										});
-								});
-
-								it("should fire behavior_attach_request_fail if not provided with an array as an argument", function(done) {
-									systemTest.done = function() {
-										done();
-									};
-									systemTest.addBehaviors("not_a_behavior");
-								});
-								it("should fire behavior_attach_request_fail with an empty array as an argument", function(done) {
-									systemTest.done = function() {
-										done();
-									};
-									systemTest.addBehaviors([]);
-								});
+								}
 							});
 						}
-					}
-				});
+
+						/**
+						 * Tests the fire function.
+						 * @member fire
+						 * @memberof module:system~test.System
+						 */
+						describe(".fire()", function() {
+							it("should not produce an error, if fired with a name that does not exist", function() {
+								systemTest.fire("name_does_not_exist", "An event that does not exist has been fired.");
+							});
+						});
+
+						if (element.hasOwnProperty("behaviorTest")) {
+							if (element.behaviorTest) {
+								/**
+								 * Tests the addBehaviors function.
+								 * @member addBehaviors
+								 * @memberof module:system~test.System
+								 */
+								describe(".addBehaviors()", function() {
+									before(function(done) {
+										systemTest
+											.addBehaviors([
+												{
+													behavior_attach_request_fail() {
+														systemTest.done();
+													}
+												}
+											])
+											.then(function() {
+												done();
+											});
+									});
+
+									it("should fire behavior_attach_request_fail if not provided with an array as an argument", function(done) {
+										systemTest.done = function() {
+											done();
+										};
+										systemTest.addBehaviors("not_a_behavior");
+									});
+									it("should fire behavior_attach_request_fail with an empty array as an argument", function(done) {
+										systemTest.done = function() {
+											done();
+										};
+										systemTest.addBehaviors([]);
+									});
+								});
+							}
+						}
+					});
+				} else {
+					describe("constructor", function(): void {
+						it("should execute onError callback", function(): void {
+							assert.equal(constructorError.code, element.constructorError);
+						});
+					});
+				}
 			});
 		});
 
