@@ -49,7 +49,7 @@ export class Subsystem extends AtomicLock {
 
 	data: any;
 
-	constructor(systemContext: System, subsystemMethods: Array<SubsystemMethod> | null) {
+	constructor(systemContext: System, subsystemMethods?: Array<SubsystemMethod> | null) {
 		super();
 
 		// Set reference to system
@@ -57,16 +57,20 @@ export class Subsystem extends AtomicLock {
 
 		// Set subsystem objects
 		this.method = <Method>new Object();
-		if (subsystemMethods !== null) {
-			// Bind methods
-			for (let bindFn of subsystemMethods) {
-				// Bind fn to object; Using parent-child access not to create and overwrite an object wastefully
-				this.method[bindFn.name] = bindFn.fn.bind(this);
-			}
+		if (subsystemMethods !== undefined && subsystemMethods !== null) {
+			this.addMethods(subsystemMethods);
 		}
 
 		// Create a dummy data property
 		this.data = null;
+	}
+
+	protected addMethods(methods: Array<SubsystemMethod>) {
+		// Bind methods
+		for (let bindFn of methods) {
+			// Bind fn to object; Using parent-child access not to create and overwrite an object wastefully
+			this.method[bindFn.name] = bindFn.fn.bind(this);
+		}
 	}
 
 	/**
