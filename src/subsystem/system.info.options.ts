@@ -22,7 +22,7 @@ export default class Options extends Info {
 		// Set options to be read
 		if (args.args.hasOwnProperty("system_args")) {
 			// Assign system option args
-			let options = <SystemOptions>args.args["system_args"];
+			let options = <SystemOptions>args.args["system_args"].options;
 
 			// Check options failure
 			if (!checkOptionsFailure(options)) {

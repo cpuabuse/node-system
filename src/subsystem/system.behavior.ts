@@ -9,6 +9,7 @@
 
 import { EventEmitter } from "events";
 import { AtomicLock } from "../system/atomic";
+import { LoaderError } from "../loaderError";
 import {
 	Subsystem /* eslint-disable-line no-unused-vars */, // ESLint bug
 	SubsystemExtensionArgs as Args /* eslint-disable-line no-unused-vars */ // ESLint bug
@@ -29,45 +30,19 @@ interface BehaviorIndex {
  * **Behavior - argument outline**
  *
  * ```typescript
- *  amazing_behavior: (that) => {
+ *  amazing_behavior: function (that) {
  *   // Process system instance on "amazing_behavior"
  *   amazingProcessor(that);
  * }
  * ```
  */
 export interface BehaviorInterface {
-	(that: System): void;
+	[key: string]: BehaviorInterfaceCallback;
 }
 
-/** System behavior class. */
-export class Behavior extends Subsystem {
-	/** Atomic lock to perform counter increments. */
-	protected atomicLock: AtomicLock = new AtomicLock();
-
-	/** IDs to use as actual event identifiers. */
-	protected behaviorId: BehaviorIndex = new Object() as BehaviorIndex;
-
-	/** Index to link id's back to behavior names. */
-	protected behaviorIndex: BehaviorIndex = new Object() as BehaviorIndex;
-
-	/** Contains the event data for the behaviors to fire. */
-	protected emitter: EventEmitter = new EventEmitter();
-
-	/** Counter to use to generate IDs. */
-	protected nextBehaviorCounter: number = 0;
-
-	/** Initializes system behavior. */
-	constructor({ systemContext, args, vars }: Args) {
-		// Call superclass's constructor
-		super(systemContext);
-
-		this.addMethods([
-			{
-				fn: addBehavior,
-				name: "addBehavior"
-			}
-		]);
-	}
+/** Callback to be used for a behavior. */
+export interface BehaviorInterfaceCallback {
+	(that: System): void;
 }
 
 /**
@@ -90,7 +65,7 @@ export class Behavior extends Subsystem {
  * @param callback Behavior callback function
  * @returns ID of the behavior; `behaviorCreationError` if creation failed
  */
-async function addBehavior(this: Behavior, name: string, callback: Function): Promise<string> {
+async function addBehavior(this: Behavior, name: string, callback: BehaviorInterfaceCallback): Promise<string> {
 	if (typeof name === "string") {
 		// Name must be string
 		if (typeof callback === "function") {
@@ -104,7 +79,7 @@ async function addBehavior(this: Behavior, name: string, callback: Function): Pr
 				let id: string = (this.nextBehaviorCounter++).toString();
 
 				// If no behavior with such name existed before, initialize an array for it
-				if (!this.behaviorId.hasOwnProperty(name)) {
+				if (!Object.prototype.hasOwnProperty.call(this.behaviorId, name)) {
 					this.behaviorId[name] = new Array();
 				}
 
@@ -114,7 +89,7 @@ async function addBehavior(this: Behavior, name: string, callback: Function): Pr
 				this.behaviorIndex[id].push(name);
 
 				// Add the behavior
-				this.emitter.addListener(id, <(...args: any[]) => void>callback);
+				this.emitter.addListener(id, callback);
 
 				// Release lock
 				this.atomicLock.release();
@@ -148,12 +123,63 @@ async function addBehavior(this: Behavior, name: string, callback: Function): Pr
  */
 function behave(this: Behavior, name: string): void {
 	if (typeof name === "string") {
-		if (this.behaviorId.hasOwnProperty(name)) {
-			this.behaviorId[name].forEach(event => {
+		if (Object.prototype.hasOwnProperty.call(this.behaviorId, name)) {
+			this.behaviorId[name].forEach((event: string): void => {
 				this.emitter.emit(event);
 			});
 		}
 	} else {
 		// Fire here
+	}
+}
+
+/** System behavior class. */
+export default class Behavior extends Subsystem {
+	/** Atomic lock to perform counter increments. */
+	protected atomicLock: AtomicLock = new AtomicLock();
+
+	/** IDs to use as actual event identifiers. */
+	protected behaviorId: BehaviorIndex = new Object() as BehaviorIndex;
+
+	/** Index to link id's back to behavior names. */
+	protected behaviorIndex: BehaviorIndex = new Object() as BehaviorIndex;
+
+	/** Contains the event data for the behaviors to fire. */
+	protected emitter: EventEmitter = new EventEmitter();
+
+	/** Counter to use to generate IDs. */
+	protected nextBehaviorCounter: number = 0;
+
+	/** Initializes system behavior. */
+	// @ts-ignore tsc does not see inevitability of super()
+	constructor({ systemContext, args }: Args) {
+		// Call superclass's constructor
+		super(systemContext);
+
+		// Only if we received the args we continue
+		if (Object.prototype.hasOwnProperty.call(args, "system_args")) {
+			// Add the methods
+			this.addMethods([
+				{
+					fn: addBehavior,
+					name: "addBehavior"
+				},
+				{
+					fn: behave,
+					name: "behave"
+				}
+			]);
+
+			// Add the behaviors
+			if (args.system_args.behaviors !== undefined) {
+				this.method.addBehavior(args.system_args.behaviors);
+			}
+		} else {
+			// Report an error
+			throw new LoaderError(
+				"system_options_failure",
+				"The options provided to the system constructor are inconsistent."
+			);
+		}
 	}
 }
