@@ -23,6 +23,9 @@ import { SystemError } from "../error";
 // Re-export
 export { AtomicLock };
 
+/** Temporary hold name for options subsystem, to be moved to file system subsystem. */
+const optionsSubsystem: string = "options";
+
 /** An interface to describe the resolve argument of promise executor. */
 export interface Resolve {
 	(value?: void | PromiseLike<void> | undefined): void;
@@ -217,21 +220,6 @@ interface ISystemProperty {
 		toRelative(dir: string, file: string): Promise<string>;
 	};
 
-	/** To be deprecated. */
-	id: string;
-
-	/** To be deprecated. */
-	initFilename: string;
-
-	/** To be deprecated. */
-	logging: string;
-
-	/** To be deprecated. */
-	relativeInitDir: string;
-
-	/** To be deprecated. */
-	rootDir: string;
-
 	/** Actual subsystems are located here. */
 	subsystem: {
 		[key: string]: Subsystem;
@@ -384,11 +372,6 @@ export class System extends Loader {
 							(async (): Promise<void> => {
 								/* eslint-disable-line require-await */ // It is async by design, not by need
 								this.system = new Object() as ISystemProperty;
-								this.system.id = options.id;
-								this.system.rootDir = options.rootDir;
-								this.system.relativeInitDir = options.relativeInitDir;
-								this.system.initFilename = options.initFilename;
-								this.system.logging = options.logging;
 								this.system.subsystem = new Object() as {
 									[key: string]: Subsystem;
 								};
@@ -403,9 +386,9 @@ export class System extends Loader {
 									},
 									filter: {
 										isDir: (filterContext: FilterContext): Promise<boolean> =>
-											Loader.isDir(this.system.rootDir, filterContext.item),
+											Loader.isDir(this.system.subsystem[optionsSubsystem].get("rootDir"), filterContext.item),
 										isFile: (filterContext: FilterContext): Promise<boolean> =>
-											Loader.isFile(Loader.join(this.system.rootDir, Loader.join(
+											Loader.isFile(Loader.join(this.system.subsystem[optionsSubsystem].get("rootDir"), Loader.join(
 												filterContext.dir,
 												filterContext.itemName
 											) as string) as string) // Only two arguments make string always
@@ -425,7 +408,11 @@ export class System extends Loader {
 											(async (): Promise<Buffer> => {
 												/* eslint-disable-line func-style */ // Can't have arrow style function declaration
 												try {
-													return await Loader.getFile(this.system.rootDir, dir, file);
+													return await Loader.getFile(
+														this.system.subsystem[optionsSubsystem].get("rootDir"),
+														dir,
+														file
+													);
 												} catch (error) {
 													// TODO: this.fire("file_system_error");
 													throw this.system.error.file_system_error;
@@ -515,14 +502,19 @@ export class System extends Loader {
 										// Return
 										return pGetFile();
 									},
-									getYaml: (dir: string, file: string): Promise<string> => loadYaml(this.system.rootDir, dir, file),
+									getYaml: (dir: string, file: string): Promise<string> =>
+										loadYaml(this.system.subsystem[optionsSubsystem].get("rootDir"), dir, file),
 									async join(rootDir: string, target: string | Array<string>): Promise<string | Array<string>> {
 										/* eslint-disable-line require-await */ // We want file methods to produce same type output
 										return Loader.join(rootDir, target);
 									},
 									list: async (dir: string, filter: Filter | null): Promise<Array<string>> => {
 										let filteredItems: Array<string>; // Return array
-										let itemNames: Array<string> = await Loader.list(this.system.rootDir, dir); // Wait for folder contets
+										console.log(this.system.subsystem[optionsSubsystem].get("rootDir"));
+										let itemNames: Array<string> = await Loader.list(
+											this.system.subsystem[optionsSubsystem].get("rootDir"),
+											dir
+										); // Wait for folder contets
 										let items: Array<string> = (await this.system.file.join(dir, itemNames)) as Array<string>; // The return will be always be an array
 
 										// Was the filter even specified?
@@ -564,10 +556,7 @@ export class System extends Loader {
 											let filePath: string = Loader.join(dir, file) as string; // Only two arguments make string always
 
 											// Return
-											return Loader.join(
-												this.system.subsystem["system.info.options"].get("rootDir"),
-												filePath
-											) as string;
+											return Loader.join(this.system.subsystem[optionsSubsystem].get("rootDir"), filePath) as string;
 										})(),
 									async toRelative(rootDir: string, target: string): Promise<string> {
 										/* eslint-disable-line require-await */ // We want file methods to produce same type output
@@ -920,9 +909,9 @@ export class System extends Loader {
 	 * labInventory.error(text);
 	 */
 	private error(text: string): void {
-		if (this.system.logging === "console") {
-			System.error(`${this.system.id}: ${text}`);
-		}
+		// if (this.system.subsystem[optionsSubsystem].get("logging") === "console") {
+		// 	System.error(`${this.system.subsystem[optionsSubsystem].get("id")}: ${text}`);
+		// }
 	} // <== error
 
 	/**
@@ -1021,9 +1010,9 @@ export class System extends Loader {
 	 * labInventory.log(text);
 	 */
 	private log(text: string): void {
-		if (this.system.logging === "console") {
-			System.log(`${this.system.id}: ${text}`);
-		}
+		// if (this.system.subsystem[optionsSubsystem].get("logging") === "console") {
+		// 	System.log(`${this.system.subsystem[optionsSubsystem].get("id")}: ${text}`);
+		// }
 	} // <== log
 
 	/**
