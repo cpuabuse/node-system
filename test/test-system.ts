@@ -15,12 +15,50 @@
 
 import * as assert from "assert";
 import * as path from "path";
-import * as system from "../src/system/system";
+import { ErrorCallback, Options, System } from "../src/system/system"; /* eslint-disable-line no-unused-vars */ // ESLint bug
 import * as systemError from "../src/error";
 import * as loaderError from "../src/loaderError";
 import * as expected from "./expected";
 
 const nonExistentFileOrDir = "Non-existent file or directory";
+
+/** System test unit initialization data. */
+export interface SystemTest {
+	/** Whether behavior test to be done. */
+	behaviorTest: true;
+
+	/** Which subsystem vars to check. */
+	checkSubsystemVars: {
+		[key: string]: any;
+	};
+
+	/** Error testing data. */
+	error: {
+		/** Actual errors. */
+		errorInstances: Array<string>;
+
+		/** Errors not to exist. */
+		stringErrors: Array<string>;
+	};
+
+	/** Contents of the init file as an object. */
+	initContents: object;
+
+	/** Yaml contents of the init file as a string. */
+	initYamlContents: string;
+
+	/** System init options. */
+	options: Options;
+
+	/** Raw init file name. */
+	rawInitFilename: string;
+
+	/** Amount of directories in a root directory. */
+	rootDirFileAmount: number;
+
+	/** Amount of files in a root directory. */
+	rootDirFolderAmount: number;
+}
 
 /**
  * Tests of System class.
@@ -40,34 +78,34 @@ export function testSystem() {
 		 */
 		describe("constructor", function() {
 			it("should still execute with inappropriate options and no ways to report an error", function() {
-				new system.System({} as {
+				new System({} as {
 					behaviors: Array<{
 						[key: string]: {
-							(that: system.System): void;
+							(that: System): void;
 						};
 					}> | null;
-					onError: system.ErrorCallback | null;
-					options: system.Options;
+					onError: ErrorCallback | null;
+					options: Options;
 				}); /* eslint-disable-line no-new */ // "new System" is only used for side-effects of testing
 			});
 			it("should execute with inappropriate options and error reporting not being a function", function() {
-				new system.System({
-					options: (null as unknown) as system.Options,
+				new System({
+					options: (null as unknown) as Options,
 					behaviors: null,
-					onError: ("notFunction" as unknown) as system.ErrorCallback
+					onError: ("notFunction" as unknown) as ErrorCallback
 				} as {
 					behaviors: Array<{
 						[key: string]: {
-							(that: system.System): void;
+							(that: System): void;
 						};
 					}> | null;
-					onError: system.ErrorCallback | null;
-					options: system.Options;
+					onError: ErrorCallback | null;
+					options: Options;
 				}); /* eslint-disable-line no-new */ // "new System" is only used for side-effects of testing
 			});
 			it("should fail with inappropriate options", function(done) {
-				new system.System({
-					options: (null as unknown) as system.Options,
+				new System({
+					options: (null as unknown) as Options,
 					behaviors: null,
 					onError: function(error: any) {
 						/* eslint-disable-line no-new */ // "new System" is only used for side-effects of testing
@@ -86,7 +124,7 @@ export function testSystem() {
 					logging: "off"
 				};
 
-				new system.System({
+				new System({
 					options: options,
 					behaviors: null,
 					onError: function(err: any) {
@@ -112,7 +150,7 @@ export function testSystem() {
 					logging: "off"
 				};
 
-				new system.System({
+				new System({
 					options: options,
 					behaviors: null,
 					onError: function(err: any) {
@@ -134,8 +172,6 @@ export function testSystem() {
 			 *
 			 * - Should not generate inappropriately defined errors
 			 * - Should generate the default message
-			 * @function errorInitialization
-			 * @memberof module:system~test.System.constructor
 			 */
 			describe("errorInitialization", function() {
 				let options = {
@@ -161,8 +197,8 @@ export function testSystem() {
 				];
 				let systemTest: any;
 				before(function(done) {
-					systemTest = new system.System({
-						options: options,
+					systemTest = new System({
+						options,
 						behaviors: [
 							{
 								system_load() {
@@ -202,7 +238,7 @@ export function testSystem() {
 				initYamlContents: expected.exampleYamlInit,
 				initContents: expected.exampleInit,
 				rootDirFileAmount: 28,
-				rootDirFolderAmount: 8
+				rootDirFolderAmount: 9
 			},
 			{
 				// Options without system arguments
@@ -217,7 +253,7 @@ export function testSystem() {
 				initYamlContents: expected.exampleYamlInit,
 				initContents: expected.exampleInit,
 				rootDirFileAmount: 28,
-				rootDirFolderAmount: 8,
+				rootDirFolderAmount: 9,
 				constructorError: "system_options_failure"
 			},
 			{
@@ -233,7 +269,7 @@ export function testSystem() {
 				initYamlContents: expected.flowerShopYamlInit,
 				initContents: expected.flowerShopInit,
 				rootDirFileAmount: 28,
-				rootDirFolderAmount: 8,
+				rootDirFolderAmount: 9,
 				error: {
 					errorInstances: ["all_flowers_gone"],
 					stringErrors: ["carShopError"]
@@ -249,7 +285,7 @@ export function testSystem() {
 				let constructorError: loaderError.LoaderError;
 				// Promise that will resolve on system_load
 				let systemTestLoad = new Promise(function(resolve) {
-					systemTest = new system.System({
+					systemTest = new System({
 						options: element.options,
 						behaviors: [
 							{
@@ -329,13 +365,13 @@ export function testSystem() {
 
 					// System property of System instance
 					describe("#system", function() {
-						// System instance ID
-						describe("id", function() {
-							it("should be " + element.options.id, function(done: any) {
-								assert.strictEqual(systemTest.system.id, element.options.id);
-								done();
-							});
-						});
+						// // System instance ID
+						// describe("id", function() {
+						// 	it("should be " + element.options.id, function(done: any) {
+						// 		assert.strictEqual(systemTest.system.id, element.options.id);
+						// 		done();
+						// 	});
+						// });
 
 						/**
 						 * Tests the getFile function.
@@ -479,10 +515,10 @@ export function testSystem() {
 						});
 
 						/*
-						Perform test only on units that have the error property.
-						Iterate through "errorInstances" array, if present, and check that respective errors are indeed of type SystemError.
-						Iterate through "stringErrors" array, if present, and check that respective errors are not of type SystemError.
-					*/
+							Perform test only on units that have the error property.
+							Iterate through "errorInstances" array, if present, and check that respective errors are indeed of type SystemError.
+							Iterate through "stringErrors" array, if present, and check that respective errors are not of type SystemError.
+						*/
 						if (element.hasOwnProperty("error")) {
 							describe("error", function() {
 								// @ts-ignore
@@ -649,7 +685,7 @@ export function testSystem() {
 			];
 			optionsArray.forEach(function(options) {
 				it("should fail with " + options.errorDescription, function() {
-					assert.strictEqual(system.System.checkOptionsFailure(options.options as system.Options), true);
+					assert.strictEqual(System.checkOptionsFailure(options.options as Options), true);
 				});
 			});
 		});

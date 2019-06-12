@@ -1,4 +1,4 @@
-system.info.options:
+options:
   folder: subsystems
   path: relative
 local-fs:
