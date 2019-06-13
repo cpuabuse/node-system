@@ -231,6 +231,16 @@ interface LoaderProperty {
 	[key: string]: LoaderProperty;
 }
 
+/** Entrypoint for the subsystem. */
+export interface SubsystemEntrypoint {
+	get: {
+		(property: string): any;
+	};
+	method: {
+		[key: string]: (...args: Array<any>) => any;
+	};
+}
+
 /** Arguments for the system. */
 interface SystemArgs {
 	behaviors: Array<{ [key: string]: BehaviorInterface }> | null;
@@ -280,7 +290,7 @@ function isProperLoaderObject(object: { [key: string]: any }, property: string, 
  * // TODO: @event module:system.private#events#systemLoad
  */
 export class System extends Loader {
-	/* Subsystem entrypoints. */
+	/** Public entrypoints. */
 	public public!: {
 		subsystem: {
 			[key: string]: {
@@ -291,6 +301,13 @@ export class System extends Loader {
 					[key: string]: (...args: Array<any>) => any;
 				};
 			};
+		};
+	};
+
+	/** Protected entrypoints. */
+	protected protected!: {
+		subsystem: {
+			[key: string]: SubsystemEntrypoint;
 		};
 	};
 
@@ -386,6 +403,9 @@ export class System extends Loader {
 							(async (): Promise<void> => {
 								// It is async by design, not by need
 								this.public = {
+									subsystem: {}
+								};
+								this.protected = {
 									subsystem: {}
 								};
 
@@ -607,11 +627,18 @@ export class System extends Loader {
 														}
 													}
 
+													// Initialize subsystem entrypoints
+													this.public.subsystem[subsystem] = new Object() as SubsystemEntrypoint;
+													this.protected.subsystem[subsystem] = new Object() as SubsystemEntrypoint;
+
+													// Initialize subsystem
 													this.private.subsystem[
 														subsystem
 														/* eslint-disable-next-line new-cap */ // It is an argument
 													] = new subsystemModule.default({
 														args: systemArgs,
+														protectedEntrypoint: this.protected.subsystem[subsystem],
+														publicEntrypoint: this.public.subsystem[subsystem],
 														systemContext: this,
 														vars: subsystemsProperty.vars
 													});
