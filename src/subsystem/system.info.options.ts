@@ -20,9 +20,9 @@ export interface OptionsInterface extends SystemOptions, OptionsVars {} /* eslin
 export default class Options extends Info {
 	constructor(args: SubsystemExtensionArgs) {
 		// Set options to be read
-		if (args.args.hasOwnProperty("system_args")) {
+		if (args.args.system_args !== undefined) {
 			// Assign system option args
-			let options = <SystemOptions>args.args["system_args"].options;
+			let options = args.args.system_args.options;
 
 			// Check options failure
 			if (!checkOptionsFailure(options)) {

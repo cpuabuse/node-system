@@ -599,17 +599,11 @@ export class System extends Loader {
 										promises.push(
 											import(`../subsystem/${(subsystemsProperty.type as unknown) as string}`).then(
 												(subsystemModule: { default: ISubsystem }): void => {
-													let systemArgs: {
-														/* eslint-disable-next-line camelcase */
-														system_args?: SystemArgs;
-													} = new Object() as {
-														/* eslint-disable-next-line camelcase */
-														system_args?: SystemArgs;
-													}; /* eslint-disable-line camelcase */ // Variables defined in yml file
+													let systemArgs: any = new Object();
 													if (isProperLoaderObject(subsystemsProperty, "args", "array")) {
 														if (((subsystemsProperty.args as unknown) as Array<any>).includes("system_args")) {
 															/* eslint-disable-next-line dot-notation */ /* tslint:disable-next-line no-string-literal */ // Parens are necessary
-															systemArgs["system_args"] = { behaviors, onError, options };
+															systemArgs["system_args"] = { behaviors, options };
 														}
 													}
 
