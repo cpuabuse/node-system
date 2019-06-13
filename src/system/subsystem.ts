@@ -8,7 +8,8 @@
  */
 
 import { AtomicLock } from "./atomic";
-import { System } from "./system"; /* eslint-disable-line no-unused-vars */ // ESLint type import detection bug
+import { BehaviorInterface } from "../behavior"; /* eslint-disable-line no-unused-vars */ // ESLint type import detection bug
+import { System, Options } from "./system"; /* eslint-disable-line no-unused-vars */ // ESLint type import detection bug
 
 export interface ISubsystem extends Subsystem {
 	new (args: SubsystemExtensionArgs): ISubsystem;
@@ -16,11 +17,19 @@ export interface ISubsystem extends Subsystem {
 
 /** Interface for subsystem constructor data exchange. */
 export interface SubsystemExtensionArgs {
+	/** Arguments from system or extending class. */
+	args: {
+		[key: string]: any;
+
+		system_args?: {
+			behaviors: Array<{ [key: string]: BehaviorInterface }>;
+			options: Options;
+		};
+	};
+
 	/** Context of a parent system. */
 	systemContext: System;
-	args: {
-		system_args?: any;
-	};
+
 	/** Arbitrary arguments from a file. */
 	vars: any;
 } /* eslint-disable-line no-extra-semi */ // ESLint inteface no-extra-semi bug

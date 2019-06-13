@@ -157,7 +157,7 @@ export default class Behavior extends Subsystem {
 		super(systemContext);
 
 		// Only if we received the args we continue
-		if (Object.prototype.hasOwnProperty.call(args, "system_args")) {
+		if (args.system_args !== undefined) {
 			// Add the methods
 			this.addMethods([
 				{
@@ -170,6 +170,7 @@ export default class Behavior extends Subsystem {
 				}
 			]);
 
+			// TODO: Mimic add bevaviors
 			// Add the behaviors
 			if (args.system_args.behaviors !== undefined) {
 				this.method.addBehavior(args.system_args.behaviors);
