@@ -11,7 +11,7 @@
 import { testAtomicLock } from "./test-atomic";
 import { testLoaderError, testSystemError } from "./test-errors";
 import { testLoader } from "./test-loader";
-import { testSystem } from "./test-system";
+import { testSystem } from "./system/system";
 
 // DEBUG: Devonly - promise throw
 process.on("unhandledRejection" as NodeJS.Signals, function(up: NodeJS.Signals): void {
