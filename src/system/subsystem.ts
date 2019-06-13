@@ -9,13 +9,13 @@
 
 import { AtomicLock } from "./atomic";
 import { BehaviorInterface } from "../behavior"; /* eslint-disable-line no-unused-vars */ // ESLint type import detection bug
-import { System, Options } from "./system"; /* eslint-disable-line no-unused-vars */ // ESLint type import detection bug
+import { System, Options, SubsystemEntrypoint } from "./system"; /* eslint-disable-line no-unused-vars */ // ESLint type import detection bug
 
 export interface ISubsystem extends Subsystem {
 	new (args: SubsystemExtensionArgs): ISubsystem;
 }
 
-/** Interface for subsystem constructor data exchange. */
+/** Interface for arguments of extended classes. */
 export interface SubsystemExtensionArgs {
 	/** Arguments from system or extending class. */
 	args: {
@@ -26,6 +26,12 @@ export interface SubsystemExtensionArgs {
 			options: Options;
 		};
 	};
+
+	/** Protected entrypoint for subsystem. */
+	protectedEntrypoint: SubsystemEntrypoint;
+
+	/** Public entrypoint for subsystem. */
+	publicEntrypoint: SubsystemEntrypoint;
 
 	/** Context of a parent system. */
 	systemContext: System;
