@@ -32,6 +32,10 @@ rules:
   # Let programmer decide.
   no-array-constructor: off
 
+  # The use of bitwise operators in JavaScript is very rare and often & or | is simply a mistyped && or ||, which will lead to unexpected behavior.
+  # Bitwise is essential.
+  no-bitwise: off
+
   # Disallow Object constructors.
   # Let programmer decide.
   no-new-object: off

@@ -9,10 +9,44 @@
 
 import { AtomicLock } from "./atomic";
 import { BehaviorInterface } from "../behavior"; /* eslint-disable-line no-unused-vars */ // ESLint type import detection bug
-import { System, Options, SubsystemEntrypoint } from "./system"; /* eslint-disable-line no-unused-vars */ // ESLint type import detection bug
+import { System, Options } from "./system"; /* eslint-disable-line no-unused-vars */ // ESLint type import detection bug
+
+/** Method access flags. */
+export enum Access /* eslint-disable-line no-unused-vars */ { // ESLint detection bug
+	/** Public flag. */
+	public = 1 << 1 /* eslint-disable-line no-unused-vars */, // ESLint detection bug
+
+	/** Protected flag. */
+	protected = 1 << 2 /* eslint-disable-line no-unused-vars */, // ESLint detection bug
+
+	/** Private flag. */
+	private = 1 << 3 /* eslint-disable-line no-unused-vars */ // ESLint detection bug
+}
 
 export interface ISubsystem extends Subsystem {
 	new (args: SubsystemExtensionArgs): ISubsystem;
+}
+
+/** Subsystem class arguments. */
+export interface SubsystemArgs {
+	/** Protected entrypoint reference. */
+	protectedEntrypoint: SubsystemEntrypoint;
+
+	/** Public entrypoint reference. */
+	publicEntrypoint: SubsystemEntrypoint;
+
+	/** System context. */
+	system: System;
+}
+
+/** Entrypoint for the subsystem. */
+export interface SubsystemEntrypoint {
+	call: {
+		[key: string]: (...args: Array<any>) => any;
+	};
+	get: {
+		(property: string): any;
+	};
 }
 
 /** Interface for arguments of extended classes. */
@@ -20,6 +54,10 @@ export interface SubsystemExtensionArgs {
 	/** Arguments from system or extending class. */
 	args: {
 		[key: string]: any;
+
+		protectedEntrypoint: SubsystemEntrypoint;
+
+		publicEntrypoint: SubsystemEntrypoint;
 
 		system_args?: {
 			behaviors: Array<{ [key: string]: BehaviorInterface }>;
@@ -34,58 +72,63 @@ export interface SubsystemExtensionArgs {
 	publicEntrypoint: SubsystemEntrypoint;
 
 	/** Context of a parent system. */
-	systemContext: System;
+	system: System;
 
 	/** Arbitrary arguments from a file. */
 	vars: any;
-} /* eslint-disable-line no-extra-semi */ // ESLint inteface no-extra-semi bug
+}
 
-/**
- * A way methods are transfered to a subsystem.
- * @typedef SubsystemMethod
- * @property {string} name Name of a function.
- * @property {Function} fn Function body, taking arbitrary arguments.
- */
-export type SubsystemMethod = {
+/** A way methods are transfered to a subsystem. */
+export interface SubsystemMethod {
+	/** Access flags. */
+	access: Access;
+
+	/** Function body, taking arbitrary arguments. */
+	fn: (...args: any) => any;
+
+	/** Name of a function. */
 	name: string;
-	fn: Function;
-};
-/**
- * @typedef Method
- */
-type Method = {
-	[key: string]: Function;
-};
+}
 
-export class Subsystem extends AtomicLock {
-	system: System;
+/** Methods of an initialized subsystem. */
+interface Method {
+	[key: string]: (...args: any) => any;
+}
 
-	method: Method;
+/** Base subsystem class. All subsystems extend it. */
+export class Subsystem extends AtomicLock implements SubsystemEntrypoint {
+	/** Private functions. */
+	public call: Method = new Object() as Method;
 
-	data: any;
+	/** Private data */
+	protected data: any = new Object();
 
-	constructor(systemContext: System, subsystemMethods?: Array<SubsystemMethod> | null) {
+	/** Private methods */
+	private method: Method = new Object() as Method;
+
+	/** Reference to private entrypoint. */
+	private private: SubsystemEntrypoint = this;
+
+	/** Reference to protected entrypoint. */
+	private protected: SubsystemEntrypoint;
+
+	/** Reference to public entrypoint. */
+	private public: SubsystemEntrypoint;
+
+	/** Parent system. */
+	private system: System;
+
+	/** Constructs subsystem. */
+	constructor({ system, protectedEntrypoint, publicEntrypoint }: SubsystemArgs) {
 		super();
-
 		// Set reference to system
-		this.system = systemContext;
+		this.system = system;
 
-		// Set subsystem objects
-		this.method = <Method>new Object();
-		if (subsystemMethods !== undefined && subsystemMethods !== null) {
-			this.addMethods(subsystemMethods);
-		}
+		// Initialize public entrypoint
+		this.public = publicEntrypoint;
 
-		// Create a dummy data property
-		this.data = null;
-	}
-
-	protected addMethods(methods: Array<SubsystemMethod>) {
-		// Bind methods
-		for (let bindFn of methods) {
-			// Bind fn to object; Using parent-child access not to create and overwrite an object wastefully
-			this.method[bindFn.name] = bindFn.fn.bind(this);
-		}
+		// Initialize protected entrypoint
+		this.protected = protectedEntrypoint;
 	}
 
 	/**
@@ -109,5 +152,31 @@ export class Subsystem extends AtomicLock {
 
 		// Return result
 		return result;
+	}
+
+	/** Add methods to the subsystem. */
+	protected addMethods(methods: Array<SubsystemMethod>): void {
+		// Bind methods
+		methods.forEach((method: SubsystemMethod): void => {
+			let addMethod: (access: "public" | "protected" | "private") => void = (
+				access: "public" | "protected" | "private"
+			): void => {
+				if ((method.access & Access[access]) === Access[access]) {
+					this[access].call[method.name] = this.method[method.name];
+				}
+			};
+
+			// Assign the method
+			this.method[method.name] = method.fn.bind(this);
+
+			// Assign public entrypoint
+			addMethod("public");
+
+			// Assign protected entrypoint
+			addMethod("protected");
+
+			// Assign public entrypoint
+			addMethod("private");
+		});
 	}
 }

@@ -11,6 +11,7 @@ import { EventEmitter } from "events";
 import { AtomicLock } from "../system/atomic";
 import { LoaderError } from "../loaderError";
 import {
+	Access,
 	Subsystem /* eslint-disable-line no-unused-vars */, // ESLint bug
 	SubsystemExtensionArgs as Args /* eslint-disable-line no-unused-vars */ // ESLint bug
 } from "../system/subsystem";
@@ -152,19 +153,21 @@ export default class Behavior extends Subsystem {
 
 	/** Initializes system behavior. */
 	// @ts-ignore tsc does not see inevitability of super()
-	constructor({ systemContext, args }: Args) {
+	constructor({ system, args, protectedEntrypoint, publicEntrypoint }: Args) {
 		// Call superclass's constructor
-		super(systemContext);
+		super({ protectedEntrypoint, publicEntrypoint, system });
 
 		// Only if we received the args we continue
 		if (args.system_args !== undefined) {
 			// Add the methods
 			this.addMethods([
 				{
+					access: Access.private | Access.protected,
 					fn: addBehavior,
 					name: "addBehavior"
 				},
 				{
+					access: Access.private | Access.protected,
 					fn: behave,
 					name: "behave"
 				}
@@ -173,7 +176,7 @@ export default class Behavior extends Subsystem {
 			// TODO: Mimic add bevaviors
 			// Add the behaviors
 			if (args.system_args.behaviors !== undefined) {
-				this.method.addBehavior(args.system_args.behaviors);
+				protectedEntrypoint.call.addBehavior(args.system_args.behaviors);
 			}
 		} else {
 			// Report an error
