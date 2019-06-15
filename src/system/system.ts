@@ -612,8 +612,8 @@ export class System extends Loader {
 													}
 
 													// Initialize subsystem entrypoints
-													this.public.subsystem[subsystem] = new Object() as SubsystemEntrypoint;
-													this.protected.subsystem[subsystem] = new Object() as SubsystemEntrypoint;
+													this.public.subsystem[subsystem] = new SubsystemEntrypoint();
+													this.protected.subsystem[subsystem] = new SubsystemEntrypoint();
 
 													// Initialize subsystem
 													this.private.subsystem[
@@ -675,7 +675,6 @@ export class System extends Loader {
 						}
 					})
 					.catch(function(error: Error | LoaderError): void {
-						console.log(error);
 						// Errors returned from load or staticInitializationPromise
 						processLoaderError(
 							error instanceof LoaderError

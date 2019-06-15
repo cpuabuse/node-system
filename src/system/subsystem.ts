@@ -39,16 +39,6 @@ export interface SubsystemArgs {
 	system: System;
 }
 
-/** Entrypoint for the subsystem. */
-export interface SubsystemEntrypoint {
-	call: {
-		[key: string]: (...args: Array<any>) => any;
-	};
-	get: {
-		(property: string): any;
-	};
-}
-
 /** Interface for arguments of extended classes. */
 export interface SubsystemExtensionArgs {
 	/** Arguments from system or extending class. */
@@ -92,16 +82,29 @@ export interface SubsystemMethod {
 
 /** Methods of an initialized subsystem. */
 interface Method {
-	[key: string]: (...args: any) => any;
+	[key: string]: (...args: Array<any>) => any;
+}
+
+/** Entrypoint for the subsystem. */
+export class SubsystemEntrypoint {
+	/* */
+	/** Methods. */
+	public call: Method = new Object() as Method;
+
+	/** Data. */
+	public get: Function = new Function();
 }
 
 /** Base subsystem class. All subsystems extend it. */
-export class Subsystem extends AtomicLock implements SubsystemEntrypoint {
+export class Subsystem implements SubsystemEntrypoint {
 	/** Private functions. */
 	public call: Method = new Object() as Method;
 
 	/** Private data */
 	protected data: any = new Object();
+
+	/** Atomic lock for atomic subsystem operations. */
+	private lock: AtomicLock = new AtomicLock();
 
 	/** Private methods */
 	private method: Method = new Object() as Method;
@@ -120,12 +123,12 @@ export class Subsystem extends AtomicLock implements SubsystemEntrypoint {
 
 	/** Constructs subsystem. */
 	constructor({ system, protectedEntrypoint, publicEntrypoint }: SubsystemArgs) {
-		super();
 		// Set reference to system
 		this.system = system;
 
 		// Initialize public entrypoint
 		this.public = publicEntrypoint;
+		this.public.get = this.get;
 
 		// Initialize protected entrypoint
 		this.protected = protectedEntrypoint;
@@ -137,7 +140,7 @@ export class Subsystem extends AtomicLock implements SubsystemEntrypoint {
 	 */
 	public get(name: string): any {
 		// Lock
-		this.lock();
+		this.lock.lock();
 
 		// Defualt return value
 		let result: any; // Undefined
@@ -148,7 +151,7 @@ export class Subsystem extends AtomicLock implements SubsystemEntrypoint {
 		}
 
 		// Unlock
-		this.release();
+		this.lock.release();
 
 		// Return result
 		return result;
