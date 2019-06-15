@@ -12,7 +12,8 @@ import * as events from "../events";
 import { Behavior, BehaviorInterface /* eslint-disable-line no-unused-vars */ } from "../behavior";
 import {
 	ISubsystem /* eslint-disable-line no-unused-vars */,
-	Subsystem /* eslint-disable-line no-unused-vars */
+	Subsystem /* eslint-disable-line no-unused-vars */,
+	SubsystemEntrypoint /* eslint-disable-line no-unused-vars */
 } from "./subsystem";
 import { Loader, loadYaml } from "../loader"; // Auxiliary system lib
 import { AtomicLock } from "./atomic";
@@ -231,16 +232,6 @@ interface LoaderProperty {
 	[key: string]: LoaderProperty;
 }
 
-/** Entrypoint for the subsystem. */
-export interface SubsystemEntrypoint {
-	get: {
-		(property: string): any;
-	};
-	method: {
-		[key: string]: (...args: Array<any>) => any;
-	};
-}
-
 /** Arguments for the system. */
 interface SystemArgs {
 	behaviors: Array<{ [key: string]: BehaviorInterface }> | null;
@@ -293,14 +284,7 @@ export class System extends Loader {
 	/** Public entrypoints. */
 	public public!: {
 		subsystem: {
-			[key: string]: {
-				get: {
-					(property: string): any;
-				};
-				method: {
-					[key: string]: (...args: Array<any>) => any;
-				};
-			};
+			[key: string]: SubsystemEntrypoint;
 		};
 	};
 
@@ -639,7 +623,7 @@ export class System extends Loader {
 														args: systemArgs,
 														protectedEntrypoint: this.protected.subsystem[subsystem],
 														publicEntrypoint: this.public.subsystem[subsystem],
-														systemContext: this,
+														system: this,
 														vars: subsystemsProperty.vars
 													});
 												}
@@ -691,6 +675,7 @@ export class System extends Loader {
 						}
 					})
 					.catch(function(error: Error | LoaderError): void {
+						console.log(error);
 						// Errors returned from load or staticInitializationPromise
 						processLoaderError(
 							error instanceof LoaderError

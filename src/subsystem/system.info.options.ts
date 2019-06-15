@@ -17,26 +17,27 @@ interface OptionsVars {
 } /* eslint-disable-line no-extra-semi */ // ESLint inteface no-extra-semi bug
 export interface OptionsInterface extends SystemOptions, OptionsVars {} /* eslint-disable-line no-extra-semi */ // ESLint inteface no-extra-semi bug
 
+/** Stores system options. */
 export default class Options extends Info {
-	constructor({ args, systemContext, publicEntrypoint, protectedEntrypoint, vars }: SubsystemExtensionArgs) {
+	constructor({ args, system, publicEntrypoint, protectedEntrypoint, vars }: SubsystemExtensionArgs) {
 		// Set options to be read
 		if (args.system_args !== undefined) {
 			// Assign system option args
-			let options = args.system_args.options;
+			let { options }: { options: SystemOptions } = args.system_args;
 
 			// Check options failure
 			if (!checkOptionsFailure(options)) {
 				let variables: OptionsInterface = {
 					...options,
-					...(<OptionsVars>vars)
+					...(vars as OptionsVars)
 				};
 
 				// Call superclass constructor
 				super({
-					args: new Object(),
+					args: new Object() as SubsystemExtensionArgs,
 					protectedEntrypoint,
 					publicEntrypoint,
-					systemContext,
+					system,
 					vars: variables
 				});
 
@@ -47,8 +48,8 @@ export default class Options extends Info {
 
 		// Call superconstructor with dummy arguments
 		super({
-			systemContext,
-			args: new Object(),
+			system,
+			args: new Object() as SubsystemExtensionArgs,
 			vars: null,
 			publicEntrypoint,
 			protectedEntrypoint

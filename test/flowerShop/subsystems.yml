@@ -4,6 +4,3 @@ options:
 local-fs:
   folder: subsystems
   path: relative
-behavior:
-  folder: subsystems
-  path: relative

@@ -10,9 +10,9 @@
 import { SubsystemExtensionArgs, Subsystem } from "../system/subsystem"; /* eslint-disable-line no-unused-vars */ // ESLint type import detection bug
 
 export default class Info extends Subsystem {
-	constructor({ systemContext, vars }: SubsystemExtensionArgs) {
+	constructor({ system, vars, protectedEntrypoint, publicEntrypoint }: SubsystemExtensionArgs) {
 		// Call superclass constructor
-		super(systemContext, null);
+		super({ protectedEntrypoint, publicEntrypoint, system });
 
 		// Assign data
 		this.data = vars;
