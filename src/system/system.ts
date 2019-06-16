@@ -30,6 +30,9 @@ export { AtomicLock, checkOptionsFailure };
 /** Temporary hold name for options subsystem, to be moved to file system subsystem. */
 const optionsSubsystem: string = "options";
 
+/** Temporary hold behavior name. */
+const behaviorSubsystem: string = "behavior";
+
 /** An interface to describe the resolve argument of promise executor. */
 export interface Resolve {
 	(value?: void | PromiseLike<void> | undefined): void;
@@ -908,7 +911,7 @@ export class System extends Loader {
 	 * var labInventory = new System(options);
 	 * labInventory.fire("system_load_aux", "Auxiliary system loaded.");
 	 */
-	private fire(name: string, message: string): void {
+	public fire(name: string, message: string): void {
 		const eventAbsent: string = "event_absent";
 		const errorHell: string = "error_hell";
 

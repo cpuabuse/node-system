@@ -118,26 +118,26 @@ export class Subsystem extends SubsystemEntrypoint {
 	/** Private functions. */
 	public call: Method = new Object() as Method;
 
+	/** Reference to private entrypoint. */
+	public private: SubsystemEntrypoint = this;
+
+	/** Reference to protected entrypoint. */
+	public protected: SubsystemEntrypoint;
+
+	/** Reference to public entrypoint. */
+	public public: SubsystemEntrypoint;
+
+	/** Parent system. */
+	protected system: System;
+
 	/** Private data */
-	protected data: any = new Object();
+	private data: any = new Object();
 
 	/** Atomic lock for atomic subsystem operations. */
 	private lock: AtomicLock = new AtomicLock();
 
 	/** Private methods */
 	private method: Method = new Object() as Method;
-
-	/** Reference to private entrypoint. */
-	private private: SubsystemEntrypoint = this;
-
-	/** Reference to protected entrypoint. */
-	private protected: SubsystemEntrypoint;
-
-	/** Reference to public entrypoint. */
-	private public: SubsystemEntrypoint;
-
-	/** Parent system. */
-	private system: System;
 
 	/** Constructs subsystem. */
 	constructor({ system, protectedEntrypoint, publicEntrypoint }: SubsystemArgs) {
