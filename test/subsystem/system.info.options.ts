@@ -20,7 +20,7 @@ export default function test(system: System, systemTest: SystemTest): void {
 		// System instance ID
 		describe("id", function(): void {
 			it(`should be ${systemTest.options.id}`, function(done: () => void): void {
-				strictEqual(system.public.subsystem.options.get("id"), systemTest.options.id);
+				strictEqual(system.public.subsystem.options.get.id, systemTest.options.id);
 				done();
 			});
 		});

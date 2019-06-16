@@ -38,6 +38,10 @@ rules:
     - order: fields-first
       alphabetize: true
 
+  # A file may not contain more than the specified number of classes.
+  # Let programmer decide.
+  max-classes-per-file: false
+
   # Requires lines to be under a certain max length.
   # Wrap text.
   max-line-length: false
