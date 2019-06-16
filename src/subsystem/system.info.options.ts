@@ -46,15 +46,6 @@ export default class Options extends Info {
 			}
 		}
 
-		// Call superconstructor with dummy arguments
-		super({
-			system,
-			args: new Object() as SubsystemExtensionArgs,
-			vars: null,
-			publicEntrypoint,
-			protectedEntrypoint
-		});
-
 		// Report an error
 		throw new LoaderError("system_options_failure", "The options provided to the system constructor are inconsistent.");
 	}

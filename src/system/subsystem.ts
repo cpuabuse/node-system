@@ -10,6 +10,7 @@
 import { AtomicLock } from "./atomic";
 import { BehaviorInterface } from "../behavior"; /* eslint-disable-line no-unused-vars */ // ESLint type import detection bug
 import { System, Options } from "./system"; /* eslint-disable-line no-unused-vars */ // ESLint type import detection bug
+import { stringify } from "querystring";
 
 /** Method access flags. */
 export enum Access /* eslint-disable-line no-unused-vars */ { // ESLint detection bug
@@ -23,8 +24,18 @@ export enum Access /* eslint-disable-line no-unused-vars */ { // ESLint detectio
 	private = 1 << 3 /* eslint-disable-line no-unused-vars */ // ESLint detection bug
 }
 
+/** Interface to represent data held by subsystem. */
+interface Data {
+	[key: string]: any;
+}
+
 export interface ISubsystem extends Subsystem {
 	new (args: SubsystemExtensionArgs): ISubsystem;
+}
+
+/** Methods of an initialized subsystem. */
+interface Method {
+	[key: string]: (...args: Array<any>) => any;
 }
 
 /** Subsystem class arguments. */
@@ -37,6 +48,18 @@ export interface SubsystemArgs {
 
 	/** System context. */
 	system: System;
+}
+
+/** Defines how data is added to the subsystem. */
+export interface SubsystemData {
+	/**  */
+	access: Access;
+
+	/** Name of the data. */
+	name: string;
+
+	/** The data iteself. */
+	obj: any;
 }
 
 /** Interface for arguments of extended classes. */
@@ -80,11 +103,6 @@ export interface SubsystemMethod {
 	name: string;
 }
 
-/** Methods of an initialized subsystem. */
-interface Method {
-	[key: string]: (...args: Array<any>) => any;
-}
-
 /** Entrypoint for the subsystem. */
 export class SubsystemEntrypoint {
 	/* */
@@ -92,11 +110,11 @@ export class SubsystemEntrypoint {
 	public call: Method = new Object() as Method;
 
 	/** Data. */
-	public get: Function = new Function();
+	public get: Data = new Object() as Data;
 }
 
 /** Base subsystem class. All subsystems extend it. */
-export class Subsystem implements SubsystemEntrypoint {
+export class Subsystem extends SubsystemEntrypoint {
 	/** Private functions. */
 	public call: Method = new Object() as Method;
 
@@ -123,6 +141,9 @@ export class Subsystem implements SubsystemEntrypoint {
 
 	/** Constructs subsystem. */
 	constructor({ system, protectedEntrypoint, publicEntrypoint }: SubsystemArgs) {
+		// Call superclass constructor
+		super();
+
 		// Set reference to system
 		this.system = system;
 
@@ -134,27 +155,31 @@ export class Subsystem implements SubsystemEntrypoint {
 		this.protected = protectedEntrypoint;
 	}
 
-	/**
-	 * Returns a copy of specified variable.
-	 * @param name Name of the property
-	 */
-	public get(name: string): any {
-		// Lock
-		this.lock.lock();
+	/** Adds subsystem data to the subsystem. */
+	protected addData(data: Array<SubsystemData>): void {
+		data.forEach((subsystemData: SubsystemData): void => {
+			let addSubsystemData: (access: "public" | "protected" | "private") => void = (
+				access: "public" | "protected" | "private"
+			): void => {
+				if ((subsystemData.access & Access[access]) === Access[access]) {
+					Object.defineProperty(this[access].get, subsystemData.name, {
+						get: (): void => {
+							return typeof this.data[subsystemData.name] === "object"
+								? Object.assign(new Object(), this.data[subsystemData.name])
+								: this.data[subsystemData.name];
+						}
+					});
+				}
+			};
 
-		// Defualt return value
-		let result: any; // Undefined
+			// Assign to data
+			this.data[subsystemData.name] = subsystemData.obj;
 
-		// Return copied object if target is object, else return the primitive itself
-		if (Object.keys(this.data).includes(name)) {
-			result = typeof this.data[name] === "object" ? Object.assign(new Object(), this.data[name]) : this.data[name];
-		}
-
-		// Unlock
-		this.lock.release();
-
-		// Return result
-		return result;
+			// Assign entrypoints
+			addSubsystemData("public");
+			addSubsystemData("protected");
+			addSubsystemData("private");
+		});
 	}
 
 	/** Add methods to the subsystem. */

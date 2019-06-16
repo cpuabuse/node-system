@@ -408,9 +408,9 @@ export class System extends Loader {
 									},
 									filter: {
 										isDir: (filterContext: FilterContext): Promise<boolean> =>
-											Loader.isDir(this.private.subsystem[optionsSubsystem].get("rootDir"), filterContext.item),
+											Loader.isDir(this.private.subsystem[optionsSubsystem].get.rootDir, filterContext.item),
 										isFile: (filterContext: FilterContext): Promise<boolean> =>
-											Loader.isFile(Loader.join(this.private.subsystem[optionsSubsystem].get("rootDir"), Loader.join(
+											Loader.isFile(Loader.join(this.private.subsystem[optionsSubsystem].get.rootDir, Loader.join(
 												filterContext.dir,
 												filterContext.itemName
 											) as string) as string) // Only two arguments make string always
@@ -433,11 +433,7 @@ export class System extends Loader {
 											(async (): Promise<Buffer> => {
 												/* eslint-disable-line func-style */ // Can't have arrow style function declaration
 												try {
-													return await Loader.getFile(
-														this.private.subsystem[optionsSubsystem].get("rootDir"),
-														dir,
-														file
-													);
+													return await Loader.getFile(this.private.subsystem[optionsSubsystem].get.rootDir, dir, file);
 												} catch (error) {
 													// TODO: this.fire("fileprivate_error");
 													throw this.private.error.file_system_error;
@@ -528,7 +524,7 @@ export class System extends Loader {
 										return pGetFile();
 									},
 									getYaml: (dir: string, file: string): Promise<string> =>
-										loadYaml(this.private.subsystem[optionsSubsystem].get("rootDir"), dir, file),
+										loadYaml(this.private.subsystem[optionsSubsystem].get.rootDir, dir, file),
 									async join(rootDir: string, target: string | Array<string>): Promise<string | Array<string>> {
 										/* eslint-disable-line require-await */ // We want file methods to produce same type output
 										return Loader.join(rootDir, target);
@@ -536,7 +532,7 @@ export class System extends Loader {
 									list: async (dir: string, filter: Filter | null): Promise<Array<string>> => {
 										let filteredItems: Array<string>; // Return array
 										let itemNames: Array<string> = await Loader.list(
-											this.private.subsystem[optionsSubsystem].get("rootDir"),
+											this.private.subsystem[optionsSubsystem].get.rootDir,
 											dir
 										); // Wait for folder contets
 										let items: Array<string> = (await this.private.file.join(dir, itemNames)) as Array<string>; // The return will be always be an array
@@ -580,7 +576,7 @@ export class System extends Loader {
 											let filePath: string = Loader.join(dir, file) as string; // Only two arguments make string always
 
 											// Return
-											return Loader.join(this.private.subsystem[optionsSubsystem].get("rootDir"), filePath) as string;
+											return Loader.join(this.private.subsystem[optionsSubsystem].get.rootDir, filePath) as string;
 										})(),
 									async toRelative(rootDir: string, target: string): Promise<string> {
 										/* eslint-disable-line require-await */ // We want file methods to produce same type output
@@ -675,6 +671,7 @@ export class System extends Loader {
 						}
 					})
 					.catch(function(error: Error | LoaderError): void {
+						console.log(error);
 						// Errors returned from load or staticInitializationPromise
 						processLoaderError(
 							error instanceof LoaderError
@@ -934,8 +931,8 @@ export class System extends Loader {
 	 * labInventory.error(text);
 	 */
 	private error(text: string): void {
-		if (this.private.subsystem[optionsSubsystem].get("logging") === "console") {
-			System.error(`${this.private.subsystem[optionsSubsystem].get("id")}: ${text}`);
+		if (this.private.subsystem[optionsSubsystem].get.logging === "console") {
+			System.error(`${this.private.subsystem[optionsSubsystem].get.id}: ${text}`);
 		}
 	} // <== error
 
@@ -1035,8 +1032,8 @@ export class System extends Loader {
 	 * labInventory.log(text);
 	 */
 	private log(text: string): void {
-		if (this.private.subsystem[optionsSubsystem].get("logging") === "console") {
-			System.log(`${this.private.subsystem[optionsSubsystem].get("id")}: ${text}`);
+		if (this.private.subsystem[optionsSubsystem].get.logging === "console") {
+			System.log(`${this.private.subsystem[optionsSubsystem].get.id}: ${text}`);
 		}
 	} // <== log
 
