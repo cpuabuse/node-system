@@ -260,6 +260,22 @@ export function testSystem(): void {
 				constructorError: "system_options_failure"
 			},
 			{
+				// Options without system arguments
+				options: {
+					id: "behavior-no-args",
+					rootDir: "test",
+					relativeInitDir: "behavior-no-args",
+					initFilename: "init",
+					logging: "off"
+				},
+				rawInitFilename: "init.yml",
+				initYamlContents: expected.exampleYamlInit,
+				initContents: expected.exampleInit,
+				initDirFileAmount: 5,
+				initDirFolderAmount: 1,
+				constructorError: "system_options_failure"
+			},
+			{
 				// Flower shop
 				options: {
 					id: "flower_shop",
