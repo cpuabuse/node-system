@@ -15,7 +15,12 @@
 
 import * as assert from "assert";
 import * as path from "path";
-import { ErrorCallback, Options, System } from "../../src/system/system"; /* eslint-disable-line no-unused-vars */ // ESLint bug
+import {
+	ErrorCallback /* eslint-disable-line no-unused-vars */,
+	Options /* eslint-disable-line no-unused-vars */,
+	System,
+	checkOptionsFailure
+} from "../../src/system/system";
 import * as systemError from "../../src/error";
 import * as loaderError from "../../src/loaderError";
 import * as expected from "../expected";
@@ -671,7 +676,7 @@ export function testSystem(): void {
 			];
 			optionsArray.forEach(function(options) {
 				it("should fail with " + options.errorDescription, function() {
-					assert.strictEqual(System.checkOptionsFailure(options.options as Options), true);
+					assert.strictEqual(checkOptionsFailure(options.options as Options), true);
 				});
 			});
 		});

@@ -18,11 +18,14 @@ import {
 import { Loader, loadYaml } from "../loader"; // Auxiliary system lib
 import { AtomicLock } from "./atomic";
 import { LoaderError } from "../loaderError";
-import { OptionsInterface /* eslint-disable-line no-unused-vars */ } from "../subsystem/system.info.options";
+import {
+	OptionsInterface /* eslint-disable-line no-unused-vars */,
+	checkOptionsFailure /* eslint-disable-line no-unused-vars */
+} from "../subsystem/system.info.options";
 import { SystemError } from "../error";
 
 // Re-export
-export { AtomicLock };
+export { AtomicLock, checkOptionsFailure };
 
 /** Temporary hold name for options subsystem, to be moved to file system subsystem. */
 const optionsSubsystem: string = "options";
@@ -368,7 +371,7 @@ export class System extends Loader {
 
 		try {
 			// Throw an error if failure
-			if (System.checkOptionsFailure(options)) {
+			if (checkOptionsFailure(options)) {
 				// Call a dummy superconstructor
 				super(null, null, null, null);
 
@@ -687,56 +690,6 @@ export class System extends Loader {
 			processLoaderError(error);
 		}
 	} // <== constructor
-
-	/**
-	 * Checks options argument for missing incorrect property types
-	 * @param options System options argument
-	 * @returns Returns true if the arguments is corrupt; false if OK
-	 * @example <caption>Usage</caption>
-	 * var options = {
-	 *   id: "stars",
-	 *   rootDir: "test",
-	 *   relativeInitDir: "stars",
-	 *   initFilename: "stars.yml",
-	 *   logging: "off"
-	 * };
-	 *
-	 * if (System.checkOptionsFailure(options)){
-	 *   throw new Error ("Options inconsistent.");
-	 * }
-	 */
-	public static checkOptionsFailure(options: Options): boolean {
-		let failed: boolean = false;
-
-		if (options) {
-			// Checks boolean
-			if (!Object.prototype.hasOwnProperty.call(options, "logging")) {
-				failed = true;
-			} else if (typeof options.logging !== "string") {
-				failed = true;
-			} else if (!["off", "console", "file", "queue"].includes(options.logging)) {
-				failed = true;
-			}
-
-			// Checks strings
-			let stringOptions: Array<"id" | "rootDir" | "relativeInitDir" | "initFilename"> = [
-				"id",
-				"rootDir",
-				"relativeInitDir",
-				"initFilename"
-			];
-			stringOptions.forEach(function(element: "id" | "rootDir" | "relativeInitDir" | "initFilename"): void {
-				if (!Object.prototype.hasOwnProperty.call(options, element)) {
-					failed = true;
-				} else if (typeof options[element] !== "string") {
-					failed = true;
-				}
-			});
-		} else {
-			failed = true;
-		}
-		return failed;
-	}
 
 	/**
 	 * Access stderr
