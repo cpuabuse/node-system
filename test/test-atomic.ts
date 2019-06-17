@@ -19,47 +19,41 @@
 /* global describe:true */
 /* global it:true */
 
-import * as system from "../src/system/system";
-import * as assert from "assert";
-const waitTime = 200;
+import { strictEqual } from "assert";
+import { AtomicLock } from "../src/system/system";
 
-/**
- * Tests of AtomicLock class.
- * @member AtomicLock
- * @memberof module:system~test
- */
-export function testAtomicLock() {
-	describe("AtomicLock", function() {
+/** Time to wait. */
+const waitTime: number = 200;
+
+/** Tests of AtomicLock class. */
+export function testAtomicLock(): void {
+	describe("AtomicLock", function(): void {
 		// Assing variables
-		let atomicLock = new system.AtomicLock();
+		let atomicLock: AtomicLock = new AtomicLock();
 
-		describe("initial state", function() {
-			it("should be unlocked", function() {
-				assert.strictEqual(atomicLock.isLocked, false);
+		describe("initial state", function(): void {
+			it("should be unlocked", function(): void {
+				strictEqual(atomicLock.isLocked, false);
 			});
 		});
 
-		describe("locked state", function() {
-			it("should be locked", function(done) {
-				atomicLock.lock().then(function() {
-					assert.strictEqual(atomicLock.isLocked, true);
+		describe("locked state", function(): void {
+			it("should be locked", function(done: () => void): void {
+				atomicLock.lock().then(function(): void {
+					strictEqual(atomicLock.isLocked, true);
 					done();
 				});
 			});
 		});
 
-		describe("lock while locked", function() {
-			it("should lock after timed release", function(done) {
-				setTimeout(function() {
+		describe("lock while locked", function(): void {
+			it("should lock after timed release", function(done: () => void): void {
+				setTimeout(function(): void {
 					atomicLock.release();
 				}, waitTime);
 				atomicLock.lock().then(() => done());
-				assert.strictEqual(atomicLock.isLocked, true);
+				strictEqual(atomicLock.isLocked, true);
 			});
 		});
 	});
 }
-
-module.exports = {
-	testAtomicLock
-};
