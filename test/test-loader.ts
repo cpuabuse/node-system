@@ -1,5 +1,5 @@
 /*
-	File: test/test-loader.ts
+File: test/test-loader.ts
 	cpuabuse.com
 */
 
@@ -17,13 +17,63 @@ import * as path from "path";
 import { Loader } from "../src/loader";
 import { LoaderError } from "../src/loaderError";
 
-const nonExistentFileOrDir = "Non-existent file or directory";
+/** Default string for absent file. */
+const nonExistentFileOrDir: string = "Non-existent file or directory";
+
+/** Test data for loader. */
+interface Test {
+	/** Constructor error. */
+	constructorError?: string;
+
+	/** Relative directory. */
+	dir: string;
+
+	/** File name. */
+	file: string;
+
+	/** Amount of files and folders. */
+	filesAndFoldersAmount: number;
+
+	/** Object grandchildren. */
+	grandChildrenCompare?: Array<{
+		/** Object child name. */
+		child: string;
+
+		/** Object grandchild name. */
+		grandChild: string;
+
+		/** Expected value. */
+		value: string;
+	}>;
+	/** Object great grand children for comparison. */
+	greatGrandChildrenCompare?: Array<{
+		/** Object child name. */
+		child: string;
+
+		/** Object granchild name. */
+		grandChild: string;
+
+		/** Great grand child name. */
+		greatGrandChild: string;
+
+		/** Expected value. */
+		value: number;
+	}>;
+	/** Name of the loader. */
+	name: string;
+
+	/** Raw file name. */
+	rawFilename: string;
+
+	/** Root directory. */
+	rootDir: string;
+}
 
 /**
  * Tests for the Loader class.
  */
-export function testLoader() {
-	describe("Loader", function loaderLoader() {
+export function testLoader(): void {
+	describe("Loader", function(): void {
 		/**
 		 * Tests the constructor for:
 		 *
@@ -31,29 +81,31 @@ export function testLoader() {
 		 * - Non-failure with dummy
 		 * - "Invalid intialization entry type" error
 		 */
-		describe("constructor", function loaderConstructor() {
-			it("should produce unexpected_constructor error, with incoherent args", function loaderConstructorUnexpected() {
+		describe("constructor", function(): void {
+			it("should produce unexpected_constructor error, with incoherent args", function(): void {
 				assert.throws(
-					function loaderConstructorUnexpectedThrowsFn() {
-						new Loader /* eslint-disable-line no-new */("string", null, "string", null); // "new Loader" is only used for side-effects of testing
+					function(): void {
+						/* eslint-disable-next-line no-new */ /* tslint:disable-next-line no-unused-expression */ // "new Loader" is only used for side-effects of testing
+						new Loader("string", null, "string", null);
 					},
-					function loaderConstructorUnexpectedThrowsError(error: LoaderError | Error) {
+					function(error: LoaderError | Error): boolean {
 						return error instanceof LoaderError && error.code === "unexpected_constructor";
 					}
 				);
 			});
-			it("should not fail as a dummy", function loaderConstructorDummy() {
-				new Loader(null, null, null, null); /* eslint-disable-line no-new */ // "new Loader" is only used for side-effects of testing
+			it("should not fail as a dummy", function(): void {
+				/* eslint-disable-next-line no-new */ /* tslint:disable-next-line no-unused-expression */ // "new Loader" is only used for side-effects of testing
+				new Loader(null, null, null, null);
 			});
-			it('should produce "Invalid intialization entry type - average_height", when called with respective initialization file', function loaderConstructorInvalid() {
-				/* eslint-disable-next-line no-new */ // "new Loader" is only used for side-effects of testing
-				new Loader("test", "trees", "init", function loaderConstructorInvalidLoad(load) {
-					load.catch(function loaderConstructorInvalidCatch(err) {
+			it('should produce "Invalid intialization entry type - average_height", when called with respective initialization file', function(): void {
+				/* eslint-disable-next-line no-new */ /* tslint:disable-next-line no-unused-expression */ // "new Loader" is only used for side-effects of testing
+				new Loader("test", "trees", "init", function(load: Promise<void>): void {
+					load.catch(function(err: LoaderError | Error): void {
 						assert.throws(
-							function loaderConstructorInvalidThrows() {
+							function(): void {
 								throw err;
 							},
-							function loaderConstructorInvalidError(error: LoaderError | Error) {
+							function(error: LoaderError | Error): boolean {
 								return error instanceof Error && error.message === "Invalid intialization entry type - average_height";
 							}
 						);
@@ -63,24 +115,21 @@ export function testLoader() {
 		});
 
 		/** Tests that function produces appropriate object from YAML string. */
-		describe(".yamlToObject()", function loaderYaml() {
-			let data = "Wine: Red";
-			let expectedResults = {
+		describe(".yamlToObject()", function(): void {
+			let data: string = "Wine: Red";
+			let expectedResults: { Wine: string } = {
 				Wine: "Red"
 			};
-			it("should produce JSON", function loaderJson() {
+			it("should produce JSON", function(): void {
 				assert.deepEqual(Loader.yamlToObject(data), expectedResults);
 			});
 		});
 
-		const loaders = [
+		const loaders: Array<Test> = [
 			// Stars
 			{
-				name: "Stars",
-				rootDir: "test",
 				dir: "stars",
 				file: "stars",
-				rawFilename: "stars.yml",
 				filesAndFoldersAmount: 3,
 				grandChildrenCompare: [
 					{
@@ -98,15 +147,15 @@ export function testLoader() {
 						grandChild: "planet0",
 						value: "Barnard's Star b"
 					}
-				]
+				],
+				name: "Stars",
+				rawFilename: "stars.yml",
+				rootDir: "test"
 			},
 			// Flower Shop
 			{
-				name: "Flower Shop",
-				rootDir: "test",
 				dir: "flowerShop",
 				file: "init",
-				rawFilename: "init.yml",
 				filesAndFoldersAmount: 9,
 				greatGrandChildrenCompare: [
 					{
@@ -139,25 +188,29 @@ export function testLoader() {
 						greatGrandChild: "carrots",
 						value: 50
 					}
-				]
+				],
+				name: "Flower Shop",
+				rawFilename: "init.yml",
+				rootDir: "test"
 			},
 			// Example
 			{
-				name: "Example",
-				rootDir: "test",
 				dir: "example",
 				file: "init",
+				filesAndFoldersAmount: 6,
+				name: "Example",
 				rawFilename: "init.yml",
-				filesAndFoldersAmount: 6
+				rootDir: "test"
 			},
+			// Cars
 			{
-				name: "Cars",
-				rootDir: "test",
+				constructorError: "Invalid intialization entry type - trucks",
 				dir: "cars",
 				file: "init",
-				rawFilename: "init.yml",
 				filesAndFoldersAmount: 1,
-				constructorError: "Invalid intialization entry type - trucks"
+				name: "Cars",
+				rawFilename: "init.yml",
+				rootDir: "test"
 			}
 		];
 		loaders.forEach(function(element) {
@@ -295,9 +348,7 @@ export function testLoader() {
 				 */
 				describe(`.isFile("${element.rootDir}", "${element.dir}", "${element.rawFilename}")`, function() {
 					let isFile = Loader.isFile(element.rootDir + path.sep + element.dir + path.sep + element.rawFilename);
-					it(`should be a file with args ("${
-						element.rootDir
-					}${path.sep}${element.dir}${path.sep}${element.rawFilename}")`, function(done) {
+					it(`should be a file with args ("${element.rootDir}${path.sep}${element.dir}${path.sep}${element.rawFilename}")`, function(done) {
 						isFile.then(function(result) {
 							assert.strictEqual(result, true);
 							done();
@@ -309,9 +360,7 @@ export function testLoader() {
 							done();
 						});
 					});
-					it(`should not be a directory with args ("${
-						element.rootDir
-					}${path.sep}${nonExistentFileOrDir}")`, function(done) {
+					it(`should not be a directory with args ("${element.rootDir}${path.sep}${nonExistentFileOrDir}")`, function(done) {
 						Loader.isFile(element.rootDir + path.sep + nonExistentFileOrDir).then(function(result) {
 							assert.strictEqual(result, false);
 							done();
@@ -334,9 +383,7 @@ export function testLoader() {
 						});
 					});
 
-					it(`should not be a directory with args ("${
-						element.rootDir
-					}", "${element.dir}${path.sep}${element.rawFilename}")`, function(done) {
+					it(`should not be a directory with args ("${element.rootDir}", "${element.dir}${path.sep}${element.rawFilename}")`, function(done) {
 						Loader.isDir(element.rootDir, Loader.join(element.dir, element.rawFilename) as string).then(function(
 							result
 						) {

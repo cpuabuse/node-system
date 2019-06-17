@@ -8,62 +8,47 @@
  * If error is thrown, node will exit with code 1, otherwise 0.
  */
 
-"use strict";
-
 // Set eslint to ingore describe and it for assert
 /* global describe:true */
 /* global it:true */
 
-import * as systemError from "../src/error";
-import * as loaderError from "../src/loaderError";
-import * as assert from "assert";
+import { strictEqual } from "assert";
+import { SystemError } from "../src/error";
+import { LoaderError } from "../src/loaderError";
 
 /**
  * Tests for the Loader class.
  * @member LoaderError
  * @memberof module:system~test
  */
-export function testLoaderError() {
-	describe("LoaderError", function() {
-		describe("constructor", function() {
-			it("should initialize with default values", function() {
-				let error = new loaderError.LoaderError();
-				assert.strictEqual(error.code, "default_code");
-				assert.strictEqual(error.message, "default_message");
+export function testLoaderError(): void {
+	describe("LoaderError", function(): void {
+		describe("constructor", function(): void {
+			it("should initialize with default values", function(): void {
+				let error: LoaderError = new LoaderError();
+				strictEqual(error.code, "default_code");
+				strictEqual(error.message, "default_message");
 
 				// Repeat with empty strings
-				error = new loaderError.LoaderError("", "");
-				assert.strictEqual(error.code, "default_code");
-				assert.strictEqual(error.message, "default_message");
-			});
-		});
-	});
-}
-/**
- * Tests for the Loader class.
- * @member SystemError
- * @memberof module:system~test
- */
-export function testSystemError() {
-	describe("SystemError", function() {
-		describe(".isSystemError()", function() {
-			it("should return false for an empty error code", function() {
-				let error = new systemError.SystemError("", "message");
-				assert.strictEqual(systemError.SystemError.isSystemError(error), false);
-			});
-			it("should return false for non instance of SystemError", function() {
-				assert.strictEqual(
-					systemError.SystemError.isSystemError(
-						("Not an instance of SystemError" as unknown) as systemError.SystemError
-					),
-					false
-				);
+				error = new LoaderError("", "");
+				strictEqual(error.code, "default_code");
+				strictEqual(error.message, "default_message");
 			});
 		});
 	});
 }
 
-module.exports = {
-	testLoaderError,
-	testSystemError
-};
+/** Tests for the Loader class. */
+export function testSystemError(): void {
+	describe("SystemError", function(): void {
+		describe(".isSystemError()", function(): void {
+			it("should return false for an empty error code", function(): void {
+				let error: SystemError = new SystemError("", "message");
+				strictEqual(SystemError.isSystemError(error), false);
+			});
+			it("should return false for non instance of SystemError", function(): void {
+				strictEqual(SystemError.isSystemError(("Not an instance of SystemError" as unknown) as SystemError), false);
+			});
+		});
+	});
+}
