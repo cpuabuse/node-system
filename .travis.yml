@@ -22,10 +22,8 @@ jobs:
       tag: next
   - name: coverage
     script:
-    - |-
-      # Coverage
-      npm run coverage
-      cat ./coverage/lcov.info | node ./node_modules/coveralls/bin/coveralls.js
+      - npm run coverage
+      - npm run codecov
   - name: docs
     script: |
       npm run docs

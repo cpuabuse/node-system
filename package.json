@@ -6,6 +6,7 @@
   "types": "src/system.d.ts",
   "license": "UNLICENSED",
   "scripts": {
+    "codecov": "echo Deploying coverage... && codecov",
     "coverage": "echo Running coverage... && nyc --reporter=lcovonly --reporter=text-summary --reporter=text --extension=.ts npm run ts-mocha",
     "build": "echo Building JS files... && tsc",
     "docs": "echo Building documentation... && typedoc --ignoreCompilerErrors",
@@ -26,10 +27,10 @@
   "devDependencies": {
     "@types/js-yaml": "^3.12.1",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^12.0.7",
+    "@types/node": "^12.0.8",
     "@typescript-eslint/eslint-plugin": "^1.10.2",
     "@typescript-eslint/parser": "^1.10.2",
-    "coveralls": "^3.0.4",
+    "codecov": "^3.5.0",
     "eslint": "^5.16.0",
     "eslint-config-airbnb": "^17.1.0",
     "eslint-config-airbnb-base": "^13.1.0",
@@ -43,10 +44,10 @@
     "pre-commit": "^1.2.2",
     "prettier": "^1.18.2",
     "touch": "^3.1.0",
-    "ts-node": "^8.2.0",
+    "ts-node": "^8.3.0",
     "tslint": "^5.17.0",
     "typedoc": "^0.14.2",
-    "typescript": "^3.5.1"
+    "typescript": "^3.5.2"
   },
   "pre-commit": [
     "test"
