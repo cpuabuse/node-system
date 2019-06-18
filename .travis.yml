@@ -9,7 +9,7 @@ os:
 - windows
 jobs:
   include:
-  - stage: Post test
+  - stage: Deploy
     name: npm next release
     deploy:
       email: cpuabuse@gmail.com

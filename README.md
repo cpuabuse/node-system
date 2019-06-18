@@ -1,35 +1,28 @@
-[![Build Status](https://travis-ci.com/cpuabuse/node-system.svg?branch=master)](https://travis-ci.com/cpuabuse/node-system)
-[![npm version](https://badge.fury.io/js/cpuabuse-system.svg)](https://badge.fury.io/js/cpuabuse-system)
-[![Coverage Status](https://coveralls.io/repos/github/cpuabuse/node-system/badge.svg?branch=master)](https://coveralls.io/github/cpuabuse/node-system?branch=master)
-[![Maintainability](https://api.codeclimate.com/v1/badges/381bca0c5f71d32f23df/maintainability)](https://codeclimate.com/github/cpuabuse/node-system/maintainability)
-[![Inline docs](http://inch-ci.org/github/cpuabuse/node-system.svg?branch=master)](http://inch-ci.org/github/cpuabuse/node-system)
+[![travis](https://img.shields.io/travis/com/cpuabuse/node-system.svg)](https://travis-ci.com/cpuabuse/node-system)
+[![npm](https://img.shields.io/npm/v/cpuabuse-system.svg)](https://www.npmjs.com/package/cpuabuse-system)
+[![coverage](https://img.shields.io/codecov/c/github/cpuabuse/node-system.svg)](https://codecov.io/gh/cpuabuse/node-system)
+[![CodeFactor](https://www.codefactor.io/repository/github/cpuabuse/node-system/badge)](https://www.codefactor.io/repository/github/cpuabuse/node-system)
+[![dependecies](https://img.shields.io/librariesio/release/npm/cpuabuse-system.svg)](https://libraries.io/npm/cpuabuse-system)
+[![documentation](https://img.shields.io/badge/documentation-gh--pages-success.svg)](https://cpuabuse.github.io/node-system/)
+[![chat](https://img.shields.io/badge/chat-slack-success.svg)](https://join.slack.com/t/cpuabuse/shared_invite/enQtNjYzMjQ4NjY1MTUzLTZjMTY1M2NiYmZkNzBjMzI0YTQ4OGVjZDA1ODJkNjFiNDU1NDQwYjViMjBjODA1Y2Y4ZjNiYmUzODA2YWI3NDM)
 
 # About
 
-## Project
-
-![Framework Infrastructure](https://s3.ap-northeast-2.amazonaws.com/file.cpuabuse.com/public/boop/imageset/programming/site/2018-10-26/4927c8224eda0669accd97bc91766ad2.png)
+## Related projects
 
 - [cpuabuse-framework](https://github.com/cpuabuse/node-framework)
 - [cpuabuse-app](https://github.com/cpuabuse/node-app)
 - [cpuabuse-server](https://github.com/cpuabuse/node-server)
 - [cpuabuse-system](https://github.com/cpuabuse/node-system)
 
-## Tests Member Declaration
-
-Type | Selector
----|---
-static | `.`
-inner | `~`
-instance | `#`
-
-## Files & Data
-
-- Folders are treated as children of system root, while the files are treated as grandchildren.
-- Default file extension is added, if missing.
-- For empty value in key/value pair, value equal to key is assumed.
-- In absent key/value child pairs, default values for missing keys are assumed.
+## Description
 
 ## Structure
 
-![Structure](https://s3.ap-northeast-2.amazonaws.com/file.cpuabuse.com/public/boop/imageset/programming/site/2018-10-26/4d3f5711c3c47d3eb60a7c08281aa2a2.png)
+# How to
+
+## Installation
+
+## CLI
+
+## API
