@@ -385,6 +385,8 @@ export class System extends Loader {
 				);
 			}
 
+			let pushTest = 5;
+
 			// First things first, call a loader, if loader has failed, there are no tools to report gracefully, so the errors from there will just go above
 			super(options.rootDir, options.relativeInitDir, options.initFilename, (load: Promise<void>): void => {
 				load
