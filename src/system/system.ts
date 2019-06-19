@@ -9,7 +9,7 @@
 
 // Imports
 import * as events from "../events";
-import { Behavior, BehaviorInterface /* eslint-disable-line no-unused-vars */ } from "../behavior";
+import { Behavior, Behaviors, BehaviorInterface /* eslint-disable-line no-unused-vars */ } from "../behavior";
 import {
 	ISubsystem /* eslint-disable-line no-unused-vars */,
 	Subsystem /* eslint-disable-line no-unused-vars */,
@@ -25,7 +25,7 @@ import {
 import { SystemError } from "../error";
 
 // Re-export
-export { AtomicLock, checkOptionsFailure };
+export { AtomicLock, Behaviors, checkOptionsFailure };
 
 /** Temporary hold name for options subsystem, to be moved to file system subsystem. */
 const optionsSubsystem: string = "options";
@@ -44,6 +44,33 @@ export interface Reject {
 /** An interface to describe the promise executor. */
 export interface Executor {
 	(resolve: Resolve, reject: Reject): void;
+}
+
+/** An interface representing a single import durin subsystem initialization. */
+interface Import {
+	active: boolean;
+	depends: Array<string>;
+	fn: () => Promise<void>;
+}
+
+/** Arguments for [[importRecursion]] function. */
+interface ImportRecursionArgs {
+	/** Import to be processed. */
+	current: string;
+
+	/** Imports array. */
+	imports: Imports;
+
+	/** Actual promises to be filled. */
+	promises: Array<Promise<void>>;
+
+	/** Stack of dependencies up until now. */
+	stack: Array<string>;
+}
+
+/** An interface to be used for logic, when importaing subsystems. */
+interface Imports {
+	[key: string]: Import;
 }
 
 /** System options. */
@@ -240,21 +267,31 @@ interface LoaderProperty {
 
 /** Arguments for the system. */
 interface SystemArgs {
-	behaviors: Array<{ [key: string]: BehaviorInterface }> | null;
-	onError: ErrorCallback | null;
+	behaviors?: Array<{ [key: string]: BehaviorInterface }>;
+	onError?: ErrorCallback;
 	options: Options;
 }
 
 /** Checks that the data initialized by the loader is proper for the objects. */
-function isProperLoaderObject(object: { [key: string]: any }, property: string, type: string): boolean {
+function isProperLoaderObject(
+	object: { [key: string]: any },
+	property: string,
+	type: "object" | "string" | "arrayOfString"
+): boolean {
 	let proper: boolean = false;
 
 	if (Object.prototype.hasOwnProperty.call(object, property)) {
 		const objectProperty: any = object[property];
 		switch (type) {
-			case "array":
+			case "arrayOfString":
 				if (Array.isArray(objectProperty)) {
-					proper = true;
+					if (
+						objectProperty.reduce(function(accumulator: boolean, current: any): boolean {
+							return typeof current === "string" && accumulator;
+						}, true)
+					) {
+						proper = true;
+					}
 				}
 				break;
 
@@ -276,6 +313,38 @@ function isProperLoaderObject(object: { [key: string]: any }, property: string, 
 
 	// Return
 	return proper;
+}
+
+/** Performs import recursion for the subsystems. */
+function importRecursion({ stack, promises, imports, current }: ImportRecursionArgs): void {
+	// Check for circular dependency
+	if (stack.includes(current)) {
+		throw new LoaderError(
+			"subsystem_circular_depends",
+			"System cannot be initialized with subsystem circular dependencies."
+		);
+	}
+
+	// Add current to stack
+	stack.push(current);
+
+	// Process dependencies
+	if (!imports[current].active) {
+		imports[current].depends.forEach(function(next: string): void {
+			importRecursion({
+				current: next,
+				imports,
+				promises,
+				stack
+			});
+		});
+	}
+
+	// Start the import
+	promises.push(imports[current].fn());
+
+	// Mark this import as active
+	imports[current].active = true; /* eslint-disable-line no-param-reassign */ // We are using an argument as a pointer
 }
 
 /**
@@ -595,45 +664,65 @@ export class System extends Loader {
 						// The following is code dependent on full initialization by static system initializer and Loader.
 						// Initialize subsystems
 						if (isProperLoaderObject(this, "subsystems", "object")) {
+							// Assign subsystems shortcut reference
 							let subsystems: LoaderProperty = this.subsystems as LoaderProperty;
+
+							// Declare array to populate with actual promises for await
 							let promises: Array<Promise<void>> = new Array();
+
+							// Declare an array of functions to be mapped
+							let imports: Imports = new Object() as Imports;
+
+							// Loop through subsystems
 							/* eslint-disable-next-line no-restricted-syntax */
 							for (let subsystem in subsystems) {
 								if (isProperLoaderObject(subsystems, subsystem, "object")) {
 									let subsystemsProperty: LoaderProperty = subsystems[subsystem];
 									if (isProperLoaderObject(subsystemsProperty, "type", "string")) {
-										promises.push(
-											import(`../subsystem/${(subsystemsProperty.type as unknown) as string}`).then(
-												(subsystemModule: { default: ISubsystem }): void => {
-													let systemArgs: any = new Object();
-													if (isProperLoaderObject(subsystemsProperty, "args", "array")) {
-														if (((subsystemsProperty.args as unknown) as Array<any>).includes("system_args")) {
-															/* eslint-disable-next-line dot-notation */ /* tslint:disable-next-line no-string-literal */ // Parens are necessary
-															systemArgs["system_args"] = { behaviors, options };
+										imports[subsystem] = {
+											active: false,
+											depends: isProperLoaderObject(subsystems[subsystem], "depends", "arrayOfString")
+												? ((subsystems[subsystem].depends as unknown) as Array<string>)
+												: new Array(),
+											fn: (): Promise<void> =>
+												import(`../subsystem/${(subsystemsProperty.type as unknown) as string}`).then(
+													(subsystemModule: { default: ISubsystem }): void => {
+														let systemArgs: any = new Object();
+														if (isProperLoaderObject(subsystemsProperty, "args", "arrayOfString")) {
+															if (((subsystemsProperty.args as unknown) as Array<any>).includes("system_args")) {
+																/* eslint-disable-next-line dot-notation */ /* tslint:disable-next-line no-string-literal */ // Parens are necessary
+																systemArgs["system_args"] = {
+																	behaviors,
+																	options
+																};
+															}
 														}
+
+														// Initialize subsystem entrypoints
+														this.public.subsystem[subsystem] = new SubsystemEntrypoint();
+														this.protected.subsystem[subsystem] = new SubsystemEntrypoint();
+
+														// Initialize subsystem
+														this.private.subsystem[
+															subsystem
+															/* eslint-disable-next-line new-cap */ // It is an argument
+														] = new subsystemModule.default({
+															args: systemArgs,
+															protectedEntrypoint: this.protected.subsystem[subsystem],
+															publicEntrypoint: this.public.subsystem[subsystem],
+															system: this,
+															vars: subsystemsProperty.vars
+														});
 													}
-
-													// Initialize subsystem entrypoints
-													this.public.subsystem[subsystem] = new SubsystemEntrypoint();
-													this.protected.subsystem[subsystem] = new SubsystemEntrypoint();
-
-													// Initialize subsystem
-													this.private.subsystem[
-														subsystem
-														/* eslint-disable-next-line new-cap */ // It is an argument
-													] = new subsystemModule.default({
-														args: systemArgs,
-														protectedEntrypoint: this.protected.subsystem[subsystem],
-														publicEntrypoint: this.public.subsystem[subsystem],
-														system: this,
-														vars: subsystemsProperty.vars
-													});
-												}
-											)
-										);
+												)
+										};
 									}
 								}
 							}
+							Object.keys(imports).forEach(function(current: string): void {
+								importRecursion({ current, imports, promises, stack: new Array() });
+							});
+
 							await Promise.all(promises);
 						}
 						if (

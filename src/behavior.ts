@@ -35,6 +35,12 @@ type BehaviorIndex = {
 	[key: string]: Array<string>;
 };
 
+export interface Behaviors {
+	[index: number]: {
+		[key: string]: BehaviorInterface;
+	};
+}
+
 /** System behavior class. */
 export class Behavior extends EventEmitter {
 	/** Atomic lock to perform counter increments. */

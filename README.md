@@ -17,12 +17,36 @@
 
 ## Description
 
-## Structure
-
-# How to
+The system handles initialization of data structures using information from yaml files. System is split into multiple extendable modular subsystems, responsible for respective functionality such as file system, error handling, internal system logic, etc.
 
 ## Installation
 
-## CLI
-
 ## API
+
+### TypeScript
+
+```typescript
+// Import
+import {Behaviors, ErrorCallback, Options, System} from "cpuabuse-system";
+
+// Init options
+let options: Options = {
+  id: "my_system",
+  initFilename: "init",
+  logging: "off",
+  relativeInitDir: "my_system",
+  rootDir: "root"
+};
+
+// Init behaviors
+let behaviors: Behaviors = [
+  {
+    system_load() {
+      console.log("done");
+    }
+  }
+]
+
+// Create a system
+let mySystem: System = new System({options, behaviors, onError});
+```
