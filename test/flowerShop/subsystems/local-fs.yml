@@ -1,0 +1,6 @@
+type: system.file-system
+vars:
+  homepage: https://github.com/cpuabuse/node-system
+  a: b
+args:
+depends:
