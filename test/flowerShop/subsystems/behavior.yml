@@ -5,3 +5,4 @@ vars:
 args:
   - system_args
 depends:
+  - event

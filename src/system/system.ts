@@ -33,6 +33,9 @@ const optionsSubsystem: string = "options";
 /** Temporary hold behavior name. */
 const behaviorSubsystem: string = "behavior";
 
+/** Temporary hold event subsystem name. */
+const eventSubsystem: string = "event";
+
 /** An interface to describe the resolve argument of promise executor. */
 export interface Resolve {
 	(value?: void | PromiseLike<void> | undefined): void;
@@ -725,12 +728,7 @@ export class System extends Loader {
 
 							await Promise.all(promises);
 						}
-						if (
-							!(
-								Object.prototype.hasOwnProperty.call(this, "events") &&
-								Object.prototype.hasOwnProperty.call(this, "behaviors")
-							)
-						) {
+						if (!Object.prototype.hasOwnProperty.call(this, "behaviors")) {
 							// Make sure basic system carcass was initialized
 							throw new LoaderError("loader_fail", "Mandatory initialization files are missing.");
 						}
@@ -1010,13 +1008,13 @@ export class System extends Loader {
 			let event: { behavior?: boolean | undefined; error?: string | undefined; log?: string | undefined };
 
 			// Verify event exists
-			if (!Object.prototype.hasOwnProperty.call(this.events, name)) {
+			if (!Object.prototype.hasOwnProperty.call(this.private.subsystem[eventSubsystem].get.data, name)) {
 				// throw new system error
 				throw new SystemError(eventAbsent, "Could not fire an event that is not described.");
 			}
 
 			// Locate event
-			event = this.events[name];
+			event = this.private.subsystem[eventSubsystem].get.data[name];
 
 			// Assign the message, as it is technically optional
 			if (!message) {

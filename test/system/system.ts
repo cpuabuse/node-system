@@ -240,7 +240,7 @@ export function testSystem(): void {
 				rawInitFilename: "init.yml",
 				initYamlContents: expected.exampleYamlInit,
 				initContents: expected.exampleInit,
-				initDirFileAmount: 5,
+				initDirFileAmount: 4,
 				initDirFolderAmount: 1
 			},
 			{
@@ -271,7 +271,7 @@ export function testSystem(): void {
 				rawInitFilename: "init.yml",
 				initYamlContents: expected.exampleYamlInit,
 				initContents: expected.exampleInit,
-				initDirFileAmount: 5,
+				initDirFileAmount: 4,
 				initDirFolderAmount: 1,
 				constructorError: "system_options_failure"
 			},
@@ -287,7 +287,7 @@ export function testSystem(): void {
 				rawInitFilename: "init.yml",
 				initYamlContents: expected.flowerShopYamlInit,
 				initContents: expected.flowerShopInit,
-				initDirFileAmount: 7,
+				initDirFileAmount: 6,
 				initDirFolderAmount: 2,
 				error: {
 					errorInstances: ["all_flowers_gone"],
