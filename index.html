@@ -64,29 +64,49 @@
 	<div class="row">
 		<div class="col-8 col-content">
 			<div class="tsd-panel tsd-typography">
-				<p><a href="https://travis-ci.com/cpuabuse/node-system"><img src="https://travis-ci.com/cpuabuse/node-system.svg?branch=master" alt="Build Status"></a>
-					<a href="https://badge.fury.io/js/cpuabuse-system"><img src="https://badge.fury.io/js/cpuabuse-system.svg" alt="npm version"></a>
-					<a href="https://coveralls.io/github/cpuabuse/node-system?branch=master"><img src="https://coveralls.io/repos/github/cpuabuse/node-system/badge.svg?branch=master" alt="Coverage Status"></a>
-					<a href="https://codeclimate.com/github/cpuabuse/node-system/maintainability"><img src="https://api.codeclimate.com/v1/badges/381bca0c5f71d32f23df/maintainability" alt="Maintainability"></a>
-				<a href="http://inch-ci.org/github/cpuabuse/node-system"><img src="http://inch-ci.org/github/cpuabuse/node-system.svg?branch=master" alt="Inline docs"></a></p>
+				<p><a href="https://travis-ci.com/cpuabuse/node-system"><img src="https://img.shields.io/travis/com/cpuabuse/node-system.svg" alt="travis"></a>
+					<a href="https://www.npmjs.com/package/cpuabuse-system"><img src="https://img.shields.io/npm/v/cpuabuse-system.svg" alt="npm"></a>
+					<a href="https://codecov.io/gh/cpuabuse/node-system"><img src="https://img.shields.io/codecov/c/github/cpuabuse/node-system.svg" alt="coverage"></a>
+					<a href="https://www.codefactor.io/repository/github/cpuabuse/node-system"><img src="https://www.codefactor.io/repository/github/cpuabuse/node-system/badge" alt="CodeFactor"></a>
+					<a href="https://libraries.io/npm/cpuabuse-system"><img src="https://img.shields.io/librariesio/release/npm/cpuabuse-system.svg" alt="dependecies"></a>
+					<a href="https://cpuabuse.github.io/node-system/"><img src="https://img.shields.io/badge/documentation-gh--pages-success.svg" alt="documentation"></a>
+				<a href="https://join.slack.com/t/cpuabuse/shared_invite/enQtNjYzMjQ4NjY1MTUzLTZjMTY1M2NiYmZkNzBjMzI0YTQ4OGVjZDA1ODJkNjFiNDU1NDQwYjViMjBjODA1Y2Y4ZjNiYmUzODA2YWI3NDM"><img src="https://img.shields.io/badge/chat-slack-success.svg" alt="chat"></a></p>
 				<h1 id="about">About</h1>
-				<p><strong>Project</strong>
-				<img src="https://s3.ap-northeast-2.amazonaws.com/file.cpuabuse.com/public/boop/imageset/programming/site/2018-10-26/4927c8224eda0669accd97bc91766ad2.png" alt="Framework Infrastructure"></p>
+				<h2 id="related-projects">Related projects</h2>
 				<ul>
 					<li><a href="https://github.com/cpuabuse/node-framework">cpuabuse-framework</a></li>
 					<li><a href="https://github.com/cpuabuse/node-app">cpuabuse-app</a></li>
 					<li><a href="https://github.com/cpuabuse/node-server">cpuabuse-server</a></li>
 					<li><a href="https://github.com/cpuabuse/node-system">cpuabuse-system</a></li>
 				</ul>
-				<p><strong>Files &amp; Data</strong></p>
-				<ul>
-					<li>Folders are treated as children of system root, while the files are treated as grandchildren.</li>
-					<li>Default file extension is added, if missing.</li>
-					<li>For empty value in key/value pair, value equal to key is assumed.</li>
-					<li>In absent key/value child pairs, default values for missing keys are assumed.</li>
-				</ul>
-				<p><strong>Structure</strong></p>
-				<p><img src="https://s3.ap-northeast-2.amazonaws.com/file.cpuabuse.com/public/boop/imageset/programming/site/2018-10-26/4d3f5711c3c47d3eb60a7c08281aa2a2.png" alt="Structure"></p>
+				<h2 id="description">Description</h2>
+				<p>The system handles initialization of data structures using information from yaml files. System is split into multiple extendable modular subsystems, responsible for respective functionality such as file system, error handling, internal system logic, etc.</p>
+				<h2 id="installation">Installation</h2>
+				<h2 id="api">API</h2>
+				<h3 id="typescript">TypeScript</h3>
+				<pre><code class="language-typescript"><span class="hljs-comment">// Import</span>
+<span class="hljs-keyword">import</span> {Behaviors, ErrorCallback, Options, System} <span class="hljs-keyword">from</span> <span class="hljs-string">"cpuabuse-system"</span>;
+
+<span class="hljs-comment">// Init options</span>
+<span class="hljs-keyword">let</span> options: Options = {
+  id: <span class="hljs-string">"my_system"</span>,
+  initFilename: <span class="hljs-string">"init"</span>,
+  logging: <span class="hljs-string">"off"</span>,
+  relativeInitDir: <span class="hljs-string">"my_system"</span>,
+  rootDir: <span class="hljs-string">"root"</span>
+};
+
+<span class="hljs-comment">// Init behaviors</span>
+<span class="hljs-keyword">let</span> behaviors: Behaviors = [
+  {
+    system_load() {
+      <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"done"</span>);
+    }
+  }
+]
+
+<span class="hljs-comment">// Create a system</span>
+<span class="hljs-keyword">let</span> mySystem: System = <span class="hljs-keyword">new</span> System({options, behaviors, onError});</code></pre>
 			</div>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
@@ -94,9 +114,6 @@
 				<ul>
 					<li class="globals  ">
 						<a href="globals.html"><em>Globals</em></a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_src_atomic_.html">"src/atomic"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="modules/_src_behavior_.html">"src/behavior"</a>
@@ -123,25 +140,37 @@
 						<a href="modules/_src_meta_externals_.html">"src/meta/externals"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_src_subsystem_.html">"src/subsystem"</a>
+						<a href="modules/_src_subsystem_system_behavior_.html">"src/subsystem/system.behavior"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_src_subsystems_system_file_system_.html">"src/subsystems/system.file-<wbr>system"</a>
+						<a href="modules/_src_subsystem_system_file_system_.html">"src/subsystem/system.file-<wbr>system"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_src_subsystems_system_info_.html">"src/subsystems/system.info"</a>
+						<a href="modules/_src_subsystem_system_info_.html">"src/subsystem/system.info"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_src_subsystems_system_info_options_.html">"src/subsystems/system.info.options"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_src_system_.html">"src/system"</a>
+						<a href="modules/_src_subsystem_system_info_options_.html">"src/subsystem/system.info.options"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="modules/_src_system_file_.html">"src/system-<wbr>file"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_system_atomic_.html">"src/system/atomic"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_system_subsystem_.html">"src/system/subsystem"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_system_system_.html">"src/system/system"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
 						<a href="modules/_test_expected_.html">"test/expected"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_test_subsystem_system_info_options_.html">"test/subsystem/system.info.options"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_test_system_system_.html">"test/system/system"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="modules/_test_test_.html">"test/test"</a>
@@ -154,9 +183,6 @@
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="modules/_test_test_loader_.html">"test/test-<wbr>loader"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_test_test_system_.html">"test/test-<wbr>system"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="modules/_test_test_vars_.html">"test/test-<wbr>vars"</a>
