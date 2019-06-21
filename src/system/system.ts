@@ -64,9 +64,6 @@ interface ImportRecursionArgs {
 	/** Imports array. */
 	imports: Imports;
 
-	/** Actual promises to be filled. */
-	promises: Array<Promise<void>>;
-
 	/** Stack of dependencies up until now. */
 	stack: Array<string>;
 }
@@ -319,7 +316,7 @@ function isProperLoaderObject(
 }
 
 /** Performs import recursion for the subsystems. */
-function importRecursion({ stack, promises, imports, current }: ImportRecursionArgs): void {
+async function importRecursion({ stack, imports, current }: ImportRecursionArgs): Promise<void> {
 	// Check for circular dependency
 	if (stack.includes(current)) {
 		throw new LoaderError(
@@ -328,26 +325,28 @@ function importRecursion({ stack, promises, imports, current }: ImportRecursionA
 		);
 	}
 
-	// Add current to stack
-	stack.push(current);
-
 	// Process dependencies
 	if (!imports[current].active) {
-		imports[current].depends.forEach(function(next: string): void {
-			importRecursion({
-				current: next,
-				imports,
-				promises,
-				stack
-			});
-		});
+		// Add current to stack
+		stack.push(current);
+
+		// Await
+		await Promise.all(
+			imports[current].depends.map(function(next: string): Promise<void> {
+				return importRecursion({
+					current: next,
+					imports,
+					stack: [...stack]
+				});
+			})
+		);
+
+		// Start the import
+		await imports[current].fn();
+
+		// Mark this import as active
+		imports[current].active = true; /* eslint-disable-line no-param-reassign */ // We are using an argument as a pointer
 	}
-
-	// Start the import
-	promises.push(imports[current].fn());
-
-	// Mark this import as active
-	imports[current].active = true; /* eslint-disable-line no-param-reassign */ // We are using an argument as a pointer
 }
 
 /**
@@ -513,7 +512,7 @@ export class System extends Loader {
 												try {
 													return await Loader.getFile(this.private.subsystem[optionsSubsystem].get.rootDir, dir, file);
 												} catch (error) {
-													// TODO: this.fire("fileprivate_error");
+													// TODO: this.private.subsystem[behaviorSubsystem].call.fire("fileprivate_error");
 													throw this.private.error.file_system_error;
 												}
 											})();
@@ -670,9 +669,6 @@ export class System extends Loader {
 							// Assign subsystems shortcut reference
 							let subsystems: LoaderProperty = this.subsystems as LoaderProperty;
 
-							// Declare array to populate with actual promises for await
-							let promises: Array<Promise<void>> = new Array();
-
 							// Declare an array of functions to be mapped
 							let imports: Imports = new Object() as Imports;
 
@@ -722,11 +718,11 @@ export class System extends Loader {
 									}
 								}
 							}
-							Object.keys(imports).forEach(function(current: string): void {
-								importRecursion({ current, imports, promises, stack: new Array() });
-							});
-
-							await Promise.all(promises);
+							await Promise.all(
+								Object.keys(imports).map(function(current: string): Promise<void> {
+									return importRecursion({ current, imports, stack: new Array() });
+								})
+							);
 						}
 						if (!Object.prototype.hasOwnProperty.call(this, "behaviors")) {
 							// Make sure basic system carcass was initialized
@@ -754,17 +750,18 @@ export class System extends Loader {
 								}
 							});
 						}
-						// Initialize the behaviors; If behaviors not provided as argument, it is OK; Not immediate, since the load.then() code will execute after the instance finish initializing.
-						if (behaviors) {
-							this.addBehaviors(behaviors).then(() =>
-								this.fire(events.systemLoad, "Behaviors initialized during system loading.")
-							);
-						} else {
-							this.fire(events.systemLoad, "System loading complete.");
-						}
 					})
+					.then(() =>
+						// Add the behaviors
+						this.private.subsystem[behaviorSubsystem].call.addBehaviors(behaviors)
+					)
+					.then(() =>
+						this.private.subsystem[behaviorSubsystem].call.fire(
+							events.systemLoad,
+							"Behaviors initialized during system loading."
+						)
+					)
 					.catch(function(error: Error | LoaderError): void {
-						console.log(error);
 						// Errors returned from load or staticInitializationPromise
 						processLoaderError(
 							error instanceof LoaderError
@@ -814,96 +811,6 @@ export class System extends Loader {
 	}
 
 	/**
-	 * Adds behaviors to the system, and fires post-addtion events.
-	 * Firstly, this function attempts to add the behaviors.
-	 * When the behavior addition has been processed, the function will attempt to fire post-addition events, depending on success/failure of behavior additions.
-	 * @instance
-	 * @param {module:system.private~behavior[]} behaviors
-	 * @fires module:system.private#events#behaviorAttach
-	 * @fires module:system.private#events#behaviorAttachFail
-	 * @fires module:system.private#events#behaviorAttachRequestFail
-	 * @example <caption>Usage</caption>
-	 * var options = {
-	 *   id: "lab_inventory",
-	 *   rootDir: "labs",
-	 *   relativeInitDir: "black_mesa",
-	 *   initFilename: "inventory.yml",
-	 *   logging: console
-	 * };
-	 * var behavior = {
-	 *   "check_inventory": () => {
-	 *     // Behavior functionality
-	 *     // ...
-	 *   }
-	 * }
-	 *
-	 * var labInventory = new System(options);
-	 * labInventory.addBehaviors([behavior]).then(function(){
-	 *   console.log("Behavior added.");
-	 * });
-	 */
-	private async addBehaviors(behaviors: Array<{ [key: string]: BehaviorInterface }>): Promise<void> {
-		if (Array.isArray(behaviors)) {
-			// Sanity check - is an array
-			if (behaviors.length > 0) {
-				// Sanity check - is not empty
-				// Loop - attachment
-				await Promise.all(
-					behaviors
-						.map((element: { [key: string]: BehaviorInterface }): {
-							behaviorAdded: Promise<string> | null;
-							key: string;
-						} | null => {
-							if (typeof element === "object") {
-								let properties: Array<string> = Object.getOwnPropertyNames(element);
-								if (properties.length === 1) {
-									let [key]: Array<string> = properties;
-									let value: BehaviorInterface = element[key];
-									if (typeof key === "string") {
-										if (key.length > 0 && typeof value === "function") {
-											return {
-												behaviorAdded: this.private.behavior.addBehavior(key, () => value(this)),
-												key
-											};
-										}
-										return {
-											behaviorAdded: null,
-											key
-										};
-									}
-								}
-							}
-							return null;
-						})
-						.map(
-							(element: { behaviorAdded: Promise<string> | null; key: string } | null): Promise<string | void> => {
-								// Loop - post-attachment event fire
-								if (element === null) {
-									this.fire(events.behaviorAttachFail, "Behavior could not be added.");
-									return Promise.resolve();
-								}
-								if (element.behaviorAdded) {
-									this.fire(events.behaviorAttach, element.key);
-									return element.behaviorAdded;
-								}
-
-								// Behavior not added
-								this.fire(events.behaviorAttachRequestFail, "Event not described.");
-								return Promise.resolve();
-							}
-						)
-				);
-
-				// Terminate if successfully processed arrays
-				return;
-			}
-		}
-
-		// Behaviors not an array || empty array
-		this.fire(events.behaviorAttachRequestFail, "Incorrect request.");
-	} // <== addBehaviors
-
-	/**
 	 * Adds an error to the System dynamically
 	 * @instance
 	 * @param {string} code Error code
@@ -926,7 +833,7 @@ export class System extends Loader {
 	private addError(code: string, message: string): void {
 		if (Object.prototype.hasOwnProperty.call(this.private.error, code)) {
 			// Fire an error event that error already exists
-			this.fire(events.errorExists, "Error to be added already exists.");
+			this.private.subsystem[behaviorSubsystem].call.fire(events.errorExists, "Error to be added already exists.");
 		} else {
 			this.private.error[code] = new SystemError(code, message);
 		}
@@ -946,13 +853,13 @@ export class System extends Loader {
 	 *   // ...
 	 * }
 	 */
-	private behave(event: string): void {
+	public behave(event: string): void {
 		try {
 			this.log(`Behavior - ${this.behaviors[event].text}`);
 		} catch (error) {
 			this.log(`Behavior - Undocumented behavior - ${event}`);
 		}
-		this.private.behavior.behave(event);
+		this.private.subsystem[behaviorSubsystem].call.behave(event);
 	}
 
 	/**
@@ -973,88 +880,11 @@ export class System extends Loader {
 	 * var labInventory = new System(options);
 	 * labInventory.error(text);
 	 */
-	private error(text: string): void {
+	public error(text: string): void {
 		if (this.private.subsystem[optionsSubsystem].get.logging === "console") {
 			System.error(`${this.private.subsystem[optionsSubsystem].get.id}: ${text}`);
 		}
 	} // <== error
-
-	/**
-	 * Fires a system event
-	 * @instance
-	 * @param {string} name - Event name, as specified in {@link module:system.private#events}.
-	 * @param {string=} message - [Optional] Message is not strictly required, but preferred. If not specified, will assume value of the name
-	 * @throws {external:Error} Will throw `error_hell`. The inability to process error - if {@link module:system.private#events#event:eventFail} event fails.
-	 * @fires module:system.private#events#eventFail
-	 * @example <caption>Usage</caption>
-	 * var options = {
-	 *   id: "lab_inventory",
-	 *   rootDir: "labs",
-	 *   relativeInitDir: "black_mesa",
-	 *   initFilename: "inventory.yml",
-	 *   logging: "console"
-	 * };
-	 *
-	 * var labInventory = new System(options);
-	 * labInventory.fire("system_load_aux", "Auxiliary system loaded.");
-	 */
-	public fire(name: string, message: string): void {
-		const eventAbsent: string = "event_absent";
-		const errorHell: string = "error_hell";
-
-		let msg: string = message;
-
-		try {
-			let event: { behavior?: boolean | undefined; error?: string | undefined; log?: string | undefined };
-
-			// Verify event exists
-			if (!Object.prototype.hasOwnProperty.call(this.private.subsystem[eventSubsystem].get.data, name)) {
-				// throw new system error
-				throw new SystemError(eventAbsent, "Could not fire an event that is not described.");
-			}
-
-			// Locate event
-			event = this.private.subsystem[eventSubsystem].get.data[name];
-
-			// Assign the message, as it is technically optional
-			if (!message) {
-				msg = name;
-			}
-
-			// Log
-			if (event.log) {
-				this.log(`${event.log} - ${msg}`);
-			}
-
-			// Error
-			if (event.error) {
-				this.error(`${name} - ${msg}`);
-			}
-
-			// Behavior
-			if (event.behavior) {
-				this.behave(name);
-			}
-			// Callback
-		} catch (error) {
-			let noFail: boolean = true;
-			if (name === events.eventFail) {
-				noFail = false;
-			}
-			if (name === eventAbsent) {
-				if (SystemError.isSystemError(error)) {
-					if (error.code === eventAbsent) {
-						noFail = false;
-					}
-				}
-			}
-			if (noFail) {
-				this.fire(events.eventFail, "Event has failed");
-			} else {
-				throw errorHell;
-			}
-		}
-	} // <== fire
 
 	/**
 	 * Log message from the System context
@@ -1074,7 +904,7 @@ export class System extends Loader {
 	 * var labInventory = new System(options);
 	 * labInventory.log(text);
 	 */
-	private log(text: string): void {
+	public log(text: string): void {
 		if (this.private.subsystem[optionsSubsystem].get.logging === "console") {
 			System.log(`${this.private.subsystem[optionsSubsystem].get.id}: ${text}`);
 		}
@@ -1102,6 +932,6 @@ export class System extends Loader {
 	private on(event: string, callback: (system: System) => void): void {
 		let behavior: { [key: string]: BehaviorInterface } = new Object() as { [key: string]: BehaviorInterface };
 		behavior[event] = (): void => callback(this);
-		this.addBehaviors([behavior]);
+		this.private.subsystem[behaviorSubsystem].call.addBehaviors([behavior]);
 	}
 }

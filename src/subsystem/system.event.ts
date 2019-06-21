@@ -20,7 +20,7 @@ export default class Event extends Subsystem {
 		// Prepare the date
 		let data: Array<Data> = [
 			{
-				access: Access.private | Access.protected,
+				access: Access.private | Access.protected | Access.public,
 				name: "data",
 				obj: vars.data
 			}

@@ -209,9 +209,8 @@ export function testSystem(): void {
 								}
 							}
 						],
-						onError(error: loaderError.LoaderError): void {
+						onError(): void {
 							done();
-							throw error;
 						}
 					});
 				});
@@ -580,7 +579,11 @@ export function testSystem(): void {
 						 */
 						describe(".fire()", function() {
 							it("should not produce an error, if fired with a name that does not exist", function() {
-								systemTest.fire("name_does_not_exist", "An event that does not exist has been fired.");
+								// TODO: Move to behavior subsystem
+								systemTest.public.subsystem.behavior.call.fire(
+									"name_does_not_exist",
+									"An event that does not exist has been fired."
+								);
 							});
 						});
 
@@ -593,7 +596,7 @@ export function testSystem(): void {
 								 */
 								describe(".addBehaviors()", function() {
 									before(function(done) {
-										systemTest
+										systemTest.public.subsystem.behavior.call
 											.addBehaviors([
 												{
 													behavior_attach_request_fail() {
@@ -610,13 +613,13 @@ export function testSystem(): void {
 										systemTest.done = function() {
 											done();
 										};
-										systemTest.addBehaviors("not_a_behavior");
+										systemTest.public.subsystem.behavior.call.addBehaviors("not_a_behavior");
 									});
 									it("should fire behavior_attach_request_fail with an empty array as an argument", function(done) {
 										systemTest.done = function() {
 											done();
 										};
-										systemTest.addBehaviors([]);
+										systemTest.public.subsystem.behavior.call.addBehaviors([]);
 									});
 								});
 							}
@@ -698,7 +701,3 @@ export function testSystem(): void {
 		});
 	});
 }
-
-module.exports = {
-	testSystem
-};

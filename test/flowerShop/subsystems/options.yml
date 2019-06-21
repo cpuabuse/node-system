@@ -4,4 +4,3 @@ vars:
 args:
   - system_args
 depends:
-  - behavior
