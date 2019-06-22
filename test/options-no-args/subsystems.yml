@@ -7,3 +7,6 @@ system.info.options-no-args:
 behavior:
   folder: subsystems
   path: relative
+event:
+  folder: subsystems
+  path: relative

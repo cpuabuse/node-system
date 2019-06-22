@@ -4,3 +4,6 @@ options:
 behavior:
   folder: subsystems
   path: relative
+event:
+  folder: subsystems
+  path: relative

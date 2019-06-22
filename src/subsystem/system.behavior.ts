@@ -9,6 +9,7 @@
 
 import { EventEmitter } from "events";
 import { AtomicLock } from "../system/atomic";
+import { behaviorAttachFail, behaviorAttachRequestFail, behaviorAttach, systemLoad } from "../system/event-list";
 import { LoaderError } from "../loaderError";
 import {
 	Access,
@@ -16,6 +17,7 @@ import {
 	SubsystemExtensionArgs as Args /* eslint-disable-line no-unused-vars */ // ESLint bug
 } from "../system/subsystem";
 import { System } from "../system/system"; /* eslint-disable-line no-unused-vars */ // ESLint bug
+import { SystemError } from "../error";
 
 /** Behavior creation error, returned by [[Behavior.addBehavior]]. */
 export const behaviorCreationError: string = "behavior_creation_error";
@@ -103,6 +105,100 @@ async function addBehavior(this: Behavior, name: string, callback: BehaviorInter
 }
 
 /**
+ * Adds behaviors to the system, and fires post-addtion events.
+ * Firstly, this function attempts to add the behaviors.
+ * When the behavior addition has been processed, the function will attempt to fire post-addition events, depending on success/failure of behavior additions.
+ * @instance
+ * @param behaviors Behaviors
+ * // TODO: Events
+ * @fires module:system.private#events#behaviorAttach
+ * @fires module:system.private#events#behaviorAttachFail
+ * @fires module:system.private#events#behaviorAttachRequestFail
+ * **Usage**
+ *
+ * ```typescript
+ * var options = {
+ *   id: "lab_inventory",
+ *   rootDir: "labs",
+ *   relativeInitDir: "black_mesa",
+ *   initFilename: "inventory.yml",
+ *   logging: console
+ * };
+ * var behavior = {
+ *   "check_inventory": () => {
+ *     // Behavior functionality
+ *     // ...
+ *   }
+ * }
+ *
+ * var labInventory = new System(options);
+ * labInventory.addBehaviors([behavior]).then(function(){
+ *   console.log("Behavior added.");
+ * });
+ * ```
+ */
+async function addBehaviors(this: Behavior, behaviors: Array<BehaviorInterface>): Promise<void> {
+	if (Array.isArray(behaviors)) {
+		// Sanity check - is an array
+		if (behaviors.length > 0) {
+			// Sanity check - is not empty
+			// Loop - attachment
+			await Promise.all(
+				behaviors
+					.map((element: BehaviorInterface): {
+						behaviorAdded: Promise<string> | null;
+						key: string;
+					} | null => {
+						if (typeof element === "object") {
+							let properties: Array<string> = Object.getOwnPropertyNames(element);
+							if (properties.length === 1) {
+								let [key]: Array<string> = properties;
+								let value: BehaviorInterfaceCallback = element[key];
+								if (typeof key === "string") {
+									if (key.length > 0 && typeof value === "function") {
+										return {
+											behaviorAdded: this.private.call.addBehavior(key, () => value(this.system)),
+											key
+										};
+									}
+									return {
+										behaviorAdded: null,
+										key
+									};
+								}
+							}
+						}
+						return null;
+					})
+					.map(
+						(element: { behaviorAdded: Promise<string> | null; key: string } | null): Promise<string | void> => {
+							// Loop - post-attachment event fire
+							if (element === null) {
+								this.private.call.fire(behaviorAttachFail, "Behavior could not be added.");
+								return Promise.resolve();
+							}
+							if (element.behaviorAdded) {
+								this.private.call.fire(behaviorAttach, element.key);
+								return element.behaviorAdded;
+							}
+
+							// Behavior not added
+							this.private.call.fire(behaviorAttachRequestFail, "Event not described.");
+							return Promise.resolve();
+						}
+					)
+			);
+
+			// Terminate if successfully processed arrays
+			return;
+		}
+	}
+
+	// Behaviors not an array || empty array
+	this.private.call.fire(behaviorAttachRequestFail, "Incorrect request.");
+} // <== addBehaviors
+
+/**
  * Triggers behaviors registered for name.
  *
  * **Usage**
@@ -134,6 +230,86 @@ function behave(this: Behavior, name: string): void {
 	}
 }
 
+/**
+ * Fires a system event
+ * @param name - Event name, as specified in {@link module:system.private#events}.
+ * @param message - Message is not strictly required, but preferred. If not specified, will assume value of the name
+ * // TODO: @event module:system.private#events#eventFail
+ * // TODO: **Throws** {external:Error} Will throw `error_hell`. The inability to process error - if {@link module:system.private#events#event:eventFail} event fails.
+ *
+ * **Usage**
+ *
+ * ```typescript
+ * var options = {
+ *   id: "lab_inventory",
+ *   rootDir: "labs",
+ *   relativeInitDir: "black_mesa",
+ *   initFilename: "inventory.yml",
+ *   logging: "console"
+ * };
+ *
+ * var labInventory = new System(options);
+ * labInventory.fire("system_load_aux", "Auxiliary system loaded.");
+ * ```
+ */
+function fire(this: Behavior, name: string, message?: string): void {
+	const eventSubsystem: string = "event";
+
+	const eventAbsent: string = "event_absent";
+	const errorHell: string = "error_hell";
+
+	let msg: string;
+
+	try {
+		let event: { behavior?: boolean; error?: string; log?: string };
+
+		// Verify event exists
+		if (!Object.prototype.hasOwnProperty.call(this.system.public.subsystem[eventSubsystem].get.data, name)) {
+			// throw new system error
+			throw new SystemError(eventAbsent, "Could not fire an event that is not described.");
+		}
+
+		// Locate event
+		event = this.system.public.subsystem[eventSubsystem].get.data[name];
+
+		// Assign the message
+		msg = message === undefined ? name : message;
+
+		// Log
+		if (event.log) {
+			this.system.log(`${event.log} - ${msg}`);
+		}
+
+		// Error
+		if (event.error) {
+			this.system.error(`${name} - ${msg}`);
+		}
+
+		// Behavior
+		if (event.behavior) {
+			this.system.behave(name);
+		}
+		// Callback
+	} catch (error) {
+		let noFail: boolean = true;
+		if (name === "event_fail") {
+			noFail = false;
+		}
+		if (name === eventAbsent) {
+			if (SystemError.isSystemError(error)) {
+				if (error.code === eventAbsent) {
+					noFail = false;
+				}
+			}
+		}
+		if (noFail) {
+			this.private.call.fire("event_fail", "Event has failed");
+		} else {
+			throw errorHell;
+		}
+	}
+} // <== fire
+
 /** System behavior class. */
 export default class Behavior extends Subsystem {
 	/** Atomic lock to perform counter increments. */
@@ -153,7 +329,7 @@ export default class Behavior extends Subsystem {
 
 	/** Initializes system behavior. */
 	// @ts-ignore tsc does not see inevitability of super()
-	constructor({ system, args, protectedEntrypoint, publicEntrypoint }: Args) {
+	constructor({ system, args, protectedEntrypoint, publicEntrypoint, vars }: Args) {
 		// Call superclass's constructor
 		super({ protectedEntrypoint, publicEntrypoint, system });
 
@@ -167,16 +343,31 @@ export default class Behavior extends Subsystem {
 					name: "addBehavior"
 				},
 				{
+					access: Access.private | Access.protected | Access.public,
+					fn: addBehaviors,
+					name: "addBehaviors"
+				},
+				{
 					access: Access.private | Access.protected,
 					fn: behave,
 					name: "behave"
+				},
+				{
+					access: Access.private | Access.protected | Access.public,
+					fn: fire,
+					name: "fire"
 				}
 			]);
 
-			// TODO: Mimic add bevaviors
-			// Add the behaviors
-			if (args.system_args.behaviors !== undefined) {
-				protectedEntrypoint.call.addBehavior(args.system_args.behaviors);
+			// Add the data
+			if (Object.prototype.hasOwnProperty.call(vars, "data")) {
+				this.addData([
+					{
+						access: Access.private | Access.protected | Access.public,
+						name: "data",
+						obj: vars.data
+					}
+				]);
 			}
 		} else {
 			// Report an error

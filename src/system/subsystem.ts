@@ -52,7 +52,7 @@ export interface SubsystemArgs {
 
 /** Defines how data is added to the subsystem. */
 export interface SubsystemData {
-	/**  */
+	/** What access the data should have.  */
 	access: Access;
 
 	/** Name of the data. */
@@ -149,7 +149,6 @@ export class Subsystem extends SubsystemEntrypoint {
 
 		// Initialize public entrypoint
 		this.public = publicEntrypoint;
-		this.public.get = this.get;
 
 		// Initialize protected entrypoint
 		this.protected = protectedEntrypoint;

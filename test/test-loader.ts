@@ -163,7 +163,7 @@ export function testLoader(): void {
 			{
 				dir: "flowerShop",
 				file: "init",
-				filesAndFoldersAmount: 9,
+				filesAndFoldersAmount: 7,
 				greatGrandChildrenCompare: [
 					{
 						child: "branch",
@@ -204,7 +204,7 @@ export function testLoader(): void {
 			{
 				dir: "example",
 				file: "init",
-				filesAndFoldersAmount: 6,
+				filesAndFoldersAmount: 4,
 				name: "Example",
 				rawFilename: "init.yml",
 				rootDir: "test"
