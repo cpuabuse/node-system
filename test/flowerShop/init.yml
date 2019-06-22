@@ -3,7 +3,6 @@ data:
   path: relative
   folder: data
   extend: false
-behaviors:
 errors:
 branch:
   extend: true

@@ -1,4 +1,3 @@
-behaviors:
 errors:
 subsystems:
   extend: true

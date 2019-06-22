@@ -12,7 +12,6 @@ export const flowerShopInit: string = `data:
   path: relative
   folder: data
   extend: false
-behaviors:
 errors:
 branch:
   extend: true
@@ -20,7 +19,6 @@ subsystems:
   extend: true
 `;
 export const flowerShopYamlInit: any = {
-	behaviors: null,
 	branch: {
 		extend: true
 	},
@@ -35,13 +33,11 @@ export const flowerShopYamlInit: any = {
 		extend: true
 	}
 };
-export const exampleInit: string = `behaviors:
-errors:
+export const exampleInit: string = `errors:
 subsystems:
   extend: true
 `;
 export const exampleYamlInit: any = {
-	behaviors: null,
 	errors: null,
 	subsystems: {
 		extend: true

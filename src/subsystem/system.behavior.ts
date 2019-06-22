@@ -329,7 +329,7 @@ export default class Behavior extends Subsystem {
 
 	/** Initializes system behavior. */
 	// @ts-ignore tsc does not see inevitability of super()
-	constructor({ system, args, protectedEntrypoint, publicEntrypoint }: Args) {
+	constructor({ system, args, protectedEntrypoint, publicEntrypoint, vars }: Args) {
 		// Call superclass's constructor
 		super({ protectedEntrypoint, publicEntrypoint, system });
 
@@ -358,6 +358,17 @@ export default class Behavior extends Subsystem {
 					name: "fire"
 				}
 			]);
+
+			// Add the data
+			if (Object.prototype.hasOwnProperty.call(vars, "data")) {
+				this.addData([
+					{
+						access: Access.private | Access.protected | Access.public,
+						name: "data",
+						obj: vars.data
+					}
+				]);
+			}
 		} else {
 			// Report an error
 			throw new LoaderError(

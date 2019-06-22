@@ -372,34 +372,11 @@ export class System extends Loader {
 		};
 	};
 
-	private readonly behaviors!: {
-		[key: string]: {
-			text: string;
-		};
-	};
-
 	/** Error list. */
 	private readonly errors!: {
 		[key: string]: {
 			/** Error message. */
 			message?: string;
-		};
-	};
-
-	/**
-	 * Events to be populated by the loader.
-	 * System by itself does not deal with events, it only confirms that the events were initialized. Although, if the events are fired, and failure to fire event is set to throw, or undocumented events encountered, it would throw errors.
-	 */
-	private readonly events!: {
-		[key: string]: {
-			/** Behavior present? */
-			behavior: boolean;
-
-			/** Report an error? */
-			error: string;
-
-			/** Log it? */
-			log: string;
 		};
 	};
 
@@ -718,18 +695,15 @@ export class System extends Loader {
 									}
 								}
 							}
+							// Await for subsystem load
 							await Promise.all(
 								Object.keys(imports).map(function(current: string): Promise<void> {
 									return importRecursion({ current, imports, stack: new Array() });
 								})
 							);
 						}
-						if (!Object.prototype.hasOwnProperty.call(this, "behaviors")) {
-							// Make sure basic system carcass was initialized
-							throw new LoaderError("loader_fail", "Mandatory initialization files are missing.");
-						}
 
-						// Initialize the events
+						// Initialize the errors
 						if (isProperLoaderObject(this, "errors", "object")) {
 							Object.keys(this.errors as object).forEach((err: string): void => {
 								// Will skip garbled errors
@@ -855,7 +829,7 @@ export class System extends Loader {
 	 */
 	public behave(event: string): void {
 		try {
-			this.log(`Behavior - ${this.behaviors[event].text}`);
+			this.log(`Behavior - ${this.private.subsystem[behaviorSubsystem].get.data[event].text}`);
 		} catch (error) {
 			this.log(`Behavior - Undocumented behavior - ${event}`);
 		}

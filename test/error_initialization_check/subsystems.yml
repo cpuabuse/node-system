@@ -1,9 +1,3 @@
 options:
   folder: subsystems
   path: relative
-behavior:
-  folder: subsystems
-  path: relative
-event:
-  folder: subsystems
-  path: relative

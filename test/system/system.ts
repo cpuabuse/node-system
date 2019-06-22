@@ -137,7 +137,7 @@ export function testSystem(): void {
 								throw err;
 							},
 							function(error: any) {
-								return error instanceof loaderError.LoaderError && error.code === "loader_fail";
+								return error instanceof loaderError.LoaderError && error.code === "functionality_error";
 							}
 						);
 						done();
@@ -239,7 +239,7 @@ export function testSystem(): void {
 				rawInitFilename: "init.yml",
 				initYamlContents: expected.exampleYamlInit,
 				initContents: expected.exampleInit,
-				initDirFileAmount: 4,
+				initDirFileAmount: 3,
 				initDirFolderAmount: 1
 			},
 			{
@@ -286,7 +286,7 @@ export function testSystem(): void {
 				rawInitFilename: "init.yml",
 				initYamlContents: expected.flowerShopYamlInit,
 				initContents: expected.flowerShopInit,
-				initDirFileAmount: 6,
+				initDirFileAmount: 5,
 				initDirFolderAmount: 2,
 				error: {
 					errorInstances: ["all_flowers_gone"],

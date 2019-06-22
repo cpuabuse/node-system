@@ -1,7 +1,9 @@
 type: system.behavior
 vars:
   homepage: https://github.com/cpuabuse/node-system
-  a: b
+  data:
+    system_load:
+      text: xxx
 args:
   - system_args
 depends:
