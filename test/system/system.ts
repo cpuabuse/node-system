@@ -25,7 +25,11 @@ import * as systemError from "../../src/error";
 import * as loaderError from "../../src/loaderError";
 import * as expected from "../expected";
 
-const nonExistentFileOrDir = "Non-existent file or directory";
+/** Non-existent file or directory. */
+const nonExistentFileOrDir: string = "Non-existent file or directory";
+
+/** Number of retries. */
+const retries: number = 3;
 
 /** System test unit initialization data. */
 export interface SystemTest {
@@ -79,8 +83,9 @@ export function testSystem(): void {
 		 * @function constructor
 		 * @memberof module:system~test.System
 		 */
-		describe("constructor", function() {
-			it("should still execute with inappropriate options and no ways to report an error", function() {
+		describe("constructor", function(): void {
+			it("should still execute with inappropriate options and no ways to report an error", function(): void {
+				/* eslint-disable-next-line no-new */ /* tslint:disable-next-line no-unused-expression */ // "new System" is only used for side-effects of testing
 				new System({} as {
 					behaviors: Array<{
 						[key: string]: {
@@ -89,13 +94,14 @@ export function testSystem(): void {
 					}> | null;
 					onError: ErrorCallback | null;
 					options: Options;
-				}); /* eslint-disable-line no-new */ // "new System" is only used for side-effects of testing
+				});
 			});
-			it("should execute with inappropriate options and error reporting not being a function", function() {
+			it("should execute with inappropriate options and error reporting not being a function", function(): void {
+				/* eslint-disable-next-line no-new */ /* tslint:disable-next-line no-unused-expression */ // "new System" is only used for side-effects of testing
 				new System({
-					options: (null as unknown) as Options,
 					behaviors: null,
-					onError: ("notFunction" as unknown) as ErrorCallback
+					onError: ("notFunction" as unknown) as ErrorCallback,
+					options: (null as unknown) as Options
 				} as {
 					behaviors: Array<{
 						[key: string]: {
@@ -104,69 +110,65 @@ export function testSystem(): void {
 					}> | null;
 					onError: ErrorCallback | null;
 					options: Options;
-				}); /* eslint-disable-line no-new */ // "new System" is only used for side-effects of testing
+				});
 			});
-			it("should fail with inappropriate options", function(done) {
+			it("should fail with inappropriate options", function(done: () => void): void {
+				/* eslint-disable-next-line no-new */ /* tslint:disable-next-line no-unused-expression */ // "new System" is only used for side-effects of testing
 				new System({
-					options: (null as unknown) as Options,
 					behaviors: null,
-					onError: function(error: any) {
-						/* eslint-disable-line no-new */ // "new System" is only used for side-effects of testing
+					onError(error: any): void {
 						assert.strictEqual(error.code, "system_options_failure");
 						assert.strictEqual(error.message, "The options provided to the system constructor are inconsistent.");
 						done();
-					}
+					},
+					options: (null as unknown) as Options
 				});
 			});
-			it("should fail with no events or behaviors files", function(done: any) {
-				let options = {
-					id: "cities",
-					rootDir: "test",
-					relativeInitDir: "cities",
-					initFilename: "init",
-					logging: "off"
-				};
-
+			it("should fail with no events or behaviors files", function(done: any): void {
+				/* eslint-disable-next-line no-new */ /* tslint:disable-next-line no-unused-expression */ // "new System" is only used for side-effects of testing
 				new System({
-					options: options,
 					behaviors: null,
-					onError: function(err: any) {
-						/* eslint-disable-line no-new */ // "new System" is only used for side-effects of testing
+					onError(err: any): void {
 						assert.throws(
-							function() {
+							function(): void {
 								throw err;
 							},
-							function(error: any) {
+							function(error: any): boolean {
 								return error instanceof loaderError.LoaderError && error.code === "functionality_error";
 							}
 						);
 						done();
+					},
+					options: {
+						id: "cities",
+						initFilename: "init",
+						logging: "off",
+						relativeInitDir: "cities",
+						rootDir: "test"
 					}
 				});
 			});
-			it("should report functionality_error with fake options", function(done: any) {
-				let options = {
-					id: "fakeID",
-					rootDir: "fakeRoot",
-					relativeInitDir: "fakeDir",
-					initFilename: "fakeInit",
-					logging: "off"
-				};
-
+			it("should report functionality_error with fake options", function(done: any): void {
+				/* eslint-disable-next-line no-new */ /* tslint:disable-next-line no-unused-expression */ // "new System" is only used for side-effects of testing
 				new System({
-					options: options,
 					behaviors: null,
-					onError: function(err: any) {
-						/* eslint-disable-line no-new */ // "new System" is only used for side-effects of testing
+					onError(err: any): void {
 						assert.throws(
-							function() {
+							function(): void {
 								throw err;
 							},
-							function(error: any) {
+							function(error: any): boolean {
 								return err instanceof loaderError.LoaderError && error.code === "functionality_error";
 							}
 						);
 						done();
+					},
+					options: {
+						id: "fakeID",
+						initFilename: "fakeInit",
+						logging: "off",
+						relativeInitDir: "fakeDir",
+						rootDir: "fakeRoot"
 					}
 				});
 			});
@@ -417,6 +419,7 @@ export function testSystem(): void {
 										'")',
 									function(done: any) {
 										this.timeout(1); /* eslint-disable-line no-invalid-this */
+										this.retries(retries);
 										systemTest.private.file
 											.getFile(element.options.relativeInitDir, element.rawInitFilename)
 											.then(function(result: any) {
