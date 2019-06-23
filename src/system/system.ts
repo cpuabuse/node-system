@@ -9,7 +9,6 @@
 
 // Imports
 import * as events from "../events";
-import { Behavior, Behaviors, BehaviorInterface /* eslint-disable-line no-unused-vars */ } from "../behavior";
 import {
 	ISubsystem /* eslint-disable-line no-unused-vars */,
 	Subsystem /* eslint-disable-line no-unused-vars */,
@@ -18,6 +17,7 @@ import {
 import { Loader, loadYaml } from "../loader"; // Auxiliary system lib
 import { AtomicLock } from "./atomic";
 import { LoaderError } from "../loaderError";
+import { Behaviors, BehaviorInterface } from "../subsystem/system.behavior";
 import {
 	OptionsInterface /* eslint-disable-line no-unused-vars */,
 	checkOptionsFailure /* eslint-disable-line no-unused-vars */
@@ -32,9 +32,6 @@ const optionsSubsystem: string = "options";
 
 /** Temporary hold behavior name. */
 const behaviorSubsystem: string = "behavior";
-
-/** Temporary hold event subsystem name. */
-const eventSubsystem: string = "event";
 
 /** An interface to describe the resolve argument of promise executor. */
 export interface Resolve {
@@ -137,9 +134,6 @@ interface FileObject {
 
 /** Contains system info. */
 interface ISystemProperty {
-	/** Event emitter for the behaviors. Generally should use the public system instance methods instead. Actual behaviors are located here. */
-	behavior: Behavior;
-
 	/** Actual errors are located here. */
 	error: {
 		[key: string]: SystemError;
@@ -267,7 +261,7 @@ interface LoaderProperty {
 
 /** Arguments for the system. */
 interface SystemArgs {
-	behaviors?: Array<{ [key: string]: BehaviorInterface }>;
+	behaviors?: Behaviors;
 	onError?: ErrorCallback;
 	options: Options;
 }
@@ -398,7 +392,7 @@ export class System extends Loader {
 		behaviors,
 		onError
 	}: {
-		behaviors: Array<{ [key: string]: BehaviorInterface }> | null;
+		behaviors: Behaviors | null;
 		onError: ErrorCallback | null;
 		options: Options;
 	}) {
@@ -451,7 +445,6 @@ export class System extends Loader {
 								this.private.subsystem = new Object() as {
 									[key: string]: Subsystem;
 								};
-								this.private.behavior = new Behavior();
 								this.private.error = new Object() as {
 									[key: string]: SystemError;
 								};
@@ -904,7 +897,7 @@ export class System extends Loader {
 	 * });
 	 */
 	private on(event: string, callback: (system: System) => void): void {
-		let behavior: { [key: string]: BehaviorInterface } = new Object() as { [key: string]: BehaviorInterface };
+		let behavior: BehaviorInterface = new Object() as BehaviorInterface;
 		behavior[event] = (): void => callback(this);
 		this.private.subsystem[behaviorSubsystem].call.addBehaviors([behavior]);
 	}

@@ -48,6 +48,12 @@ export interface BehaviorInterfaceCallback {
 	(that: System): void;
 }
 
+/** Behaviors used in [[addBehaviors]]. */
+export interface Behaviors {
+	/** Single behavior. */
+	[index: number]: BehaviorInterface;
+}
+
 /**
  * Adds a behavior to the behavior class instance.
  *
@@ -137,7 +143,7 @@ async function addBehavior(this: Behavior, name: string, callback: BehaviorInter
  * });
  * ```
  */
-async function addBehaviors(this: Behavior, behaviors: Array<BehaviorInterface>): Promise<void> {
+async function addBehaviors(this: Behavior, behaviors: Behaviors): Promise<void> {
 	if (Array.isArray(behaviors)) {
 		// Sanity check - is an array
 		if (behaviors.length > 0) {

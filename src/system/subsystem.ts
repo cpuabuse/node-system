@@ -8,9 +8,8 @@
  */
 
 import { AtomicLock } from "./atomic";
-import { BehaviorInterface } from "../behavior"; /* eslint-disable-line no-unused-vars */ // ESLint type import detection bug
+import { Behaviors } from "../subsystem/system.behavior"; /* eslint-disable-line no-unused-vars */ // ESLint type import detection bug
 import { System, Options } from "./system"; /* eslint-disable-line no-unused-vars */ // ESLint type import detection bug
-import { stringify } from "querystring";
 
 /** Method access flags. */
 export enum Access /* eslint-disable-line no-unused-vars */ { // ESLint detection bug
@@ -73,7 +72,7 @@ export interface SubsystemExtensionArgs {
 		publicEntrypoint: SubsystemEntrypoint;
 
 		system_args?: {
-			behaviors: Array<{ [key: string]: BehaviorInterface }>;
+			behaviors: Behaviors;
 			options: Options;
 		};
 	};
