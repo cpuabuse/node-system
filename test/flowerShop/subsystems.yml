@@ -4,7 +4,8 @@ options:
 local-fs:
   folder: subsystems
   path: relative
-behavior:
+strange_behavior_name:
+  file: behavior
   folder: subsystems
   path: relative
 event:

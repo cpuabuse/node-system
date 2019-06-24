@@ -27,11 +27,12 @@ import { SystemError } from "../error";
 // Re-export
 export { AtomicLock, Behaviors, checkOptionsFailure };
 
+// TODO: Move variables and constants to system scope
 /** Temporary hold name for options subsystem, to be moved to file system subsystem. */
 const optionsSubsystem: string = "options";
 
 /** Temporary hold behavior name. */
-const behaviorSubsystem: string = "behavior";
+let behaviorSubsystem: string = "behavior";
 
 /** Temporary hold event subsystem name. */
 const eventSubsystem: string = "event";
@@ -660,9 +661,25 @@ export class System extends Loader {
 											depends: isProperLoaderObject(subsystems[subsystem], "depends", "arrayOfString")
 												? ((subsystems[subsystem].depends as unknown) as Array<string>)
 												: new Array(),
-											fn: (): Promise<void> =>
+											// TODO: Remove the no-loop-func with a rework
+											fn: (): Promise<void> /* eslint-disable-line no-loop-func */ =>
 												import(`../subsystem/${(subsystemsProperty.type as unknown) as string}`).then(
 													(subsystemModule: { default: ISubsystem }): void => {
+														// Process roles
+														if (isProperLoaderObject(subsystemsProperty, "roles", "arrayOfString")) {
+															let roles: Array<string> = (subsystemsProperty.roles as unknown) as Array<string>;
+															roles.forEach(function(element: string): void {
+																switch (element) {
+																	case "behavior":
+																		behaviorSubsystem = subsystem;
+																		break;
+
+																	default:
+																}
+															});
+														}
+
+														// Process system args
 														let systemArgs: any = new Object();
 														if (isProperLoaderObject(subsystemsProperty, "args", "arrayOfString")) {
 															if (((subsystemsProperty.args as unknown) as Array<any>).includes("system_args")) {
