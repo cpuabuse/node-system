@@ -24,6 +24,7 @@ import {
 import * as systemError from "../../src/error";
 import * as loaderError from "../../src/loaderError";
 import * as expected from "../expected";
+import { Interface } from "mocha";
 
 /** Non-existent file or directory. */
 const nonExistentFileOrDir: string = "Non-existent file or directory";
@@ -33,6 +34,9 @@ const retries: number = 3;
 
 /** System test unit initialization data. */
 export interface SystemTest {
+	/** Name of the behavior subsystem. */
+	behaviorSubsystem: string;
+
 	/** Whether behavior test to be done. */
 	behaviorTest: true;
 
@@ -178,14 +182,7 @@ export function testSystem(): void {
 			 * - Should not generate inappropriately defined errors
 			 * - Should generate the default message
 			 */
-			describe("errorInitialization", function() {
-				let options = {
-					id: "errorInitializationCheck",
-					rootDir: "test",
-					relativeInitDir: "error_initialization_check",
-					initFilename: "init",
-					logging: "off"
-				};
+			describe("errorInitialization", function(): void {
 				let systemErrors = [
 					{
 						error: "no_message",
@@ -203,7 +200,6 @@ export function testSystem(): void {
 				let systemTest: any;
 				before(function(done) {
 					systemTest = new System({
-						options,
 						behaviors: [
 							{
 								system_load() {
@@ -211,6 +207,13 @@ export function testSystem(): void {
 								}
 							}
 						],
+						options: {
+							id: "errorInitializationCheck",
+							initFilename: "init",
+							logging: "off",
+							relativeInitDir: "error_initialization_check",
+							rootDir: "test"
+						},
 						onError(): void {
 							done();
 						}
@@ -295,6 +298,7 @@ export function testSystem(): void {
 					stringErrors: ["carShopError"]
 				},
 				behaviorTest: true,
+				behaviorSubsystem: "strange_behavior_name",
 				checkSubsystemVars: { "local-fs": { a: "b", homepage: "https://github.com/cpuabuse/node-system" } }
 			}
 		];
@@ -583,10 +587,9 @@ export function testSystem(): void {
 						describe(".fire()", function() {
 							it("should not produce an error, if fired with a name that does not exist", function() {
 								// TODO: Move to behavior subsystem
-								systemTest.public.subsystem.behavior.call.fire(
-									"name_does_not_exist",
-									"An event that does not exist has been fired."
-								);
+								systemTest.public.subsystem[
+									element.behaviorSubsystem === undefined ? "behavior" : element.behaviorSubsystem
+								].call.fire("name_does_not_exist", "An event that does not exist has been fired.");
 							});
 						});
 
@@ -599,7 +602,9 @@ export function testSystem(): void {
 								 */
 								describe(".addBehaviors()", function() {
 									before(function(done) {
-										systemTest.public.subsystem.behavior.call
+										systemTest.public.subsystem[
+											element.behaviorSubsystem === undefined ? "behavior" : element.behaviorSubsystem
+										].call
 											.addBehaviors([
 												{
 													behavior_attach_request_fail() {
@@ -616,13 +621,17 @@ export function testSystem(): void {
 										systemTest.done = function() {
 											done();
 										};
-										systemTest.public.subsystem.behavior.call.addBehaviors("not_a_behavior");
+										systemTest.public.subsystem[
+											element.behaviorSubsystem === undefined ? "behavior" : element.behaviorSubsystem
+										].call.addBehaviors("not_a_behavior");
 									});
 									it("should fire behavior_attach_request_fail with an empty array as an argument", function(done) {
 										systemTest.done = function() {
 											done();
 										};
-										systemTest.public.subsystem.behavior.call.addBehaviors([]);
+										systemTest.public.subsystem[
+											element.behaviorSubsystem === undefined ? "behavior" : element.behaviorSubsystem
+										].call.addBehaviors([]);
 									});
 								});
 							}
