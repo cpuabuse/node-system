@@ -27,13 +27,6 @@ import { SystemError } from "../error";
 // Re-export
 export { AtomicLock, Behaviors, checkOptionsFailure };
 
-// TODO: Move variables and constants to system scope
-/** Temporary hold name for options subsystem, to be moved to file system subsystem. */
-const optionsSubsystem: string = "options";
-
-/** Temporary hold behavior name. */
-let behaviorSubsystem: string = "behavior";
-
 /** An interface to describe the resolve argument of promise executor. */
 export interface Resolve {
 	(value?: void | PromiseLike<void> | undefined): void;
@@ -249,6 +242,12 @@ interface ISystemProperty {
 		toRelative(dir: string, file: string): Promise<string>;
 	};
 
+	/** Contains roles. */
+	role: {
+		/** Subsystem. */
+		[key: string]: string;
+	};
+
 	/** Actual subsystems are located here. */
 	subsystem: {
 		[key: string]: Subsystem;
@@ -456,12 +455,12 @@ export class System extends Loader {
 									},
 									filter: {
 										isDir: (filterContext: FilterContext): Promise<boolean> =>
-											Loader.isDir(this.private.subsystem[optionsSubsystem].get.rootDir, filterContext.item),
+											Loader.isDir(this.private.subsystem[this.private.role.options].get.rootDir, filterContext.item),
 										isFile: (filterContext: FilterContext): Promise<boolean> =>
-											Loader.isFile(Loader.join(this.private.subsystem[optionsSubsystem].get.rootDir, Loader.join(
-												filterContext.dir,
-												filterContext.itemName
-											) as string) as string) // Only two arguments make string always
+											Loader.isFile(Loader.join(
+												this.private.subsystem[this.private.role.options].get.rootDir,
+												Loader.join(filterContext.dir, filterContext.itemName) as string
+											) as string) // Only two arguments make string always
 									},
 									getFile: async (dir: string, file: string, cacheTtl: number, force: boolean): Promise<Buffer> => {
 										// Construct a path
@@ -481,9 +480,13 @@ export class System extends Loader {
 											(async (): Promise<Buffer> => {
 												/* eslint-disable-line func-style */ // Can't have arrow style function declaration
 												try {
-													return await Loader.getFile(this.private.subsystem[optionsSubsystem].get.rootDir, dir, file);
+													return await Loader.getFile(
+														this.private.subsystem[this.private.role.options].get.rootDir,
+														dir,
+														file
+													);
 												} catch (error) {
-													// TODO: this.private.subsystem[behaviorSubsystem].call.fire("fileprivate_error");
+													// TODO: this.private.subsystem[this.private.role.behavior].call.fire("fileprivate_error");
 													throw this.private.error.file_system_error;
 												}
 											})();
@@ -572,7 +575,7 @@ export class System extends Loader {
 										return pGetFile();
 									},
 									getYaml: (dir: string, file: string): Promise<string> =>
-										loadYaml(this.private.subsystem[optionsSubsystem].get.rootDir, dir, file),
+										loadYaml(this.private.subsystem[this.private.role.options].get.rootDir, dir, file),
 									async join(rootDir: string, target: string | Array<string>): Promise<string | Array<string>> {
 										/* eslint-disable-line require-await */ // We want file methods to produce same type output
 										return Loader.join(rootDir, target);
@@ -580,7 +583,7 @@ export class System extends Loader {
 									list: async (dir: string, filter: Filter | null): Promise<Array<string>> => {
 										let filteredItems: Array<string>; // Return array
 										let itemNames: Array<string> = await Loader.list(
-											this.private.subsystem[optionsSubsystem].get.rootDir,
+											this.private.subsystem[this.private.role.options].get.rootDir,
 											dir
 										); // Wait for folder contets
 										let items: Array<string> = (await this.private.file.join(dir, itemNames)) as Array<string>; // The return will be always be an array
@@ -624,13 +627,19 @@ export class System extends Loader {
 											let filePath: string = Loader.join(dir, file) as string; // Only two arguments make string always
 
 											// Return
-											return Loader.join(this.private.subsystem[optionsSubsystem].get.rootDir, filePath) as string;
+											return Loader.join(
+												this.private.subsystem[this.private.role.options].get.rootDir,
+												filePath
+											) as string;
 										})(),
 									async toRelative(rootDir: string, target: string): Promise<string> {
 										/* eslint-disable-line require-await */ // We want file methods to produce same type output
 										return Loader.toRelative(rootDir, target) as string; // Only two arguments make string always
 									}
 								}; // <== file
+
+								// Initialize the roles
+								this.private.role = {};
 							})()
 					)
 					.then(async () => {
@@ -661,26 +670,34 @@ export class System extends Loader {
 														// Process roles
 														if (isProperLoaderObject(subsystemsProperty, "roles", "arrayOfString")) {
 															let roles: Array<string> = (subsystemsProperty.roles as unknown) as Array<string>;
-															roles.forEach(function(element: string): void {
-																switch (element) {
-																	case "behavior":
-																		behaviorSubsystem = subsystem;
-																		break;
-
-																	default:
-																}
+															roles.forEach((element: string): void => {
+																// Assigning subsystem name to a role identified by subsystem
+																this.private.role[element] = subsystem;
 															});
 														}
 
-														// Process system args
-														let systemArgs: any = new Object();
+														// Process args
+														let resultingArgs: {
+															[key: string]: any;
+														} = new Object();
 														if (isProperLoaderObject(subsystemsProperty, "args", "arrayOfString")) {
-															if (((subsystemsProperty.args as unknown) as Array<any>).includes("system_args")) {
+															// Define subsystem arguments
+															let subsystemArgsProperty: Array<string> = (subsystemsProperty.args as unknown) as Array<
+																string
+															>;
+															// Process the system args
+															if (subsystemArgsProperty.includes("system_args")) {
 																/* eslint-disable-next-line dot-notation */ /* tslint:disable-next-line no-string-literal */ // Parens are necessary
-																systemArgs["system_args"] = {
+																resultingArgs["system_args"] = {
 																	behaviors,
 																	options
 																};
+															}
+
+															// Process the roles
+															if (subsystemArgsProperty.includes("roles")) {
+																/* eslint-disable-next-line dot-notation */ /* tslint:disable-next-line no-string-literal */ // Potential future change to some form of the definitions of the strings
+																resultingArgs["roles"] = this.private.role;
 															}
 														}
 
@@ -693,7 +710,7 @@ export class System extends Loader {
 															subsystem
 															/* eslint-disable-next-line new-cap */ // It is an argument
 														] = new subsystemModule.default({
-															args: systemArgs,
+															args: resultingArgs,
 															protectedEntrypoint: this.protected.subsystem[subsystem],
 															publicEntrypoint: this.public.subsystem[subsystem],
 															system: this,
@@ -737,10 +754,10 @@ export class System extends Loader {
 					})
 					.then(() =>
 						// Add the behaviors
-						this.private.subsystem[behaviorSubsystem].call.addBehaviors(behaviors)
+						this.private.subsystem[this.private.role.behavior].call.addBehaviors(behaviors)
 					)
 					.then(() =>
-						this.private.subsystem[behaviorSubsystem].call.fire(
+						this.private.subsystem[this.private.role.behavior].call.fire(
 							events.systemLoad,
 							"Behaviors initialized during system loading."
 						)
@@ -817,7 +834,10 @@ export class System extends Loader {
 	private addError(code: string, message: string): void {
 		if (Object.prototype.hasOwnProperty.call(this.private.error, code)) {
 			// Fire an error event that error already exists
-			this.private.subsystem[behaviorSubsystem].call.fire(events.errorExists, "Error to be added already exists.");
+			this.private.subsystem[this.private.role.behavior].call.fire(
+				events.errorExists,
+				"Error to be added already exists."
+			);
 		} else {
 			this.private.error[code] = new SystemError(code, message);
 		}
@@ -839,11 +859,11 @@ export class System extends Loader {
 	 */
 	public behave(event: string): void {
 		try {
-			this.log(`Behavior - ${this.private.subsystem[behaviorSubsystem].get.data[event].text}`);
+			this.log(`Behavior - ${this.private.subsystem[this.private.role.behavior].get.data[event].text}`);
 		} catch (error) {
 			this.log(`Behavior - Undocumented behavior - ${event}`);
 		}
-		this.private.subsystem[behaviorSubsystem].call.behave(event);
+		this.private.subsystem[this.private.role.behavior].call.behave(event);
 	}
 
 	/**
@@ -865,8 +885,8 @@ export class System extends Loader {
 	 * labInventory.error(text);
 	 */
 	public error(text: string): void {
-		if (this.private.subsystem[optionsSubsystem].get.logging === "console") {
-			System.error(`${this.private.subsystem[optionsSubsystem].get.id}: ${text}`);
+		if (this.private.subsystem[this.private.role.options].get.logging === "console") {
+			System.error(`${this.private.subsystem[this.private.role.options].get.id}: ${text}`);
 		}
 	} // <== error
 
@@ -889,8 +909,8 @@ export class System extends Loader {
 	 * labInventory.log(text);
 	 */
 	public log(text: string): void {
-		if (this.private.subsystem[optionsSubsystem].get.logging === "console") {
-			System.log(`${this.private.subsystem[optionsSubsystem].get.id}: ${text}`);
+		if (this.private.subsystem[this.private.role.options].get.logging === "console") {
+			System.log(`${this.private.subsystem[this.private.role.options].get.id}: ${text}`);
 		}
 	} // <== log
 
@@ -916,6 +936,6 @@ export class System extends Loader {
 	private on(event: string, callback: (system: System) => void): void {
 		let behavior: BehaviorInterface = new Object() as BehaviorInterface;
 		behavior[event] = (): void => callback(this);
-		this.private.subsystem[behaviorSubsystem].call.addBehaviors([behavior]);
+		this.private.subsystem[this.private.role.behavior].call.addBehaviors([behavior]);
 	}
 }
