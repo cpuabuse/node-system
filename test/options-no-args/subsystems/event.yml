@@ -22,3 +22,5 @@ vars:
   homepage: https://github.com/cpuabuse/node-system
 args:
 depends:
+roles:
+  - event

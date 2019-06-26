@@ -4,3 +4,5 @@ vars:
 args:
   - system_args
 depends:
+roles:
+  - options

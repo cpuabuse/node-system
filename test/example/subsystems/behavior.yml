@@ -3,8 +3,10 @@ vars:
   homepage: https://github.com/cpuabuse/node-system
   data:
     system_load:
-      text: System loaded. 
+      text: System loaded.
 args:
   - system_args
 depends:
   - event
+roles:
+  - behavior

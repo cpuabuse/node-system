@@ -5,3 +5,5 @@ args:
   - system_args
 depends:
   - event
+roles:
+  - behavior

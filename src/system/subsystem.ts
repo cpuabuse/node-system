@@ -66,15 +66,6 @@ export interface SubsystemExtensionArgs {
 	/** Arguments from system or extending class. */
 	args: {
 		[key: string]: any;
-
-		protectedEntrypoint: SubsystemEntrypoint;
-
-		publicEntrypoint: SubsystemEntrypoint;
-
-		system_args?: {
-			behaviors: Behaviors;
-			options: Options;
-		};
 	};
 
 	/** Protected entrypoint for subsystem. */
