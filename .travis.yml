@@ -18,7 +18,6 @@ jobs:
         secure: rlPkaYcQDoaCVVWikzA15stbnVyF7XWficH32YvHlWO85WYnJuHwqG4kQsPAIjiKV4DV7lp9knPJ7vYcpQDEnptYEIUCegRI92kvvyd5jthfaMYCDlEYBEmLmiaLG/IGxpqXohqZuieaWJ37dMAvpneNxJWf8S91Xvl6sMQCk/aMTAvdk5MUKGDYU0JbtNqhEN7nC7Ra7+3GHbj4gJsYdIrvFRAo5Yy+EiMMP6q26TUNyUFTs8maFsPpZx2RGcBgmqzO0E/c3PeBKkJZG9ju0YVRdRpEFTKH+veum0fQlXGmY+38PJmUi/6N0QfWJAhjVeTYvF+ZC9mckwQSZv0ovkcH8VwsOsGjzQbuiYeFQ4i3F76esp+2ehGMItjHOMtS+cL7iR8GIsf3SkwocKHAKzim2i+V6pirWaYY9ujc54ldbUyty+jaRsRICq5gd4t47Uk7b8+972oxIhXxoXL1UtkDzWadlz3husX3rYVM/Lf2AjXTaUbKxOmp/v6BBzBPTM0NXwlGMVUTTv4O67p5qeev9oLpdvb25ZUvbR4xk5knSsniA1dzNxBL3wiqczSPmaxzY+RjcyrtUDfPyqopsfD1nuoLcBo/oKxCLIfbxrIWE4fgzcFdY37dU5MH0OyljR8J6nEoAwhOC1madVjaKM8qHsfnOUr2dE854dp7op8=
       on:
         branch: dev
-        tags: true
       tag: next
   - name: coverage
     script:

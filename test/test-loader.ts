@@ -106,7 +106,7 @@ export function testLoader(): void {
 			});
 			it('should produce "Invalid intialization entry type - average_height", when called with respective initialization file', function(): void {
 				/* eslint-disable-next-line no-new */ /* tslint:disable-next-line no-unused-expression */ // "new Loader" is only used for side-effects of testing
-				new Loader("test", "trees", "init", function(load: Promise<void>): void {
+				new Loader(`test${path.sep}loaders`, "trees", "init", function(load: Promise<void>): void {
 					load.catch(function(err: LoaderError | Error): void {
 						assert.throws(
 							function(): void {
@@ -157,7 +157,7 @@ export function testLoader(): void {
 				],
 				name: "Stars",
 				rawFilename: "stars.yml",
-				rootDir: "test"
+				rootDir: `test${path.sep}loaders`
 			},
 			// Flower Shop
 			{
@@ -217,7 +217,7 @@ export function testLoader(): void {
 				filesAndFoldersAmount: 1,
 				name: "Cars",
 				rawFilename: "init.yml",
-				rootDir: "test"
+				rootDir: `test${path.sep}loaders`
 			}
 		];
 		loaders.forEach(function(element: Test): void {
