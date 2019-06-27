@@ -333,6 +333,12 @@ export default class Behavior extends Subsystem {
 	/** Counter to use to generate IDs. */
 	protected nextBehaviorCounter: number = 0;
 
+	/** Role */
+	protected role: {
+		/** Subsystem. */
+		[key: string]: string;
+	};
+
 	/** Initializes system behavior. */
 	// @ts-ignore tsc does not see inevitability of super()
 	constructor({ system, args, protectedEntrypoint, publicEntrypoint, vars }: Args) {
@@ -340,7 +346,10 @@ export default class Behavior extends Subsystem {
 		super({ protectedEntrypoint, publicEntrypoint, system });
 
 		// Only if we received the args we continue
-		if (args.system_args !== undefined) {
+		if (args.system_args !== undefined && args.shared !== undefined) {
+			// Assigning shared to instance
+			this.role = args.shared.role;
+
 			// Add the methods
 			this.addMethods([
 				{

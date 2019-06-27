@@ -6,7 +6,7 @@ vars:
       text: xxx
 args:
   - system_args
-  - roles
+  - shared
 depends:
   - event
 roles:

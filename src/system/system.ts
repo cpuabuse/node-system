@@ -375,7 +375,18 @@ export class System extends Loader {
 	};
 
 	/** Contains system info. */
-	private private!: ISystemProperty; /* tslint:disable-line variable-name */ // Override compiler, as this property is set from async function callback down the road
+	private private!: ISystemProperty;
+
+	/** Contains data shared between the subsystems. */
+	private shared!: {
+		role: {
+			/** Subsystem. */
+			[key: string]: string;
+		};
+		subsystem: {
+			[key: string]: SubsystemEntrypoint;
+		};
+	};
 
 	/** Contains subsystem data. */
 	private readonly subsystems: any;
@@ -640,6 +651,12 @@ export class System extends Loader {
 
 								// Initialize the roles
 								this.private.role = {};
+
+								// Initialize shared
+								this.shared = {
+									role: this.private.role,
+									subsystem: {}
+								};
 							})()
 					)
 					.then(async () => {
@@ -695,9 +712,9 @@ export class System extends Loader {
 															}
 
 															// Process the roles
-															if (subsystemArgsProperty.includes("roles")) {
+															if (subsystemArgsProperty.includes("shared")) {
 																/* eslint-disable-next-line dot-notation */ /* tslint:disable-next-line no-string-literal */ // Potential future change to some form of the definitions of the strings
-																resultingArgs["roles"] = this.private.role;
+																resultingArgs["shared"] = this.shared;
 															}
 														}
 
