@@ -24,13 +24,18 @@ import {
 import * as systemError from "../../src/error";
 import * as loaderError from "../../src/loaderError";
 import * as expected from "../expected";
-import { Interface } from "mocha";
 
 /** Non-existent file or directory. */
 const nonExistentFileOrDir: string = "Non-existent file or directory";
 
 /** Number of retries. */
 const retries: number = 3;
+
+/** Test for SystemError. */
+interface ErrorTest {
+	description: string;
+	error: string;
+}
 
 /** System test unit initialization data. */
 export interface SystemTest {
@@ -181,46 +186,47 @@ export function testSystem(): void {
 			 *
 			 * - Should not generate inappropriately defined errors
 			 * - Should generate the default message
+			 * TODO : Define DONE and its function
 			 */
 			describe("errorInitialization", function(): void {
-				let systemErrors = [
+				let systemErrors: Array<ErrorTest> = [
 					{
-						error: "no_message",
-						description: "no error message"
+						description: "no error message",
+						error: "no_message"
 					},
 					{
-						error: "empty_message",
-						description: "empty message"
+						description: "empty message",
+						error: "empty_message"
 					},
 					{
-						error: "message_not_a_string",
-						description: "message not a string"
+						description: "message not a string",
+						error: "message_not_a_string"
 					}
 				];
 				let systemTest: any;
-				before(function(done) {
+				before(function(done: () => void): void {
 					systemTest = new System({
 						behaviors: [
 							{
-								system_load() {
+								system_load(): void {
 									done();
 								}
 							}
 						],
+						onError(): void {
+							done();
+						},
 						options: {
 							id: "errorInitializationCheck",
 							initFilename: "init",
 							logging: "off",
 							relativeInitDir: "error_initialization_check",
 							rootDir: "test"
-						},
-						onError(): void {
-							done();
 						}
 					});
 				});
-				it("should not generate inappropriately defined errors", function() {
-					assert.strictEqual(systemTest.private.error.hasOwnProperty("not_object"), false);
+				it("should not generate inappropriately defined errors", function(): void {
+					assert.strictEqual(Object.prototype.hasOwnProperty.call(systemTest.private.error, "not_object"), false);
 				});
 				for (let error of systemErrors) {
 					it("should generate the default message with " + error.description, function() {
