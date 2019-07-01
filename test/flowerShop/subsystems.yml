@@ -11,3 +11,6 @@ strange_behavior_name:
 event:
   folder: subsystems
   path: relative
+log:
+  folder: subsystems
+  path: relative

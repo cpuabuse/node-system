@@ -1,0 +1,8 @@
+type: system.log
+vars:
+  homepage: https://github.com/cpuabuse/node-system
+args:
+depends:
+  - options
+roles:
+  - log
