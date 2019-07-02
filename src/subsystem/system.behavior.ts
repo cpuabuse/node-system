@@ -9,7 +9,7 @@
 
 import { EventEmitter } from "events";
 import { AtomicLock } from "../system/atomic";
-import { behaviorAttachFail, behaviorAttachRequestFail, behaviorAttach, systemLoad } from "../system/event-list";
+import { behaviorAttachFail, behaviorAttachRequestFail, behaviorAttach } from "../system/event-list";
 import { LoaderError } from "../loaderError";
 import {
 	Access,
@@ -341,9 +341,9 @@ export default class Behavior extends Subsystem {
 
 	/** Initializes system behavior. */
 	// @ts-ignore tsc does not see inevitability of super()
-	constructor({ system, args, protectedEntrypoint, publicEntrypoint, vars }: Args) {
+	constructor({ system, args, protectedEntrypoint, publicEntrypoint, sharedEntrypoint, vars }: Args) {
 		// Call superclass's constructor
-		super({ protectedEntrypoint, publicEntrypoint, system });
+		super({ protectedEntrypoint, publicEntrypoint, sharedEntrypoint, system });
 
 		// Only if we received the args we continue
 		if (args.system_args !== undefined && args.shared !== undefined) {

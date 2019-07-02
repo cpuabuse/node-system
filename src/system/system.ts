@@ -721,6 +721,7 @@ export class System extends Loader {
 														// Initialize subsystem entrypoints
 														this.public.subsystem[subsystem] = new SubsystemEntrypoint();
 														this.protected.subsystem[subsystem] = new SubsystemEntrypoint();
+														this.shared.subsystem[subsystem] = new SubsystemEntrypoint();
 
 														// Initialize subsystem
 														this.private.subsystem[
@@ -730,6 +731,7 @@ export class System extends Loader {
 															args: resultingArgs,
 															protectedEntrypoint: this.protected.subsystem[subsystem],
 															publicEntrypoint: this.public.subsystem[subsystem],
+															sharedEntrypoint: this.shared.subsystem[subsystem],
 															system: this,
 															vars: subsystemsProperty.vars
 														});

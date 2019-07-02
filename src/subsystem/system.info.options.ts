@@ -11,7 +11,6 @@ import { Access, SubsystemExtensionArgs } from "../system/subsystem"; /* eslint-
 import Info from "./system.info";
 import { LoaderError } from "../loaderError";
 import { Options as SystemOptions } from "../system/system"; /* eslint-disable-line no-unused-vars */ // ESLint type import detection bug
-import { access } from "fs";
 
 interface OptionsVars {
 	homepage: string;
@@ -70,7 +69,7 @@ export function checkOptionsFailure(options: SystemOptions) {
 
 /** Stores system options. */
 export default class Options extends Info {
-	constructor({ args, system, publicEntrypoint, protectedEntrypoint, vars }: SubsystemExtensionArgs) {
+	constructor({ args, system, publicEntrypoint, protectedEntrypoint, sharedEntrypoint, vars }: SubsystemExtensionArgs) {
 		// Set options to be read
 		if (args.system_args !== undefined) {
 			// Assign system option args
@@ -88,6 +87,7 @@ export default class Options extends Info {
 					args: new Object() as SubsystemExtensionArgs,
 					protectedEntrypoint,
 					publicEntrypoint,
+					sharedEntrypoint,
 					system,
 					vars: variables
 				});
