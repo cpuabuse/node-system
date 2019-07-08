@@ -41,7 +41,7 @@ export class AtomicLock {
 	 */
 	public async lock(): Promise<void> {
 		// Assign current queue counter
-		var count: number = this.maxCount;
+		let count: number = this.maxCount;
 
 		/** Function to increment the counters in an safe manner. */
 		function increment(counter: number): number {

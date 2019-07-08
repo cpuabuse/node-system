@@ -31,9 +31,9 @@ export interface BehaviorInterface {
 }
 
 /** Behavior index type for behaviorId and behaviorIndex class members. */
-type BehaviorIndex = {
+interface BehaviorIndex {
 	[key: string]: Array<string>;
-};
+}
 
 export interface Behaviors {
 	[index: number]: {
@@ -44,16 +44,16 @@ export interface Behaviors {
 /** System behavior class. */
 export class Behavior extends EventEmitter {
 	/** Atomic lock to perform counter increments. */
-	atomicLock: AtomicLock;
+	public atomicLock: AtomicLock;
 
 	/** IDs to use as actual event identifiers. */
-	behaviorId: BehaviorIndex;
+	public behaviorId: BehaviorIndex;
 
 	/** Index to link id's back to behavior names. */
-	behaviorIndex: BehaviorIndex;
+	public behaviorIndex: BehaviorIndex;
 
 	/** Counter to use to generate IDs. */
-	nextBehaviorCounter: number = 0;
+	public nextBehaviorCounter: number = 0;
 
 	/** Initializes system behavior. */
 	constructor() {
@@ -62,8 +62,8 @@ export class Behavior extends EventEmitter {
 
 		// Instantiate class variables
 		this.atomicLock = new AtomicLock();
-		this.behaviorId = <BehaviorIndex>new Object();
-		this.behaviorIndex = <BehaviorIndex>new Object();
+		this.behaviorId = new Object() as BehaviorIndex;
+		this.behaviorIndex = new Object() as BehaviorIndex;
 	}
 
 	/**
@@ -86,7 +86,7 @@ export class Behavior extends EventEmitter {
 	 * @param callback Behavior callback function
 	 * @returns ID of the behavior; `behaviorCreationError` if creation failed
 	 */
-	async addBehavior(name: string, callback: Function): Promise<string> {
+	public async addBehavior(name: string, callback: Function): Promise<string> {
 		if (typeof name === "string") {
 			// Name must be string
 			if (typeof callback === "function") {
@@ -110,7 +110,7 @@ export class Behavior extends EventEmitter {
 					this.behaviorIndex[id].push(name);
 
 					// Add the behavior
-					this.addListener(id, <(...args: any[]) => void>callback);
+					this.addListener(id, callback as (...args: any[]) => void);
 
 					// Release lock
 					this.atomicLock.release();
@@ -142,10 +142,10 @@ export class Behavior extends EventEmitter {
 	 * ```
 	 * @param name Behavior name
 	 */
-	behave(name: string): void {
+	public behave(name: string): void {
 		if (typeof name === "string") {
 			if (this.behaviorId.hasOwnProperty(name)) {
-				this.behaviorId[name].forEach(event => {
+				this.behaviorId[name].forEach((event) => {
 					this.emit(event);
 				});
 			}

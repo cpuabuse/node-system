@@ -110,7 +110,7 @@ export function testSystem(): void {
 				new System({
 					options: (null as unknown) as Options,
 					behaviors: null,
-					onError: function(error: any) {
+					onError(error: any) {
 						/* eslint-disable-line no-new */ // "new System" is only used for side-effects of testing
 						assert.strictEqual(error.code, "system_options_failure");
 						assert.strictEqual(error.message, "The options provided to the system constructor are inconsistent.");
@@ -128,9 +128,9 @@ export function testSystem(): void {
 				};
 
 				new System({
-					options: options,
+					options,
 					behaviors: null,
-					onError: function(err: any) {
+					onError(err: any) {
 						/* eslint-disable-line no-new */ // "new System" is only used for side-effects of testing
 						assert.throws(
 							function() {
@@ -154,9 +154,9 @@ export function testSystem(): void {
 				};
 
 				new System({
-					options: options,
+					options,
 					behaviors: null,
-					onError: function(err: any) {
+					onError(err: any) {
 						/* eslint-disable-line no-new */ // "new System" is only used for side-effects of testing
 						assert.throws(
 							function() {

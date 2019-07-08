@@ -805,6 +805,83 @@ export class System extends Loader {
 		console.log(`\x1b[32m[OK]\x1b[0m ${text}`);
 	}
 
+	/**
+	 * Fires a system event
+	 * @instance
+	 * @param {string} name - Event name, as specified in {@link module:system.private#events}.
+	 * @param {string=} message - [Optional] Message is not strictly required, but preferred. If not specified, will assume value of the name
+	 * @throws {external:Error} Will throw `error_hell`. The inability to process error - if {@link module:system.private#events#event:eventFail} event fails.
+	 * @fires module:system.private#events#eventFail
+	 * @example <caption>Usage</caption>
+	 * var options = {
+	 *   id: "lab_inventory",
+	 *   rootDir: "labs",
+	 *   relativeInitDir: "black_mesa",
+	 *   initFilename: "inventory.yml",
+	 *   logging: "console"
+	 * };
+	 *
+	 * var labInventory = new System(options);
+	 * labInventory.fire("system_load_aux", "Auxiliary system loaded.");
+	 */
+	public fire(name: string, message: string): void {
+		const eventAbsent: string = "event_absent";
+		const errorHell: string = "error_hell";
+
+		let msg: string = message;
+
+		try {
+			let event: { behavior?: boolean | undefined; error?: string | undefined; log?: string | undefined };
+
+			// Verify event exists
+			if (!Object.prototype.hasOwnProperty.call(this.events, name)) {
+				// throw new system error
+				throw new SystemError(eventAbsent, "Could not fire an event that is not described.");
+			}
+
+			// Locate event
+			event = this.events[name];
+
+			// Assign the message, as it is technically optional
+			if (!message) {
+				msg = name;
+			}
+
+			// Log
+			if (event.log) {
+				this.log(`${event.log} - ${msg}`);
+			}
+
+			// Error
+			if (event.error) {
+				this.error(`${name} - ${msg}`);
+			}
+
+			// Behavior
+			if (event.behavior) {
+				this.behave(name);
+			}
+			// Callback
+		} catch (error) {
+			let noFail: boolean = true;
+			if (name === events.eventFail) {
+				noFail = false;
+			}
+			if (name === eventAbsent) {
+				if (SystemError.isSystemError(error)) {
+					if (error.code === eventAbsent) {
+						noFail = false;
+					}
+				}
+			}
+			if (noFail) {
+				this.fire(events.eventFail, "Event has failed");
+			} else {
+				throw errorHell;
+			}
+		}
+	} // <== fire
+
 	/** Test error logging. */
 	public testError(): void {
 		this.error("Test");
@@ -980,83 +1057,6 @@ export class System extends Loader {
 			System.error(`${this.private.subsystem[optionsSubsystem].get.id}: ${text}`);
 		}
 	} // <== error
-
-	/**
-	 * Fires a system event
-	 * @instance
-	 * @param {string} name - Event name, as specified in {@link module:system.private#events}.
-	 * @param {string=} message - [Optional] Message is not strictly required, but preferred. If not specified, will assume value of the name
-	 * @throws {external:Error} Will throw `error_hell`. The inability to process error - if {@link module:system.private#events#event:eventFail} event fails.
-	 * @fires module:system.private#events#eventFail
-	 * @example <caption>Usage</caption>
-	 * var options = {
-	 *   id: "lab_inventory",
-	 *   rootDir: "labs",
-	 *   relativeInitDir: "black_mesa",
-	 *   initFilename: "inventory.yml",
-	 *   logging: "console"
-	 * };
-	 *
-	 * var labInventory = new System(options);
-	 * labInventory.fire("system_load_aux", "Auxiliary system loaded.");
-	 */
-	public fire(name: string, message: string): void {
-		const eventAbsent: string = "event_absent";
-		const errorHell: string = "error_hell";
-
-		let msg: string = message;
-
-		try {
-			let event: { behavior?: boolean | undefined; error?: string | undefined; log?: string | undefined };
-
-			// Verify event exists
-			if (!Object.prototype.hasOwnProperty.call(this.events, name)) {
-				// throw new system error
-				throw new SystemError(eventAbsent, "Could not fire an event that is not described.");
-			}
-
-			// Locate event
-			event = this.events[name];
-
-			// Assign the message, as it is technically optional
-			if (!message) {
-				msg = name;
-			}
-
-			// Log
-			if (event.log) {
-				this.log(`${event.log} - ${msg}`);
-			}
-
-			// Error
-			if (event.error) {
-				this.error(`${name} - ${msg}`);
-			}
-
-			// Behavior
-			if (event.behavior) {
-				this.behave(name);
-			}
-			// Callback
-		} catch (error) {
-			let noFail: boolean = true;
-			if (name === events.eventFail) {
-				noFail = false;
-			}
-			if (name === eventAbsent) {
-				if (SystemError.isSystemError(error)) {
-					if (error.code === eventAbsent) {
-						noFail = false;
-					}
-				}
-			}
-			if (noFail) {
-				this.fire(events.eventFail, "Event has failed");
-			} else {
-				throw errorHell;
-			}
-		}
-	} // <== fire
 
 	/**
 	 * Log message from the System context

@@ -8,9 +8,9 @@
  */
 
 /** Extended system error class. */
-export class SystemError extends Error{
+export class SystemError extends Error {
 	/** Error code. */
-	code:string;
+	public code: string;
 
 	/**
 	 * Creates an instance of SystemError.
@@ -18,7 +18,7 @@ export class SystemError extends Error{
 	 * @param message Error message
 	 * @throws [[Error]] Throwing error if the code already defined
 	 */
-	constructor(code:string, message:string){
+	constructor(code: string, message: string) {
 		super(message);
 		this.code = code;
 	}
@@ -50,9 +50,9 @@ export class SystemError extends Error{
 	 * @param error Error to check
 	 * @returns Returns `true` if is is a SystemError, `false` if not.
 	 */
-	static isSystemError(error:SystemError){
-		if((error instanceof SystemError)){
-			if (error.code != ""){
+	public static isSystemError(error: SystemError) {
+		if ((error instanceof SystemError)) {
+			if (error.code != "") {
 				return true;
 			}
 		}

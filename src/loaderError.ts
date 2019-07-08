@@ -10,7 +10,7 @@
 /** Extended error class for system loading errors. */
 export class LoaderError extends Error {
 	/** Error code */
-	code: string;
+	public code: string;
 
 	/**
 	 * Creates an instance of LoaderError.

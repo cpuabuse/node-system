@@ -21,38 +21,6 @@ export type ConstructorCallback = (done: Promise<void>) => void;
 
 /** Required by system to perform file initialization. */
 export class Loader {
-	/**
-	 * Extracts relative path from rootDir to target.
-	 *
-	 * **Usage**
-	 *
-	 * ```typescript
-	 * // Convert path and output the result
-	 * console.log(Loader.toRelative("c:\machines\refrigerators", "c:\machines\appliances"));
-	 *
-	 * // Output
-	 * // ..\appliances
-	 * ```
-	 * @param dir Source folder.
-	 * @param target File/folder name|names.
-	 * @returns Relative path|paths.
-	 */
-	public static toRelative(dir: string, target: string | Array<string>): string | Array<string> {
-		if (Array.isArray(target)) {
-			let results: Array<string> = new Array() as Array<string>; // Prepare the return array
-
-			// Populate return array
-			target.forEach(function(targetMember: string): void {
-				results.push(path.relative(dir, targetMember));
-			});
-
-			// Return an array
-			return results;
-		}
-
-		// Return a string if not an array
-		return path.relative(dir, target);
-	}
 
 	/**
 	 * @param rootDir Absolute root directory.
@@ -71,7 +39,7 @@ export class Loader {
 		function dummyConstructor() {} /* eslint-disable-line no-empty-function */ // Empty because dummy
 
 		/** The standard constructor. */
-		var standardConstructor = () => {
+		let standardConstructor = () => {
 			// Initialization recursion; The error handling of the callback will happen asynchronously
 			// @ts-ignore
 			callback(initRecursion(rootDir as string, arg_relativeInitDir as string, arg_initFilename, this, true));
@@ -130,13 +98,78 @@ export class Loader {
 	 * @param file Full file name.
 	 * @returns File contents.
 	 */
-	static getFile(rootDir: string, relativeDir: string, file: string): Promise<Buffer> {
+	public static getFile(rootDir: string, relativeDir: string, file: string): Promise<Buffer> {
 		return new Promise(function(resolve, reject) {
 			fs.readFile(path.join(rootDir, relativeDir, file), function(err, data) {
 				if (err) {
 					reject(err);
 				} else {
 					resolve(data);
+				}
+			});
+		});
+	}
+
+	/**
+	 * Checks if is a directory.
+	 *
+	 * **Usage**
+	 *
+	 * ```typescript
+	 * // Verify directory
+	 * Loader.isDir("c:\machines\appliances","grapefruitJuicer.txt").then(function(result){
+	 *   console.log(result);
+	 * });
+	 *
+	 * // Input - grapefruitJuicer.txt
+	 * // 1000W powerful juicer
+	 *
+	 * // Output
+	 * // false
+	 * ```
+	 * @param rootDir Absolute root directory.
+	 * @param relativeDir Relative directory to root.
+	 * @returns Returns `true` if a directory, `false` if not.
+	 */
+	public static isDir(rootDir: string, relativeDir: string): Promise<boolean> {
+		return new Promise(function(resolve) {
+			fs.stat(path.join(rootDir, relativeDir), function(err, stats) {
+				if (err) {
+					resolve(false);
+				} else {
+					resolve(stats.isDirectory());
+				}
+			});
+		});
+	}
+
+	/**
+	 * Checks if is a file
+	 *
+	 * **Usage**
+	 *
+	 * ```typescript
+	 * // Verify file
+	 * Loader.isFile("c:\machines\appliances\grapefruitJuicer.txt").then(function(result){
+	 *   console.log(result);
+	 * });
+	 *
+	 * // Input - grapefruitJuicer.txt
+	 * // 1000W powerful juicer
+	 *
+	 * // Output
+	 * // true
+	 * ```
+	 * @param rawPath Full filepath.
+	 * @returns Returns `true` if a file, `false` if not.
+	 */
+	public static isFile(rawPath: string): Promise<boolean> {
+		return new Promise(function(resolve) {
+			fs.stat(rawPath, function(err, stats) {
+				if (err) {
+					resolve(false);
+				} else {
+					resolve(!stats.isDirectory());
 				}
 			});
 		});
@@ -157,10 +190,10 @@ export class Loader {
 	 * @param pathArrays File/folder name|names.
 	 * @returns Absolute path|paths.
 	 */
-	static join(...pathArrays: Array<string | Array<string>>): string | Array<string> {
+	public static join(...pathArrays: Array<string | Array<string>>): string | Array<string> {
 		// Determine maximum pathArray length & construct metadata
-		var maxLength: number = 0;
-		var arraysMeta: Array<{ isArray: boolean; length: number }> = new Array();
+		let maxLength: number = 0;
+		let arraysMeta: Array<{ isArray: boolean; length: number }> = new Array();
 		pathArrays.forEach(function(pathArray) {
 			let isArray: boolean = Array.isArray(pathArray);
 			let length: number = isArray ? pathArray.length : 1;
@@ -188,10 +221,10 @@ export class Loader {
 		});
 		if (filter.length === 0) {
 			// Return a string if no arrays
-			return path.join(...(<Array<string>>pathArrays)); // Casting due to inability of compiler to detect that there are no other types possible
+			return path.join(...(pathArrays as Array<string>)); // Casting due to inability of compiler to detect that there are no other types possible
 		} else {
 			// In case of arrays present
-			var results: Array<string> = new Array(); // Prepare the return array
+			let results: Array<string> = new Array(); // Prepare the return array
 			for (let i = 0; i < maxLength; i++) {
 				let joinData: Array<string> = new Array();
 				pathArrays.forEach(function(pathArray, index) {
@@ -206,7 +239,7 @@ export class Loader {
 							toPush = pathArray[i];
 						}
 					} else {
-						toPush = <string>pathArray; // Casting due to inability of compiler to detect that there are no other types possible
+						toPush = pathArray as string; // Casting due to inability of compiler to detect that there are no other types possible
 					}
 					if (toPush !== null) {
 						joinData.push(toPush);
@@ -216,71 +249,6 @@ export class Loader {
 			}
 			return results;
 		}
-	}
-
-	/**
-	 * Checks if is a file
-	 *
-	 * **Usage**
-	 *
-	 * ```typescript
-	 * // Verify file
-	 * Loader.isFile("c:\machines\appliances\grapefruitJuicer.txt").then(function(result){
-	 *   console.log(result);
-	 * });
-	 *
-	 * // Input - grapefruitJuicer.txt
-	 * // 1000W powerful juicer
-	 *
-	 * // Output
-	 * // true
-	 * ```
-	 * @param rawPath Full filepath.
-	 * @returns Returns `true` if a file, `false` if not.
-	 */
-	static isFile(rawPath: string): Promise<boolean> {
-		return new Promise(function(resolve) {
-			fs.stat(rawPath, function(err, stats) {
-				if (err) {
-					resolve(false);
-				} else {
-					resolve(!stats.isDirectory());
-				}
-			});
-		});
-	}
-
-	/**
-	 * Checks if is a directory.
-	 *
-	 * **Usage**
-	 *
-	 * ```typescript
-	 * // Verify directory
-	 * Loader.isDir("c:\machines\appliances","grapefruitJuicer.txt").then(function(result){
-	 *   console.log(result);
-	 * });
-	 *
-	 * // Input - grapefruitJuicer.txt
-	 * // 1000W powerful juicer
-	 *
-	 * // Output
-	 * // false
-	 * ```
-	 * @param rootDir Absolute root directory.
-	 * @param relativeDir Relative directory to root.
-	 * @returns Returns `true` if a directory, `false` if not.
-	 */
-	static isDir(rootDir: string, relativeDir: string): Promise<boolean> {
-		return new Promise(function(resolve) {
-			fs.stat(path.join(rootDir, relativeDir), function(err, stats) {
-				if (err) {
-					resolve(false);
-				} else {
-					resolve(stats.isDirectory());
-				}
-			});
-		});
 	}
 
 	/**
@@ -303,7 +271,7 @@ export class Loader {
 	 * @param relativeDir Relative directory.
 	 * @returns Array with contents; Rejects with errors from [fs.readdir](https://nodejs.org/api/fs.html#fs_fs_readdir_path_options_callback).
 	 */
-	static list(rootDir: string, relativeDir: string): Promise<Array<string>> {
+	public static list(rootDir: string, relativeDir: string): Promise<Array<string>> {
 		return new Promise(function(resolve, reject) {
 			fs.readdir(path.join(rootDir, relativeDir), function(err, files) {
 				if (err) {
@@ -313,6 +281,38 @@ export class Loader {
 				}
 			});
 		});
+	}
+	/**
+	 * Extracts relative path from rootDir to target.
+	 *
+	 * **Usage**
+	 *
+	 * ```typescript
+	 * // Convert path and output the result
+	 * console.log(Loader.toRelative("c:\machines\refrigerators", "c:\machines\appliances"));
+	 *
+	 * // Output
+	 * // ..\appliances
+	 * ```
+	 * @param dir Source folder.
+	 * @param target File/folder name|names.
+	 * @returns Relative path|paths.
+	 */
+	public static toRelative(dir: string, target: string | Array<string>): string | Array<string> {
+		if (Array.isArray(target)) {
+			let results: Array<string> = new Array() as Array<string>; // Prepare the return array
+
+			// Populate return array
+			target.forEach(function(targetMember: string): void {
+				results.push(path.relative(dir, targetMember));
+			});
+
+			// Return an array
+			return results;
+		}
+
+		// Return a string if not an array
+		return path.relative(dir, target);
 	}
 
 	/**
@@ -330,7 +330,7 @@ export class Loader {
 	 * @param string YAML string.
 	 * @returns Javascript object.
 	 */
-	static yamlToObject(string: string): any {
+	public static yamlToObject(string: string): any {
 		return yaml.load(string);
 	}
 }
@@ -437,7 +437,7 @@ async function initRecursion(
 	}
 
 	// Initialize files
-	for (var key in init) {
+	for (let key in init) {
 		let folder: string = relativePath,
 			file: string = key,
 			pathIsAbsolute: boolean = true,
@@ -550,7 +550,7 @@ async function initSettings(
  * @returns Javascript object.
  */
 export async function loadYaml(rootDir: string, relativeDir: string, filename: string) {
-	var fileExtension: string = ".yml"; // Making a variable for interpreted language like this would not even save any memory, but it feels right
+	let fileExtension: string = ".yml"; // Making a variable for interpreted language like this would not even save any memory, but it feels right
 
 	// Add file extension if absent
 	if (!filename.endsWith(fileExtension)) {
@@ -559,7 +559,7 @@ export async function loadYaml(rootDir: string, relativeDir: string, filename: s
 
 	// Try to read the file contents and return them; If we fail, we log filename to error stream, and rethrow the error
 	try {
-		var contents: Buffer = await Loader.getFile(rootDir, relativeDir, filename);
+		let contents: Buffer = await Loader.getFile(rootDir, relativeDir, filename);
 		return yaml.load(contents.toString());
 	} catch (err) {
 		throw err;

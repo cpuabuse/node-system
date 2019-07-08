@@ -17,11 +17,19 @@ const path = require("path");
  */
 
 class FsObject {
-	system: System;
-	name: string;
-	dir: string;
-	type: string;
-	ext: string;
+
+	get base() {
+		return this.type === "file" ? this.name + this.ext : this.name;
+	}
+
+	get path() {
+		return loader.join(this.dir, this.base);
+	}
+	public dir: string;
+	public ext: string;
+	public name: string;
+	public system: System;
+	public type: string;
 	/**
 	 * Creates an instance of FsObject.
 	 * @param {module:system.System} system Parent system reference.
@@ -41,7 +49,7 @@ class FsObject {
 		this.ext = "";
 
 		// A promise to be passed to the callback
-		var done = async () => {
+		let done = async () => {
 			// @ts-ignore
 			let { rootDir } = system.system;
 			let fullPath = loader.join(rootDir, this.dir, this.name);
@@ -71,14 +79,6 @@ class FsObject {
 
 		// Perform an error-first callback
 		callback(done());
-	}
-
-	get base() {
-		return this.type === "file" ? this.name + this.ext : this.name;
-	}
-
-	get path() {
-		return loader.join(this.dir, this.base);
 	}
 }
 

@@ -3,7 +3,7 @@
 	cpuabuse.com
 */
 
-/** 
+/**
  * Contains list of errors used in system.
  */
 
