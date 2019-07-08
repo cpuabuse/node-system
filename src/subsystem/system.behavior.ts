@@ -14,7 +14,8 @@ import { LoaderError } from "../loaderError";
 import {
 	Access,
 	Subsystem /* eslint-disable-line no-unused-vars */, // ESLint bug
-	SubsystemExtensionArgs as Args /* eslint-disable-line no-unused-vars */ // ESLint bug
+	SubsystemExtensionArgs as Args /* eslint-disable-line no-unused-vars */, // ESLint bug
+	SubsystemEntrypoint /* eslint-disable-line no-unused-vars */ // ESLint bug
 } from "../system/subsystem";
 import { System } from "../system/system"; /* eslint-disable-line no-unused-vars */ // ESLint bug
 import { SystemError } from "../error";
@@ -225,6 +226,12 @@ async function addBehaviors(this: Behavior, behaviors: Behaviors): Promise<void>
  * @param name Behavior name
  */
 function behave(this: Behavior, name: string): void {
+	try {
+		this.subsystem[this.role.log].call.log(`Behavior - ${this.private.get.data[name].text}`);
+	} catch (error) {
+		this.subsystem[this.role.log].call.log(`Behavior - Undocumented behavior - ${name}`);
+	}
+
 	if (typeof name === "string") {
 		if (Object.prototype.hasOwnProperty.call(this.behaviorId, name)) {
 			this.behaviorId[name].forEach((event: string): void => {
@@ -293,7 +300,7 @@ function fire(this: Behavior, name: string, message?: string): void {
 
 		// Behavior
 		if (event.behavior) {
-			this.system.behave(name);
+			this.private.call.behave(name);
 		}
 		// Callback
 	} catch (error) {
@@ -339,6 +346,11 @@ export default class Behavior extends Subsystem {
 		[key: string]: string;
 	};
 
+	/** Contains the shared subsystem entrypoint. */
+	protected subsystem: {
+		[key: string]: SubsystemEntrypoint;
+	};
+
 	/** Initializes system behavior. */
 	// @ts-ignore tsc does not see inevitability of super()
 	constructor({ system, args, protectedEntrypoint, publicEntrypoint, sharedEntrypoint, vars }: Args) {
@@ -349,6 +361,9 @@ export default class Behavior extends Subsystem {
 		if (args.system_args !== undefined && args.shared !== undefined) {
 			// Assigning shared to instance
 			this.role = args.shared.role;
+
+			// Assign shared subsystems
+			this.subsystem = args.shared.subsystem;
 
 			// Add the methods
 			this.addMethods([

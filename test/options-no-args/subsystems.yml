@@ -10,3 +10,6 @@ behavior:
 event:
   folder: subsystems
   path: relative
+log:
+  folder: subsystems
+  path: relative

@@ -14,6 +14,32 @@ import {
 	SubsystemEntrypoint
 } from "../system/subsystem";
 import { LoaderError } from "../loaderError";
+import { System } from "../system/system";
+
+/**
+ * Log an error  message from the System context
+ * @instance
+ * @param {string} text - Message
+ * @fires module:system.private~type_error
+ * @example <caption>Usage</caption>
+ * var options = {
+ *   id: "lab_inventory",
+ *   rootDir: "labs",
+ *   relativeInitDir: "black_mesa",
+ *   initFilename: "inventory.yml",
+ *   logging: console
+ * };
+ * var text = "Testing Lab Inventory error log.";
+ *
+ * var labInventory = new System(options);
+ * labInventory.error(text);
+ */
+function error(this: Log, text: string): void {
+	if (this.subsystem[this.role.options].get.logging === "console") {
+		/* eslint-disable-next-line no-console */
+		console.error(`\x1b[31m[Error]\x1b[0m ${this.subsystem[this.role.options].get.id}: ${text}`);
+	}
+} // <== error
 
 /**
  * Log message from the System context
@@ -62,7 +88,7 @@ export default class Log extends Subsystem {
 			// Assigning shared to instance
 			this.role = args.shared.role;
 
-			// Assign options
+			// Assign shared subsystems
 			this.subsystem = args.shared.subsystem;
 
 			// Add the homepage

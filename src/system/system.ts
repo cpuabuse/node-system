@@ -804,7 +804,7 @@ export class System extends Loader {
 	 * @example <caption>Usage</caption>
 	 * system.private.error("Not enough resources.");
 	 */
-	private static error(text: string): void {
+	public static error(text: string): void {
 		/* eslint-disable-next-line no-console */
 		console.error(`\x1b[31m[Error]\x1b[0m ${text}`);
 	}
@@ -815,7 +815,7 @@ export class System extends Loader {
 	 * @example <caption>Usage</caption>
 	 * system.private.log("Resources loaded.");
 	 */
-	private static log(text: string): void {
+	public static log(text: string): void {
 		/* eslint-disable-next-line no-console */
 		console.log(`\x1b[32m[OK]\x1b[0m ${text}`);
 	}
@@ -860,29 +860,6 @@ export class System extends Loader {
 		} else {
 			this.private.error[code] = new SystemError(code, message);
 		}
-	}
-
-	/**
-	 * Emit an event as a behavior.
-	 * @instance
-	 * @param {string} event Behavior name.
-	 * @example <caption>Usage</caption>
-	 * // From the lab inventory system context
-	 * {
-	 *   // ...
-	 *
-	 *   this.behave("system_load_aux");
-	 *
-	 *   // ...
-	 * }
-	 */
-	public behave(event: string): void {
-		try {
-			this.log(`Behavior - ${this.private.subsystem[this.private.role.behavior].get.data[event].text}`);
-		} catch (error) {
-			this.log(`Behavior - Undocumented behavior - ${event}`);
-		}
-		this.private.subsystem[this.private.role.behavior].call.behave(event);
 	}
 
 	/**

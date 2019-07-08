@@ -9,5 +9,6 @@ args:
   - shared
 depends:
   - event
+  - log
 roles:
   - behavior
