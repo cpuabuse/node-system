@@ -14,7 +14,6 @@ import {
 	SubsystemEntrypoint
 } from "../system/subsystem";
 import { LoaderError } from "../loaderError";
-import { System } from "../system/system";
 
 /**
  * Log an error  message from the System context
@@ -108,6 +107,11 @@ export default class Log extends Subsystem {
 					access: Access.private | Access.protected | Access.shared,
 					fn: log,
 					name: "log"
+				},
+				{
+					access: Access.private | Access.protected | Access.shared,
+					fn: error,
+					name: "error"
 				}
 			]);
 		} else {

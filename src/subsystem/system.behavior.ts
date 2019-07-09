@@ -290,12 +290,12 @@ function fire(this: Behavior, name: string, message?: string): void {
 
 		// Log
 		if (event.log) {
-			this.system.log(`${event.log} - ${msg}`);
+			this.subsystem[this.role.log].call.log(`${event.log} - ${msg}`);
 		}
 
 		// Error
 		if (event.error) {
-			this.system.error(`${name} - ${msg}`);
+			this.subsystem[this.role.log].call.error(`${name} - ${msg}`);
 		}
 
 		// Behavior

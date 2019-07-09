@@ -369,30 +369,6 @@ export function testSystem(): void {
 						});
 					});
 
-					/**
-					 * Tests static log function.
-					 * Inevitably produces console output.
-					 * @function log
-					 * @memberof module:system~test.System
-					 */
-					describe(".testLog()", function(): void {
-						it("should print a test message to console", function(): void {
-							systemTest.testLog("Test");
-						});
-					});
-
-					/**
-					 * Tests static error function.
-					 * Inevitably produces console output.
-					 * @function error
-					 * @memberof module:system~test.System
-					 */
-					describe(".testError()", function(): void {
-						it("should print a test error message to console", function(): void {
-							systemTest.testError("Test");
-						});
-					});
-
 					// System property of System instance
 					describe("#system", function() {
 						/**

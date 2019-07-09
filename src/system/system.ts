@@ -820,16 +820,6 @@ export class System extends Loader {
 		console.log(`\x1b[32m[OK]\x1b[0m ${text}`);
 	}
 
-	/** Test error logging. */
-	public testError(): void {
-		this.error("Test");
-	}
-
-	/** Test logging. */
-	public testLog(): void {
-		this.log("Test");
-	}
-
 	/**
 	 * Adds an error to the System dynamically
 	 * @instance
@@ -861,54 +851,6 @@ export class System extends Loader {
 			this.private.error[code] = new SystemError(code, message);
 		}
 	}
-
-	/**
-	 * Log an error  message from the System context
-	 * @instance
-	 * @param {string} text - Message
-	 * @fires module:system.private~type_error
-	 * @example <caption>Usage</caption>
-	 * var options = {
-	 *   id: "lab_inventory",
-	 *   rootDir: "labs",
-	 *   relativeInitDir: "black_mesa",
-	 *   initFilename: "inventory.yml",
-	 *   logging: console
-	 * };
-	 * var text = "Testing Lab Inventory error log.";
-	 *
-	 * var labInventory = new System(options);
-	 * labInventory.error(text);
-	 */
-	public error(text: string): void {
-		if (this.private.subsystem[this.private.role.options].get.logging === "console") {
-			System.error(`${this.private.subsystem[this.private.role.options].get.id}: ${text}`);
-		}
-	} // <== error
-
-	/**
-	 * Log message from the System context
-	 * @instance
-	 * @param {string} text - Message
-	 * @fires module:system.private~type_error
-	 * @example <caption>Usage</caption>
-	 * var options = {
-	 *   id: "lab_inventory",
-	 *   rootDir: "labs",
-	 *   relativeInitDir: "black_mesa",
-	 *   initFilename: "inventory.yml",
-	 *   loggomg: console
-	 * };
-	 * var text = "Lab Inventory working.";
-	 *
-	 * var labInventory = new System(options);
-	 * labInventory.log(text);
-	 */
-	public log(text: string): void {
-		if (this.private.subsystem[this.private.role.options].get.logging === "console") {
-			System.log(`${this.private.subsystem[this.private.role.options].get.id}: ${text}`);
-		}
-	} // <== log
 
 	/**
 	 * Adds a behavior bound to "this".
