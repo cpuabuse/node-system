@@ -153,7 +153,7 @@ export function testSystem(): void {
 						initFilename: "init",
 						logging: "off",
 						relativeInitDir: "cities",
-						rootDir: "test"
+						rootDir: `test${path.sep}data${path.sep}system`
 					}
 				});
 			});
@@ -221,7 +221,7 @@ export function testSystem(): void {
 							initFilename: "init",
 							logging: "off",
 							relativeInitDir: "error_initialization_check",
-							rootDir: "test"
+							rootDir: `test${path.sep}data${path.sep}system`
 						}
 					});
 				});
@@ -242,7 +242,7 @@ export function testSystem(): void {
 				// Example
 				options: {
 					id: "example",
-					rootDir: "test",
+					rootDir: `test${path.sep}data${path.sep}system`,
 					relativeInitDir: "example",
 					initFilename: "init",
 					logging: "console" // Test console logging
@@ -257,7 +257,7 @@ export function testSystem(): void {
 				// Options without system arguments
 				options: {
 					id: "options-no-args",
-					rootDir: "test",
+					rootDir: `test${path.sep}data${path.sep}system`,
 					relativeInitDir: "options-no-args",
 					initFilename: "init",
 					logging: "off"
@@ -273,7 +273,7 @@ export function testSystem(): void {
 				// Options without system arguments
 				options: {
 					id: "behavior-no-args",
-					rootDir: "test",
+					rootDir: `test${path.sep}data${path.sep}system`,
 					relativeInitDir: "behavior-no-args",
 					initFilename: "init",
 					logging: "off"
@@ -289,7 +289,7 @@ export function testSystem(): void {
 				// Flower shop
 				options: {
 					id: "flower_shop",
-					rootDir: "test",
+					rootDir: `test${path.sep}data${path.sep}system`,
 					relativeInitDir: "flowerShop",
 					initFilename: "init",
 					logging: "off"
