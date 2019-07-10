@@ -14,13 +14,16 @@ import { System, Options } from "./system"; /* eslint-disable-line no-unused-var
 /** Method access flags. */
 export enum Access /* eslint-disable-line no-unused-vars */ { // ESLint detection bug
 	/** Public flag. */
-	public = 1 << 1 /* eslint-disable-line no-unused-vars */, // ESLint detection bug
+	public = 1 /* eslint-disable-line no-unused-vars */, // ESLint detection bug
 
 	/** Protected flag. */
-	protected = 1 << 2 /* eslint-disable-line no-unused-vars */, // ESLint detection bug
+	protected = 1 << 1 /* eslint-disable-line no-unused-vars */, // ESLint detection bug
 
 	/** Private flag. */
-	private = 1 << 3 /* eslint-disable-line no-unused-vars */ // ESLint detection bug
+	private = 1 << 2 /* eslint-disable-line no-unused-vars */, // ESLint detection bug
+
+	/** Shared flag */
+	shared = 1 << 3 /* eslint-disable-line no-unused-vars */ // ESLint detection bug
 }
 
 /** Interface to represent data held by subsystem. */
@@ -44,6 +47,9 @@ export interface SubsystemArgs {
 
 	/** Public entrypoint reference. */
 	publicEntrypoint: SubsystemEntrypoint;
+
+	/** Shared entrypoint reference. */
+	sharedEntrypoint: SubsystemEntrypoint;
 
 	/** System context. */
 	system: System;
@@ -73,6 +79,9 @@ export interface SubsystemExtensionArgs {
 
 	/** Public entrypoint for subsystem. */
 	publicEntrypoint: SubsystemEntrypoint;
+
+	/** Shared entrypoint for subsystem. */
+	sharedEntrypoint: SubsystemEntrypoint;
 
 	/** Context of a parent system. */
 	system: System;
@@ -117,6 +126,9 @@ export class Subsystem extends SubsystemEntrypoint {
 	/** Reference to public entrypoint. */
 	public public: SubsystemEntrypoint;
 
+	/** Reference to shared entrypoint. */
+	public shared: SubsystemEntrypoint;
+
 	/** Parent system. */
 	protected system: System;
 
@@ -130,7 +142,7 @@ export class Subsystem extends SubsystemEntrypoint {
 	private method: Method = new Object() as Method;
 
 	/** Constructs subsystem. */
-	constructor({ system, protectedEntrypoint, publicEntrypoint }: SubsystemArgs) {
+	constructor({ system, protectedEntrypoint, publicEntrypoint, sharedEntrypoint }: SubsystemArgs) {
 		// Call superclass constructor
 		super();
 
@@ -142,13 +154,16 @@ export class Subsystem extends SubsystemEntrypoint {
 
 		// Initialize protected entrypoint
 		this.protected = protectedEntrypoint;
+
+		// Initialize shared entrypoint
+		this.shared = sharedEntrypoint;
 	}
 
 	/** Adds subsystem data to the subsystem. */
 	protected addData(data: Array<SubsystemData>): void {
 		data.forEach((subsystemData: SubsystemData): void => {
-			let addSubsystemData: (access: "public" | "protected" | "private") => void = (
-				access: "public" | "protected" | "private"
+			let addSubsystemData: (access: "public" | "protected" | "private" | "shared") => void = (
+				access: "public" | "protected" | "private" | "shared"
 			): void => {
 				if ((subsystemData.access & Access[access]) === Access[access]) {
 					Object.defineProperty(this[access].get, subsystemData.name, {
@@ -168,6 +183,7 @@ export class Subsystem extends SubsystemEntrypoint {
 			addSubsystemData("public");
 			addSubsystemData("protected");
 			addSubsystemData("private");
+			addSubsystemData("shared");
 		});
 	}
 
@@ -175,8 +191,8 @@ export class Subsystem extends SubsystemEntrypoint {
 	protected addMethods(methods: Array<SubsystemMethod>): void {
 		// Bind methods
 		methods.forEach((method: SubsystemMethod): void => {
-			let addMethod: (access: "public" | "protected" | "private") => void = (
-				access: "public" | "protected" | "private"
+			let addMethod: (access: "public" | "protected" | "private" | "shared") => void = (
+				access: "public" | "protected" | "private" | "shared"
 			): void => {
 				if ((method.access & Access[access]) === Access[access]) {
 					this[access].call[method.name] = this.method[method.name];
@@ -194,6 +210,9 @@ export class Subsystem extends SubsystemEntrypoint {
 
 			// Assign public entrypoint
 			addMethod("private");
+
+			// Assign public entrypoint
+			addMethod("shared");
 		});
 	}
 }

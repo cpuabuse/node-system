@@ -153,7 +153,7 @@ export function testSystem(): void {
 						initFilename: "init",
 						logging: "off",
 						relativeInitDir: "cities",
-						rootDir: "test"
+						rootDir: `test${path.sep}data${path.sep}system`
 					}
 				});
 			});
@@ -221,7 +221,7 @@ export function testSystem(): void {
 							initFilename: "init",
 							logging: "off",
 							relativeInitDir: "error_initialization_check",
-							rootDir: "test"
+							rootDir: `test${path.sep}data${path.sep}system`
 						}
 					});
 				});
@@ -242,7 +242,7 @@ export function testSystem(): void {
 				// Example
 				options: {
 					id: "example",
-					rootDir: "test",
+					rootDir: `test${path.sep}data${path.sep}system`,
 					relativeInitDir: "example",
 					initFilename: "init",
 					logging: "console" // Test console logging
@@ -257,7 +257,7 @@ export function testSystem(): void {
 				// Options without system arguments
 				options: {
 					id: "options-no-args",
-					rootDir: "test",
+					rootDir: `test${path.sep}data${path.sep}system`,
 					relativeInitDir: "options-no-args",
 					initFilename: "init",
 					logging: "off"
@@ -273,7 +273,7 @@ export function testSystem(): void {
 				// Options without system arguments
 				options: {
 					id: "behavior-no-args",
-					rootDir: "test",
+					rootDir: `test${path.sep}data${path.sep}system`,
 					relativeInitDir: "behavior-no-args",
 					initFilename: "init",
 					logging: "off"
@@ -289,7 +289,7 @@ export function testSystem(): void {
 				// Flower shop
 				options: {
 					id: "flower_shop",
-					rootDir: "test",
+					rootDir: `test${path.sep}data${path.sep}system`,
 					relativeInitDir: "flowerShop",
 					initFilename: "init",
 					logging: "off"
@@ -366,30 +366,6 @@ export function testSystem(): void {
 									assert.deepStrictEqual(subsystemVars, (element.checkSubsystemVars as any)[key] as object);
 								});
 							}
-						});
-					});
-
-					/**
-					 * Tests static log function.
-					 * Inevitably produces console output.
-					 * @function log
-					 * @memberof module:system~test.System
-					 */
-					describe(".testLog()", function(): void {
-						it("should print a test message to console", function(): void {
-							systemTest.testLog("Test");
-						});
-					});
-
-					/**
-					 * Tests static error function.
-					 * Inevitably produces console output.
-					 * @function error
-					 * @memberof module:system~test.System
-					 */
-					describe(".testError()", function(): void {
-						it("should print a test error message to console", function(): void {
-							systemTest.testError("Test");
 						});
 					});
 

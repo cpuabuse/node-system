@@ -721,6 +721,7 @@ export class System extends Loader {
 														// Initialize subsystem entrypoints
 														this.public.subsystem[subsystem] = new SubsystemEntrypoint();
 														this.protected.subsystem[subsystem] = new SubsystemEntrypoint();
+														this.shared.subsystem[subsystem] = new SubsystemEntrypoint();
 
 														// Initialize subsystem
 														this.private.subsystem[
@@ -730,6 +731,7 @@ export class System extends Loader {
 															args: resultingArgs,
 															protectedEntrypoint: this.protected.subsystem[subsystem],
 															publicEntrypoint: this.public.subsystem[subsystem],
+															sharedEntrypoint: this.shared.subsystem[subsystem],
 															system: this,
 															vars: subsystemsProperty.vars
 														});
@@ -802,7 +804,7 @@ export class System extends Loader {
 	 * @example <caption>Usage</caption>
 	 * system.private.error("Not enough resources.");
 	 */
-	private static error(text: string): void {
+	public static error(text: string): void {
 		/* eslint-disable-next-line no-console */
 		console.error(`\x1b[31m[Error]\x1b[0m ${text}`);
 	}
@@ -813,19 +815,9 @@ export class System extends Loader {
 	 * @example <caption>Usage</caption>
 	 * system.private.log("Resources loaded.");
 	 */
-	private static log(text: string): void {
+	public static log(text: string): void {
 		/* eslint-disable-next-line no-console */
 		console.log(`\x1b[32m[OK]\x1b[0m ${text}`);
-	}
-
-	/** Test error logging. */
-	public testError(): void {
-		this.error("Test");
-	}
-
-	/** Test logging. */
-	public testLog(): void {
-		this.log("Test");
 	}
 
 	/**
@@ -859,77 +851,6 @@ export class System extends Loader {
 			this.private.error[code] = new SystemError(code, message);
 		}
 	}
-
-	/**
-	 * Emit an event as a behavior.
-	 * @instance
-	 * @param {string} event Behavior name.
-	 * @example <caption>Usage</caption>
-	 * // From the lab inventory system context
-	 * {
-	 *   // ...
-	 *
-	 *   this.behave("system_load_aux");
-	 *
-	 *   // ...
-	 * }
-	 */
-	public behave(event: string): void {
-		try {
-			this.log(`Behavior - ${this.private.subsystem[this.private.role.behavior].get.data[event].text}`);
-		} catch (error) {
-			this.log(`Behavior - Undocumented behavior - ${event}`);
-		}
-		this.private.subsystem[this.private.role.behavior].call.behave(event);
-	}
-
-	/**
-	 * Log an error  message from the System context
-	 * @instance
-	 * @param {string} text - Message
-	 * @fires module:system.private~type_error
-	 * @example <caption>Usage</caption>
-	 * var options = {
-	 *   id: "lab_inventory",
-	 *   rootDir: "labs",
-	 *   relativeInitDir: "black_mesa",
-	 *   initFilename: "inventory.yml",
-	 *   logging: console
-	 * };
-	 * var text = "Testing Lab Inventory error log.";
-	 *
-	 * var labInventory = new System(options);
-	 * labInventory.error(text);
-	 */
-	public error(text: string): void {
-		if (this.private.subsystem[this.private.role.options].get.logging === "console") {
-			System.error(`${this.private.subsystem[this.private.role.options].get.id}: ${text}`);
-		}
-	} // <== error
-
-	/**
-	 * Log message from the System context
-	 * @instance
-	 * @param {string} text - Message
-	 * @fires module:system.private~type_error
-	 * @example <caption>Usage</caption>
-	 * var options = {
-	 *   id: "lab_inventory",
-	 *   rootDir: "labs",
-	 *   relativeInitDir: "black_mesa",
-	 *   initFilename: "inventory.yml",
-	 *   loggomg: console
-	 * };
-	 * var text = "Lab Inventory working.";
-	 *
-	 * var labInventory = new System(options);
-	 * labInventory.log(text);
-	 */
-	public log(text: string): void {
-		if (this.private.subsystem[this.private.role.options].get.logging === "console") {
-			System.log(`${this.private.subsystem[this.private.role.options].get.id}: ${text}`);
-		}
-	} // <== log
 
 	/**
 	 * Adds a behavior bound to "this".

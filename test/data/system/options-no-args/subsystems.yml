@@ -1,13 +1,15 @@
 options:
   folder: subsystems
   path: relative
-local-fs:
+system.info.options-no-args:
   folder: subsystems
   path: relative
-strange_behavior_name:
-  file: behavior
+behavior:
   folder: subsystems
   path: relative
 event:
+  folder: subsystems
+  path: relative
+log:
   folder: subsystems
   path: relative

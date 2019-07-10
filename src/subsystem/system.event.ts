@@ -12,8 +12,8 @@ import { Access, SubsystemData as Data, Subsystem, SubsystemExtensionArgs as Arg
 /** This class handles events. */
 export default class Event extends Subsystem {
 	/** Constructs an instance of events. */
-	constructor({ system, protectedEntrypoint, publicEntrypoint, vars }: Args) {
-		super({ protectedEntrypoint, publicEntrypoint, system });
+	constructor({ system, protectedEntrypoint, publicEntrypoint, sharedEntrypoint, vars }: Args) {
+		super({ protectedEntrypoint, publicEntrypoint, sharedEntrypoint, system });
 
 		// TODO: Add checks for consistency of the events
 
