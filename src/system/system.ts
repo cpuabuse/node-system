@@ -17,7 +17,10 @@ import {
 import { Loader, loadYaml } from "../loader"; // Auxiliary system lib
 import { AtomicLock } from "./atomic";
 import { LoaderError } from "../loaderError";
-import { Behaviors, BehaviorInterface } from "../subsystem/system.behavior";
+import {
+	Behaviors,
+	BehaviorInterface /* eslint-disable-line no-unused-vars */
+} from "../subsystem/system.behavior";
 import {
 	OptionsInterface /* eslint-disable-line no-unused-vars */,
 	checkOptionsFailure /* eslint-disable-line no-unused-vars */
@@ -190,7 +193,12 @@ interface ISystemProperty {
 		 * @param file Filename.
 		 * @returns Promise, containing string with file contents.
 		 */
-		getFile(dir: string, file: string, cacheTtl: number, force: boolean): Promise<Buffer>;
+		getFile(
+			dir: string,
+			file: string,
+			cacheTtl: number,
+			force: boolean
+		): Promise<Buffer>;
 
 		/**
 		 * Get contents of yaml file relative to system root directory.
@@ -207,7 +215,10 @@ interface ISystemProperty {
 		 * @param target File/folder path to rootDir.
 		 * @returns Promise, containing string path.
 		 */
-		join(dir: string | Array<string>, file: string | Array<string>): Promise<string | Array<string>>;
+		join(
+			dir: string | Array<string>,
+			file: string | Array<string>
+		): Promise<string | Array<string>>;
 
 		/**
 		 * List the contents of the folder, relative to system root directory.
@@ -280,9 +291,13 @@ function isProperLoaderObject(
 			case "arrayOfString":
 				if (Array.isArray(objectProperty)) {
 					if (
-						objectProperty.reduce(function(accumulator: boolean, current: any): boolean {
+						objectProperty.reduce(function(
+							accumulator: boolean,
+							current: any
+						): boolean {
 							return typeof current === "string" && accumulator;
-						}, true)
+						},
+						true)
 					) {
 						proper = true;
 					}
@@ -310,7 +325,11 @@ function isProperLoaderObject(
 }
 
 /** Performs import recursion for the subsystems. */
-async function importRecursion({ stack, imports, current }: ImportRecursionArgs): Promise<void> {
+async function importRecursion({
+	stack,
+	imports,
+	current
+}: ImportRecursionArgs): Promise<void> {
 	// Check for circular dependency
 	if (stack.includes(current)) {
 		throw new LoaderError(
@@ -420,7 +439,10 @@ export class System extends Loader {
 				onError(
 					error instanceof LoaderError
 						? error
-						: new LoaderError("other_error", "Other error in System constructor has been rethrown as Loader Error.")
+						: new LoaderError(
+								"other_error",
+								"Other error in System constructor has been rethrown as Loader Error."
+						  )
 				);
 			}
 		}
@@ -439,360 +461,485 @@ export class System extends Loader {
 			}
 
 			// First things first, call a loader, if loader has failed, there are no tools to report gracefully, so the errors from there will just go above
-			super(options.rootDir, options.relativeInitDir, options.initFilename, (load: Promise<void>): void => {
-				load
-					.then(
-						(): Promise<void> =>
-							(async (): Promise<void> => {
-								// It is async by design, not by need
-								this.public = {
-									subsystem: {}
-								};
-								this.protected = {
-									subsystem: {}
-								};
+			super(
+				options.rootDir,
+				options.relativeInitDir,
+				options.initFilename,
+				(load: Promise<void>): void => {
+					load
+						.then(
+							(): Promise<void> =>
+								(async (): Promise<void> => {
+									// It is async by design, not by need
+									this.public = {
+										subsystem: {}
+									};
+									this.protected = {
+										subsystem: {}
+									};
 
-								this.private = new Object() as ISystemProperty;
-								this.private.subsystem = new Object() as {
-									[key: string]: Subsystem;
-								};
-								this.private.error = new Object() as {
-									[key: string]: SystemError;
-								};
-								this.private.file = {
-									cache: {
-										files: [], // Array of actual files and reverse indices pointing from files to index
-										index: {} // Index pointing to files
-									},
-									filter: {
-										isDir: (filterContext: FilterContext): Promise<boolean> =>
-											Loader.isDir(this.private.subsystem[this.private.role.options].get.rootDir, filterContext.item),
-										isFile: (filterContext: FilterContext): Promise<boolean> =>
-											Loader.isFile(Loader.join(
-												this.private.subsystem[this.private.role.options].get.rootDir,
-												Loader.join(filterContext.dir, filterContext.itemName) as string
-											) as string) // Only two arguments make string always
-									},
-									getFile: async (dir: string, file: string, cacheTtl: number, force: boolean): Promise<Buffer> => {
-										// Construct a path
-										const pathToFile: string = Loader.join(dir, file) as string; // Only two arguments make string always
+									this.private = new Object() as ISystemProperty;
+									this.private.subsystem = new Object() as {
+										[key: string]: Subsystem;
+									};
+									this.private.error = new Object() as {
+										[key: string]: SystemError;
+									};
+									this.private.file = {
+										cache: {
+											files: [], // Array of actual files and reverse indices pointing from files to index
+											index: {} // Index pointing to files
+										},
+										filter: {
+											isDir: (filterContext: FilterContext): Promise<boolean> =>
+												Loader.isDir(
+													this.private.subsystem[this.private.role.options].get
+														.rootDir,
+													filterContext.item
+												),
+											isFile: (
+												filterContext: FilterContext
+											): Promise<boolean> =>
+												Loader.isFile(Loader.join(
+													this.private.subsystem[this.private.role.options].get
+														.rootDir,
+													Loader.join(
+														filterContext.dir,
+														filterContext.itemName
+													) as string
+												) as string) // Only two arguments make string always
+										},
+										getFile: async (
+											dir: string,
+											file: string,
+											cacheTtl: number,
+											force: boolean
+										): Promise<Buffer> => {
+											// Construct a path
+											const pathToFile: string = Loader.join(
+												dir,
+												file
+											) as string; // Only two arguments make string always
 
-										// Assign
-										const {
-											index,
-											files
-										}: {
-											files: FileObject[];
-											index: { [key: string]: FileObject };
-										} = this.private.file.cache;
+											// Assign
+											const {
+												index,
+												files
+											}: {
+												files: FileObject[];
+												index: { [key: string]: FileObject };
+											} = this.private.file.cache;
 
-										// Physically getting the file
-										const pGetFile: () => Promise<Buffer> = (): Promise<Buffer> =>
-											(async (): Promise<Buffer> => {
-												/* eslint-disable-line func-style */ // Can't have arrow style function declaration
-												try {
-													return await Loader.getFile(
-														this.private.subsystem[this.private.role.options].get.rootDir,
-														dir,
-														file
-													);
-												} catch (error) {
-													// TODO: this.private.subsystem[this.private.role.behavior].call.fire("fileprivate_error");
-													throw this.private.error.file_system_error;
-												}
-											})();
+											// Physically getting the file
+											const pGetFile: () => Promise<Buffer> = (): Promise<
+												Buffer
+											> =>
+												(async (): Promise<Buffer> => {
+													/* eslint-disable-line func-style */ // Can't have arrow style function declaration
+													try {
+														return await Loader.getFile(
+															this.private.subsystem[this.private.role.options]
+																.get.rootDir,
+															dir,
+															file
+														);
+													} catch (error) {
+														// TODO: this.private.subsystem[this.private.role.behavior].call.fire("fileprivate_error");
+														throw this.private.error.file_system_error;
+													}
+												})();
 
-										const maxFiles: number = 100;
-										const defaultCacheTtl: number = 86400;
-										const milliSecondsInSeconds: number = 1000; // The functionality is there for future, cacheTtl will be initialized from loader
+											const maxFiles: number = 100;
+											const defaultCacheTtl: number = 86400;
+											const milliSecondsInSeconds: number = 1000; // The functionality is there for future, cacheTtl will be initialized from loader
 
-										// Set cache to default if not provided
-										/* tslint:disable-next-line strict-type-predicates */
-										if (cacheTtl === null) {
-											cacheTtl = defaultCacheTtl; /* tslint:disable-line no-parameter-reassignment */ /* eslint-disable-line no-param-reassign */ // The functionality is there for future, cacheTtl will be initialized from loader
-										}
-										if (maxFiles > 0) {
-											// Find expiration time and current time
-											const currentTimeStamp: number = Math.trunc(new Date().getTime() / milliSecondsInSeconds);
-											const expirationTimeStamp: number = currentTimeStamp + cacheTtl;
-
-											// Find if file is cached
-											let cached: boolean = false;
-											if (Object.prototype.hasOwnProperty.call(index, pathToFile)) {
-												cached = true;
+											// Set cache to default if not provided
+											/* tslint:disable-next-line strict-type-predicates */
+											if (cacheTtl === null) {
+												cacheTtl = defaultCacheTtl; /* tslint:disable-line no-parameter-reassignment */ /* eslint-disable-line no-param-reassign */ // The functionality is there for future, cacheTtl will be initialized from loader
 											}
+											if (maxFiles > 0) {
+												// Find expiration time and current time
+												const currentTimeStamp: number = Math.trunc(
+													new Date().getTime() / milliSecondsInSeconds
+												);
+												const expirationTimeStamp: number =
+													currentTimeStamp + cacheTtl;
 
-											// Process for cached
-											if (cached) {
-												if (index[pathToFile].cacheTtl === cacheTtl) {
-													// If expired; Not expired is anticipated to be the most used path
-													if (currentTimeStamp > index[pathToFile].expires) {
-														index[pathToFile].file = await pGetFile();
-														index[pathToFile].expires = expirationTimeStamp;
-													} else if (force) {
-														index[pathToFile].file = await pGetFile();
+												// Find if file is cached
+												let cached: boolean = false;
+												if (
+													Object.prototype.hasOwnProperty.call(
+														index,
+														pathToFile
+													)
+												) {
+													cached = true;
+												}
+
+												// Process for cached
+												if (cached) {
+													if (index[pathToFile].cacheTtl === cacheTtl) {
+														// If expired; Not expired is anticipated to be the most used path
+														if (currentTimeStamp > index[pathToFile].expires) {
+															index[pathToFile].file = await pGetFile();
+															index[pathToFile].expires = expirationTimeStamp;
+														} else if (force) {
+															index[pathToFile].file = await pGetFile();
+														}
+													} else {
+														// New ttl
+														if (
+															index[pathToFile].expires > expirationTimeStamp
+														) {
+															index[pathToFile].expires = expirationTimeStamp;
+														}
+														index[pathToFile].cacheTtl = cacheTtl;
+														if (force) {
+															index[pathToFile].file = await pGetFile();
+														}
 													}
 												} else {
-													// New ttl
-													if (index[pathToFile].expires > expirationTimeStamp) {
-														index[pathToFile].expires = expirationTimeStamp;
-													}
-													index[pathToFile].cacheTtl = cacheTtl;
-													if (force) {
-														index[pathToFile].file = await pGetFile();
-													}
-												}
-											} else {
-												// <== if(cached)
-												let nextFile: number;
-												const filesLength: number = files.length;
+													// <== if(cached)
+													let nextFile: number;
+													const filesLength: number = files.length;
 
-												// Determine index and prepare space
-												if (filesLength >= maxFiles) {
-													// Update indices
-													/* tslint:disable-next-line no-dynamic-delete */
-													delete index[files[0].rIndex];
-													if (Object.keys(index[files[0].rIndex]).length === 0) {
+													// Determine index and prepare space
+													if (filesLength >= maxFiles) {
+														// Update indices
 														/* tslint:disable-next-line no-dynamic-delete */
 														delete index[files[0].rIndex];
+														if (
+															Object.keys(index[files[0].rIndex]).length === 0
+														) {
+															/* tslint:disable-next-line no-dynamic-delete */
+															delete index[files[0].rIndex];
+														}
+
+														// Shift the array
+														files.shift();
+
+														// Assign next file index
+														nextFile = maxFiles - 1;
+													} else {
+														nextFile = filesLength;
 													}
 
-													// Shift the array
-													files.shift();
+													// Unshift the array
+													files.unshift({
+														cacheTtl,
+														expires: expirationTimeStamp,
+														file: await pGetFile()
+													} as FileObject);
 
-													// Assign next file index
-													nextFile = maxFiles - 1;
-												} else {
-													nextFile = filesLength;
-												}
+													// Add indices
+													index[pathToFile] = files[nextFile];
+													files[nextFile].rIndex = pathToFile;
+												} // End: if(cached) {} else {...}
 
-												// Unshift the array
-												files.unshift({
-													cacheTtl,
-													expires: expirationTimeStamp,
-													file: await pGetFile()
-												} as FileObject);
-
-												// Add indices
-												index[pathToFile] = files[nextFile];
-												files[nextFile].rIndex = pathToFile;
-											} // End: if(cached) {} else {...}
-
-											// Return
-											return index[pathToFile].file;
-										}
-
-										// Return
-										return pGetFile();
-									},
-									getYaml: (dir: string, file: string): Promise<string> =>
-										loadYaml(this.private.subsystem[this.private.role.options].get.rootDir, dir, file),
-									async join(rootDir: string, target: string | Array<string>): Promise<string | Array<string>> {
-										/* eslint-disable-line require-await */ // We want file methods to produce same type output
-										return Loader.join(rootDir, target);
-									},
-									list: async (dir: string, filter: Filter | null): Promise<Array<string>> => {
-										let filteredItems: Array<string>; // Return array
-										let itemNames: Array<string> = await Loader.list(
-											this.private.subsystem[this.private.role.options].get.rootDir,
-											dir
-										); // Wait for folder contets
-										let items: Array<string> = (await this.private.file.join(dir, itemNames)) as Array<string>; // The return will be always be an array
-
-										// Was the filter even specified?
-										if (filter === null) {
-											filteredItems = itemNames;
-										} else {
-											filteredItems = new Array() as Array<string>; // Prepare return object
-											let { length }: Array<string> = items; // Cache length
-											let filterMatches: Array<Promise<boolean>> = new Array(); // Operations dataholder; Contains Promises
-
-											// Filter and populate promises
-											for (let i: number = 0; i < length; i++) {
-												// Declare and populate filter context
-												let filterContext: FilterContext = {
-													dir,
-													item: items[i],
-													itemName: itemNames[i]
-												};
-												filterMatches[i] = filter(filterContext);
+												// Return
+												return index[pathToFile].file;
 											}
 
-											// Work on results
-											await Promise.all(filterMatches).then((values: Array<boolean>): void => {
-												// Populate return object preserving the order
-												for (let i: number = 0; i < length; i++) {
-													if (values[i]) {
-														filteredItems.push(itemNames[i]);
-													}
-												}
-											});
-										}
-
-										// Finally - return filtered items
-										return filteredItems;
-									}, // <== list
-									toAbsolute: (dir: string, file: string): Promise<string> =>
-										(async (): Promise<string> => {
-											/* eslint-disable-line require-await */ // We want file methods to produce same type output
-											let filePath: string = Loader.join(dir, file) as string; // Only two arguments make string always
-
 											// Return
-											return Loader.join(
-												this.private.subsystem[this.private.role.options].get.rootDir,
-												filePath
-											) as string;
-										})(),
-									async toRelative(rootDir: string, target: string): Promise<string> {
-										/* eslint-disable-line require-await */ // We want file methods to produce same type output
-										return Loader.toRelative(rootDir, target) as string; // Only two arguments make string always
-									}
-								}; // <== file
+											return pGetFile();
+										},
+										getYaml: (dir: string, file: string): Promise<string> =>
+											loadYaml(
+												this.private.subsystem[this.private.role.options].get
+													.rootDir,
+												dir,
+												file
+											),
+										async join(
+											rootDir: string,
+											target: string | Array<string>
+										): Promise<string | Array<string>> {
+											/* eslint-disable-line require-await */ // We want file methods to produce same type output
+											return Loader.join(rootDir, target);
+										},
+										list: async (
+											dir: string,
+											filter: Filter | null
+										): Promise<Array<string>> => {
+											let filteredItems: Array<string>; // Return array
+											let itemNames: Array<string> = await Loader.list(
+												this.private.subsystem[this.private.role.options].get
+													.rootDir,
+												dir
+											); // Wait for folder contets
+											let items: Array<string> = (await this.private.file.join(
+												dir,
+												itemNames
+											)) as Array<string>; // The return will be always be an array
 
-								// Initialize the roles
-								this.private.role = {};
+											// Was the filter even specified?
+											if (filter === null) {
+												filteredItems = itemNames;
+											} else {
+												filteredItems = new Array() as Array<string>; // Prepare return object
+												let { length }: Array<string> = items; // Cache length
+												let filterMatches: Array<
+													Promise<boolean>
+												> = new Array(); // Operations dataholder; Contains Promises
 
-								// Initialize shared
-								this.shared = {
-									role: this.private.role,
-									subsystem: {}
-								};
-							})()
-					)
-					.then(async () => {
-						// The following is code dependent on full initialization by static system initializer and Loader.
-						// Initialize subsystems
-						if (isProperLoaderObject(this, "subsystems", "object")) {
-							// Assign subsystems shortcut reference
-							let subsystems: LoaderProperty = this.subsystems as LoaderProperty;
+												// Filter and populate promises
+												for (let i: number = 0; i < length; i++) {
+													// Declare and populate filter context
+													let filterContext: FilterContext = {
+														dir,
+														item: items[i],
+														itemName: itemNames[i]
+													};
+													filterMatches[i] = filter(filterContext);
+												}
 
-							// Declare an array of functions to be mapped
-							let imports: Imports = new Object() as Imports;
+												// Work on results
+												await Promise.all(filterMatches).then(
+													(values: Array<boolean>): void => {
+														// Populate return object preserving the order
+														for (let i: number = 0; i < length; i++) {
+															if (values[i]) {
+																filteredItems.push(itemNames[i]);
+															}
+														}
+													}
+												);
+											}
 
-							// Loop through subsystems
-							/* eslint-disable-next-line no-restricted-syntax */
-							for (let subsystem in subsystems) {
-								if (isProperLoaderObject(subsystems, subsystem, "object")) {
-									let subsystemsProperty: LoaderProperty = subsystems[subsystem];
-									if (isProperLoaderObject(subsystemsProperty, "type", "string")) {
-										imports[subsystem] = {
-											active: false,
-											depends: isProperLoaderObject(subsystems[subsystem], "depends", "arrayOfString")
-												? ((subsystems[subsystem].depends as unknown) as Array<string>)
-												: new Array(),
-											// TODO: Remove the no-loop-func with a rework
-											fn: (): Promise<void> /* eslint-disable-line no-loop-func */ =>
-												import(`../subsystem/${(subsystemsProperty.type as unknown) as string}`).then(
-													(subsystemModule: { default: ISubsystem }): void => {
-														// Process roles
-														if (isProperLoaderObject(subsystemsProperty, "roles", "arrayOfString")) {
-															let roles: Array<string> = (subsystemsProperty.roles as unknown) as Array<string>;
-															roles.forEach((element: string): void => {
-																// Assigning subsystem name to a role identified by subsystem
-																this.private.role[element] = subsystem;
+											// Finally - return filtered items
+											return filteredItems;
+										}, // <== list
+										toAbsolute: (dir: string, file: string): Promise<string> =>
+											(async (): Promise<string> => {
+												/* eslint-disable-line require-await */ // We want file methods to produce same type output
+												let filePath: string = Loader.join(dir, file) as string; // Only two arguments make string always
+
+												// Return
+												return Loader.join(
+													this.private.subsystem[this.private.role.options].get
+														.rootDir,
+													filePath
+												) as string;
+											})(),
+										async toRelative(
+											rootDir: string,
+											target: string
+										): Promise<string> {
+											/* eslint-disable-line require-await */ // We want file methods to produce same type output
+											return Loader.toRelative(rootDir, target) as string; // Only two arguments make string always
+										}
+									}; // <== file
+
+									// Initialize the roles
+									this.private.role = {};
+
+									// Initialize shared
+									this.shared = {
+										role: this.private.role,
+										subsystem: {}
+									};
+								})()
+						)
+						.then(async () => {
+							// The following is code dependent on full initialization by static system initializer and Loader.
+							// Initialize subsystems
+							if (isProperLoaderObject(this, "subsystems", "object")) {
+								// Assign subsystems shortcut reference
+								let subsystems: LoaderProperty = this
+									.subsystems as LoaderProperty;
+
+								// Declare an array of functions to be mapped
+								let imports: Imports = new Object() as Imports;
+
+								// Loop through subsystems
+								/* eslint-disable-next-line no-restricted-syntax */
+								for (let subsystem in subsystems) {
+									if (isProperLoaderObject(subsystems, subsystem, "object")) {
+										let subsystemsProperty: LoaderProperty =
+											subsystems[subsystem];
+										if (
+											isProperLoaderObject(subsystemsProperty, "type", "string")
+										) {
+											imports[subsystem] = {
+												active: false,
+												depends: isProperLoaderObject(
+													subsystems[subsystem],
+													"depends",
+													"arrayOfString"
+												)
+													? ((subsystems[subsystem]
+															.depends as unknown) as Array<string>)
+													: new Array(),
+												// TODO: Remove the no-loop-func with a rework
+												fn: (): Promise<
+													void
+												> /* eslint-disable-line no-loop-func */ =>
+													import(
+														`../subsystem/${(subsystemsProperty.type as unknown) as string}`
+													).then(
+														(subsystemModule: {
+															default: ISubsystem;
+														}): void => {
+															// Process roles
+															if (
+																isProperLoaderObject(
+																	subsystemsProperty,
+																	"roles",
+																	"arrayOfString"
+																)
+															) {
+																let roles: Array<
+																	string
+																> = (subsystemsProperty.roles as unknown) as Array<
+																	string
+																>;
+																roles.forEach(
+																	(element: string): void => {
+																		// Assigning subsystem name to a role identified by subsystem
+																		this.private.role[element] = subsystem;
+																	}
+																);
+															}
+
+															// Process args
+															let resultingArgs: {
+																[key: string]: any;
+															} = new Object();
+															if (
+																isProperLoaderObject(
+																	subsystemsProperty,
+																	"args",
+																	"arrayOfString"
+																)
+															) {
+																// Define subsystem arguments
+																let subsystemArgsProperty: Array<
+																	string
+																> = (subsystemsProperty.args as unknown) as Array<
+																	string
+																>;
+																// Process the system args
+																if (
+																	subsystemArgsProperty.includes("system_args")
+																) {
+																	/* eslint-disable-next-line dot-notation */ /* tslint:disable-next-line no-string-literal */ // Parens are necessary
+																	resultingArgs["system_args"] = {
+																		behaviors,
+																		options
+																	};
+																}
+
+																// Process the roles
+																if (subsystemArgsProperty.includes("shared")) {
+																	/* eslint-disable-next-line dot-notation */ /* tslint:disable-next-line no-string-literal */ // Potential future change to some form of the definitions of the strings
+																	resultingArgs["shared"] = this.shared;
+																}
+															}
+
+															// Initialize subsystem entrypoints
+															this.public.subsystem[
+																subsystem
+															] = new SubsystemEntrypoint();
+															this.protected.subsystem[
+																subsystem
+															] = new SubsystemEntrypoint();
+															this.shared.subsystem[
+																subsystem
+															] = new SubsystemEntrypoint();
+
+															// Initialize subsystem
+															this.private.subsystem[
+																subsystem
+																/* eslint-disable-next-line new-cap */ // It is an argument
+															] = new subsystemModule.default({
+																args: resultingArgs,
+																protectedEntrypoint: this.protected.subsystem[
+																	subsystem
+																],
+																publicEntrypoint: this.public.subsystem[
+																	subsystem
+																],
+																sharedEntrypoint: this.shared.subsystem[
+																	subsystem
+																],
+																system: this,
+																vars: subsystemsProperty.vars
 															});
 														}
-
-														// Process args
-														let resultingArgs: {
-															[key: string]: any;
-														} = new Object();
-														if (isProperLoaderObject(subsystemsProperty, "args", "arrayOfString")) {
-															// Define subsystem arguments
-															let subsystemArgsProperty: Array<string> = (subsystemsProperty.args as unknown) as Array<
-																string
-															>;
-															// Process the system args
-															if (subsystemArgsProperty.includes("system_args")) {
-																/* eslint-disable-next-line dot-notation */ /* tslint:disable-next-line no-string-literal */ // Parens are necessary
-																resultingArgs["system_args"] = {
-																	behaviors,
-																	options
-																};
-															}
-
-															// Process the roles
-															if (subsystemArgsProperty.includes("shared")) {
-																/* eslint-disable-next-line dot-notation */ /* tslint:disable-next-line no-string-literal */ // Potential future change to some form of the definitions of the strings
-																resultingArgs["shared"] = this.shared;
-															}
-														}
-
-														// Initialize subsystem entrypoints
-														this.public.subsystem[subsystem] = new SubsystemEntrypoint();
-														this.protected.subsystem[subsystem] = new SubsystemEntrypoint();
-														this.shared.subsystem[subsystem] = new SubsystemEntrypoint();
-
-														// Initialize subsystem
-														this.private.subsystem[
-															subsystem
-															/* eslint-disable-next-line new-cap */ // It is an argument
-														] = new subsystemModule.default({
-															args: resultingArgs,
-															protectedEntrypoint: this.protected.subsystem[subsystem],
-															publicEntrypoint: this.public.subsystem[subsystem],
-															sharedEntrypoint: this.shared.subsystem[subsystem],
-															system: this,
-															vars: subsystemsProperty.vars
-														});
-													}
-												)
-										};
-									}
-								}
-							}
-							// Await for subsystem load
-							await Promise.all(
-								Object.keys(imports).map(function(current: string): Promise<void> {
-									return importRecursion({ current, imports, stack: new Array() });
-								})
-							);
-						}
-
-						// Initialize the errors
-						if (isProperLoaderObject(this, "errors", "object")) {
-							Object.keys(this.errors as object).forEach((err: string): void => {
-								// Will skip garbled errors
-								if (typeof this.errors[err] === "object") {
-									/* tslint:disable-line strict-type-predicates */ // It is an argument
-									// Set default error message for absent message
-									let message: string = "Error message not set.";
-									if (Object.prototype.hasOwnProperty.call(this.errors[err], "message")) {
-										if (typeof this.errors[err].message === "string") {
-											if (this.errors[err].message !== "") {
-												({ message } = this.errors[err] as {
-													message: string;
-												});
-											}
+													)
+											};
 										}
 									}
-									this.addError(err, message);
 								}
-							});
-						}
-					})
-					.then(() =>
-						// Add the behaviors
-						this.private.subsystem[this.private.role.behavior].call.addBehaviors(behaviors)
-					)
-					.then(() =>
-						this.private.subsystem[this.private.role.behavior].call.fire(
-							events.systemLoad,
-							"Behaviors initialized during system loading."
+								// Await for subsystem load
+								await Promise.all(
+									Object.keys(imports).map(function(
+										current: string
+									): Promise<void> {
+										return importRecursion({
+											current,
+											imports,
+											stack: new Array()
+										});
+									})
+								);
+							}
+
+							// Initialize the errors
+							if (isProperLoaderObject(this, "errors", "object")) {
+								Object.keys(this.errors as object).forEach(
+									(err: string): void => {
+										// Will skip garbled errors
+										if (typeof this.errors[err] === "object") {
+											/* tslint:disable-line strict-type-predicates */ // It is an argument
+											// Set default error message for absent message
+											let message: string = "Error message not set.";
+											if (
+												Object.prototype.hasOwnProperty.call(
+													this.errors[err],
+													"message"
+												)
+											) {
+												if (typeof this.errors[err].message === "string") {
+													if (this.errors[err].message !== "") {
+														({ message } = this.errors[err] as {
+															message: string;
+														});
+													}
+												}
+											}
+											this.addError(err, message);
+										}
+									}
+								);
+							}
+						})
+						.then(() =>
+							// Add the behaviors
+							this.private.subsystem[
+								this.private.role.behavior
+							].call.addBehaviors(behaviors)
 						)
-					)
-					.catch(function(error: Error | LoaderError): void {
-						// Errors returned from load or staticInitializationPromise
-						processLoaderError(
-							error instanceof LoaderError
-								? error
-								: new LoaderError(
-										"functionality_error",
-										"There was an error in the loader functionality in constructor subroutines."
-								  )
-						);
-					});
-			});
+						.then(() =>
+							this.private.subsystem[this.private.role.behavior].call.fire(
+								events.systemLoad,
+								"Behaviors initialized during system loading."
+							)
+						)
+						.catch(function(error: Error | LoaderError): void {
+							// Errors returned from load or staticInitializationPromise
+							processLoaderError(
+								error instanceof LoaderError
+									? error
+									: new LoaderError(
+											"functionality_error",
+											"There was an error in the loader functionality in constructor subroutines."
+									  )
+							);
+						});
+				}
+			);
 		} catch (error) {
 			processLoaderError(error);
 		}
@@ -874,6 +1021,8 @@ export class System extends Loader {
 	private on(event: string, callback: (system: System) => void): void {
 		let behavior: BehaviorInterface = new Object() as BehaviorInterface;
 		behavior[event] = (): void => callback(this);
-		this.private.subsystem[this.private.role.behavior].call.addBehaviors([behavior]);
+		this.private.subsystem[this.private.role.behavior].call.addBehaviors([
+			behavior
+		]);
 	}
 }
