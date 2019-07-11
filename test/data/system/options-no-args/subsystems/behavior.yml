@@ -1,0 +1,11 @@
+type: system.behavior
+vars:
+  homepage: https://github.com/cpuabuse/node-system
+args:
+  - system_args
+  - shared
+depends:
+  - event
+  - log
+roles:
+  - behavior

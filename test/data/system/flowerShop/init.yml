@@ -1,0 +1,10 @@
+data:
+  file: flowers
+  path: relative
+  folder: data
+  extend: false
+errors:
+branch:
+  extend: true
+subsystems:
+  extend: true

@@ -25,10 +25,23 @@ import * as systemError from "../../src/error";
 import * as loaderError from "../../src/loaderError";
 import * as expected from "../expected";
 
-const nonExistentFileOrDir = "Non-existent file or directory";
+/** Non-existent file or directory. */
+const nonExistentFileOrDir: string = "Non-existent file or directory";
+
+/** Number of retries. */
+const retries: number = 3;
+
+/** Test for SystemError. */
+interface ErrorTest {
+	description: string;
+	error: string;
+}
 
 /** System test unit initialization data. */
 export interface SystemTest {
+	/** Name of the behavior subsystem. */
+	behaviorSubsystem: string;
+
 	/** Whether behavior test to be done. */
 	behaviorTest: true;
 
@@ -79,8 +92,9 @@ export function testSystem(): void {
 		 * @function constructor
 		 * @memberof module:system~test.System
 		 */
-		describe("constructor", function() {
-			it("should still execute with inappropriate options and no ways to report an error", function() {
+		describe("constructor", function(): void {
+			it("should still execute with inappropriate options and no ways to report an error", function(): void {
+				/* eslint-disable-next-line no-new */ /* tslint:disable-next-line no-unused-expression */ // "new System" is only used for side-effects of testing
 				new System({} as {
 					behaviors: Array<{
 						[key: string]: {
@@ -89,13 +103,14 @@ export function testSystem(): void {
 					}> | null;
 					onError: ErrorCallback | null;
 					options: Options;
-				}); /* eslint-disable-line no-new */ // "new System" is only used for side-effects of testing
+				});
 			});
-			it("should execute with inappropriate options and error reporting not being a function", function() {
+			it("should execute with inappropriate options and error reporting not being a function", function(): void {
+				/* eslint-disable-next-line no-new */ /* tslint:disable-next-line no-unused-expression */ // "new System" is only used for side-effects of testing
 				new System({
-					options: (null as unknown) as Options,
 					behaviors: null,
-					onError: ("notFunction" as unknown) as ErrorCallback
+					onError: ("notFunction" as unknown) as ErrorCallback,
+					options: (null as unknown) as Options
 				} as {
 					behaviors: Array<{
 						[key: string]: {
@@ -104,69 +119,65 @@ export function testSystem(): void {
 					}> | null;
 					onError: ErrorCallback | null;
 					options: Options;
-				}); /* eslint-disable-line no-new */ // "new System" is only used for side-effects of testing
+				});
 			});
-			it("should fail with inappropriate options", function(done) {
+			it("should fail with inappropriate options", function(done: () => void): void {
+				/* eslint-disable-next-line no-new */ /* tslint:disable-next-line no-unused-expression */ // "new System" is only used for side-effects of testing
 				new System({
-					options: (null as unknown) as Options,
 					behaviors: null,
-					onError: function(error: any) {
-						/* eslint-disable-line no-new */ // "new System" is only used for side-effects of testing
+					onError(error: any): void {
 						assert.strictEqual(error.code, "system_options_failure");
 						assert.strictEqual(error.message, "The options provided to the system constructor are inconsistent.");
 						done();
-					}
+					},
+					options: (null as unknown) as Options
 				});
 			});
-			it("should fail with no events or behaviors files", function(done: any) {
-				let options = {
-					id: "cities",
-					rootDir: "test",
-					relativeInitDir: "cities",
-					initFilename: "init",
-					logging: "off"
-				};
-
+			it("should fail with no events or behaviors files", function(done: any): void {
+				/* eslint-disable-next-line no-new */ /* tslint:disable-next-line no-unused-expression */ // "new System" is only used for side-effects of testing
 				new System({
-					options: options,
 					behaviors: null,
-					onError: function(err: any) {
-						/* eslint-disable-line no-new */ // "new System" is only used for side-effects of testing
+					onError(err: any): void {
 						assert.throws(
-							function() {
+							function(): void {
 								throw err;
 							},
-							function(error: any) {
-								return error instanceof loaderError.LoaderError && error.code === "loader_fail";
+							function(error: any): boolean {
+								return error instanceof loaderError.LoaderError && error.code === "functionality_error";
 							}
 						);
 						done();
+					},
+					options: {
+						id: "cities",
+						initFilename: "init",
+						logging: "off",
+						relativeInitDir: "cities",
+						rootDir: `test${path.sep}data${path.sep}system`
 					}
 				});
 			});
-			it("should report functionality_error with fake options", function(done: any) {
-				let options = {
-					id: "fakeID",
-					rootDir: "fakeRoot",
-					relativeInitDir: "fakeDir",
-					initFilename: "fakeInit",
-					logging: "off"
-				};
-
+			it("should report functionality_error with fake options", function(done: any): void {
+				/* eslint-disable-next-line no-new */ /* tslint:disable-next-line no-unused-expression */ // "new System" is only used for side-effects of testing
 				new System({
-					options: options,
 					behaviors: null,
-					onError: function(err: any) {
-						/* eslint-disable-line no-new */ // "new System" is only used for side-effects of testing
+					onError(err: any): void {
 						assert.throws(
-							function() {
+							function(): void {
 								throw err;
 							},
-							function(error: any) {
+							function(error: any): boolean {
 								return err instanceof loaderError.LoaderError && error.code === "functionality_error";
 							}
 						);
 						done();
+					},
+					options: {
+						id: "fakeID",
+						initFilename: "fakeInit",
+						logging: "off",
+						relativeInitDir: "fakeDir",
+						rootDir: "fakeRoot"
 					}
 				});
 			});
@@ -175,48 +186,47 @@ export function testSystem(): void {
 			 *
 			 * - Should not generate inappropriately defined errors
 			 * - Should generate the default message
+			 * TODO : Define DONE and its function
 			 */
-			describe("errorInitialization", function() {
-				let options = {
-					id: "errorInitializationCheck",
-					rootDir: "test",
-					relativeInitDir: "error_initialization_check",
-					initFilename: "init",
-					logging: "off"
-				};
-				let systemErrors = [
+			describe("errorInitialization", function(): void {
+				let systemErrors: Array<ErrorTest> = [
 					{
-						error: "no_message",
-						description: "no error message"
+						description: "no error message",
+						error: "no_message"
 					},
 					{
-						error: "empty_message",
-						description: "empty message"
+						description: "empty message",
+						error: "empty_message"
 					},
 					{
-						error: "message_not_a_string",
-						description: "message not a string"
+						description: "message not a string",
+						error: "message_not_a_string"
 					}
 				];
 				let systemTest: any;
-				before(function(done) {
+				before(function(done: () => void): void {
 					systemTest = new System({
-						options,
 						behaviors: [
 							{
-								system_load() {
+								system_load(): void {
 									done();
 								}
 							}
 						],
-						onError(error: loaderError.LoaderError): void {
+						onError(): void {
 							done();
-							throw error;
+						},
+						options: {
+							id: "errorInitializationCheck",
+							initFilename: "init",
+							logging: "off",
+							relativeInitDir: "error_initialization_check",
+							rootDir: `test${path.sep}data${path.sep}system`
 						}
 					});
 				});
-				it("should not generate inappropriately defined errors", function() {
-					assert.strictEqual(systemTest.private.error.hasOwnProperty("not_object"), false);
+				it("should not generate inappropriately defined errors", function(): void {
+					assert.strictEqual(Object.prototype.hasOwnProperty.call(systemTest.private.error, "not_object"), false);
 				});
 				for (let error of systemErrors) {
 					it("should generate the default message with " + error.description, function() {
@@ -232,7 +242,7 @@ export function testSystem(): void {
 				// Example
 				options: {
 					id: "example",
-					rootDir: "test",
+					rootDir: `test${path.sep}data${path.sep}system`,
 					relativeInitDir: "example",
 					initFilename: "init",
 					logging: "console" // Test console logging
@@ -240,14 +250,14 @@ export function testSystem(): void {
 				rawInitFilename: "init.yml",
 				initYamlContents: expected.exampleYamlInit,
 				initContents: expected.exampleInit,
-				initDirFileAmount: 5,
+				initDirFileAmount: 3,
 				initDirFolderAmount: 1
 			},
 			{
 				// Options without system arguments
 				options: {
 					id: "options-no-args",
-					rootDir: "test",
+					rootDir: `test${path.sep}data${path.sep}system`,
 					relativeInitDir: "options-no-args",
 					initFilename: "init",
 					logging: "off"
@@ -263,7 +273,7 @@ export function testSystem(): void {
 				// Options without system arguments
 				options: {
 					id: "behavior-no-args",
-					rootDir: "test",
+					rootDir: `test${path.sep}data${path.sep}system`,
 					relativeInitDir: "behavior-no-args",
 					initFilename: "init",
 					logging: "off"
@@ -271,7 +281,7 @@ export function testSystem(): void {
 				rawInitFilename: "init.yml",
 				initYamlContents: expected.exampleYamlInit,
 				initContents: expected.exampleInit,
-				initDirFileAmount: 5,
+				initDirFileAmount: 4,
 				initDirFolderAmount: 1,
 				constructorError: "system_options_failure"
 			},
@@ -279,7 +289,7 @@ export function testSystem(): void {
 				// Flower shop
 				options: {
 					id: "flower_shop",
-					rootDir: "test",
+					rootDir: `test${path.sep}data${path.sep}system`,
 					relativeInitDir: "flowerShop",
 					initFilename: "init",
 					logging: "off"
@@ -287,13 +297,14 @@ export function testSystem(): void {
 				rawInitFilename: "init.yml",
 				initYamlContents: expected.flowerShopYamlInit,
 				initContents: expected.flowerShopInit,
-				initDirFileAmount: 7,
+				initDirFileAmount: 5,
 				initDirFolderAmount: 2,
 				error: {
 					errorInstances: ["all_flowers_gone"],
 					stringErrors: ["carShopError"]
 				},
 				behaviorTest: true,
+				behaviorSubsystem: "strange_behavior_name",
 				checkSubsystemVars: { "local-fs": { a: "b", homepage: "https://github.com/cpuabuse/node-system" } }
 			}
 		];
@@ -358,30 +369,6 @@ export function testSystem(): void {
 						});
 					});
 
-					/**
-					 * Tests static log function.
-					 * Inevitably produces console output.
-					 * @function log
-					 * @memberof module:system~test.System
-					 */
-					describe(".testLog()", function(): void {
-						it("should print a test message to console", function(): void {
-							systemTest.testLog("Test");
-						});
-					});
-
-					/**
-					 * Tests static error function.
-					 * Inevitably produces console output.
-					 * @function error
-					 * @memberof module:system~test.System
-					 */
-					describe(".testError()", function(): void {
-						it("should print a test error message to console", function(): void {
-							systemTest.testError("Test");
-						});
-					});
-
 					// System property of System instance
 					describe("#system", function() {
 						/**
@@ -418,6 +405,7 @@ export function testSystem(): void {
 										'")',
 									function(done: any) {
 										this.timeout(1); /* eslint-disable-line no-invalid-this */
+										this.retries(retries);
 										systemTest.private.file
 											.getFile(element.options.relativeInitDir, element.rawInitFilename)
 											.then(function(result: any) {
@@ -580,7 +568,10 @@ export function testSystem(): void {
 						 */
 						describe(".fire()", function() {
 							it("should not produce an error, if fired with a name that does not exist", function() {
-								systemTest.fire("name_does_not_exist", "An event that does not exist has been fired.");
+								// TODO: Move to behavior subsystem
+								systemTest.public.subsystem[
+									element.behaviorSubsystem === undefined ? "behavior" : element.behaviorSubsystem
+								].call.fire("name_does_not_exist", "An event that does not exist has been fired.");
 							});
 						});
 
@@ -593,7 +584,9 @@ export function testSystem(): void {
 								 */
 								describe(".addBehaviors()", function() {
 									before(function(done) {
-										systemTest
+										systemTest.public.subsystem[
+											element.behaviorSubsystem === undefined ? "behavior" : element.behaviorSubsystem
+										].call
 											.addBehaviors([
 												{
 													behavior_attach_request_fail() {
@@ -610,13 +603,17 @@ export function testSystem(): void {
 										systemTest.done = function() {
 											done();
 										};
-										systemTest.addBehaviors("not_a_behavior");
+										systemTest.public.subsystem[
+											element.behaviorSubsystem === undefined ? "behavior" : element.behaviorSubsystem
+										].call.addBehaviors("not_a_behavior");
 									});
 									it("should fire behavior_attach_request_fail with an empty array as an argument", function(done) {
 										systemTest.done = function() {
 											done();
 										};
-										systemTest.addBehaviors([]);
+										systemTest.public.subsystem[
+											element.behaviorSubsystem === undefined ? "behavior" : element.behaviorSubsystem
+										].call.addBehaviors([]);
 									});
 								});
 							}
@@ -698,7 +695,3 @@ export function testSystem(): void {
 		});
 	});
 }
-
-module.exports = {
-	testSystem
-};

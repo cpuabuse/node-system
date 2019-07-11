@@ -9,7 +9,6 @@
 
 // Imports
 import * as events from "../events";
-import { Behavior, Behaviors, BehaviorInterface /* eslint-disable-line no-unused-vars */ } from "../behavior";
 import {
 	ISubsystem /* eslint-disable-line no-unused-vars */,
 	Subsystem /* eslint-disable-line no-unused-vars */,
@@ -18,6 +17,7 @@ import {
 import { Loader, loadYaml } from "../loader"; // Auxiliary system lib
 import { AtomicLock } from "./atomic";
 import { LoaderError } from "../loaderError";
+import { Behaviors, BehaviorInterface } from "../subsystem/system.behavior";
 import {
 	OptionsInterface /* eslint-disable-line no-unused-vars */,
 	checkOptionsFailure /* eslint-disable-line no-unused-vars */
@@ -26,12 +26,6 @@ import { SystemError } from "../error";
 
 // Re-export
 export { AtomicLock, Behaviors, checkOptionsFailure };
-
-/** Temporary hold name for options subsystem, to be moved to file system subsystem. */
-const optionsSubsystem: string = "options";
-
-/** Temporary hold behavior name. */
-const behaviorSubsystem: string = "behavior";
 
 /** An interface to describe the resolve argument of promise executor. */
 export interface Resolve {
@@ -60,9 +54,6 @@ interface ImportRecursionArgs {
 
 	/** Imports array. */
 	imports: Imports;
-
-	/** Actual promises to be filled. */
-	promises: Array<Promise<void>>;
 
 	/** Stack of dependencies up until now. */
 	stack: Array<string>;
@@ -137,9 +128,6 @@ interface FileObject {
 
 /** Contains system info. */
 interface ISystemProperty {
-	/** Event emitter for the behaviors. Generally should use the public system instance methods instead. Actual behaviors are located here. */
-	behavior: Behavior;
-
 	/** Actual errors are located here. */
 	error: {
 		[key: string]: SystemError;
@@ -254,6 +242,12 @@ interface ISystemProperty {
 		toRelative(dir: string, file: string): Promise<string>;
 	};
 
+	/** Contains roles. */
+	role: {
+		/** Subsystem. */
+		[key: string]: string;
+	};
+
 	/** Actual subsystems are located here. */
 	subsystem: {
 		[key: string]: Subsystem;
@@ -267,7 +261,7 @@ interface LoaderProperty {
 
 /** Arguments for the system. */
 interface SystemArgs {
-	behaviors?: Array<{ [key: string]: BehaviorInterface }>;
+	behaviors?: Behaviors;
 	onError?: ErrorCallback;
 	options: Options;
 }
@@ -316,7 +310,7 @@ function isProperLoaderObject(
 }
 
 /** Performs import recursion for the subsystems. */
-function importRecursion({ stack, promises, imports, current }: ImportRecursionArgs): void {
+async function importRecursion({ stack, imports, current }: ImportRecursionArgs): Promise<void> {
 	// Check for circular dependency
 	if (stack.includes(current)) {
 		throw new LoaderError(
@@ -325,26 +319,28 @@ function importRecursion({ stack, promises, imports, current }: ImportRecursionA
 		);
 	}
 
-	// Add current to stack
-	stack.push(current);
-
 	// Process dependencies
 	if (!imports[current].active) {
-		imports[current].depends.forEach(function(next: string): void {
-			importRecursion({
-				current: next,
-				imports,
-				promises,
-				stack
-			});
-		});
+		// Add current to stack
+		stack.push(current);
+
+		// Await
+		await Promise.all(
+			imports[current].depends.map(function(next: string): Promise<void> {
+				return importRecursion({
+					current: next,
+					imports,
+					stack: [...stack]
+				});
+			})
+		);
+
+		// Start the import
+		await imports[current].fn();
+
+		// Mark this import as active
+		imports[current].active = true; /* eslint-disable-line no-param-reassign */ // We are using an argument as a pointer
 	}
-
-	// Start the import
-	promises.push(imports[current].fn());
-
-	// Mark this import as active
-	imports[current].active = true; /* eslint-disable-line no-param-reassign */ // We are using an argument as a pointer
 }
 
 /**
@@ -370,12 +366,6 @@ export class System extends Loader {
 		};
 	};
 
-	private readonly behaviors!: {
-		[key: string]: {
-			text: string;
-		};
-	};
-
 	/** Error list. */
 	private readonly errors!: {
 		[key: string]: {
@@ -384,25 +374,19 @@ export class System extends Loader {
 		};
 	};
 
-	/**
-	 * Events to be populated by the loader.
-	 * System by itself does not deal with events, it only confirms that the events were initialized. Although, if the events are fired, and failure to fire event is set to throw, or undocumented events encountered, it would throw errors.
-	 */
-	private readonly events!: {
-		[key: string]: {
-			/** Behavior present? */
-			behavior: boolean;
+	/** Contains system info. */
+	private private!: ISystemProperty;
 
-			/** Report an error? */
-			error: string;
-
-			/** Log it? */
-			log: string;
+	/** Contains data shared between the subsystems. */
+	private shared!: {
+		role: {
+			/** Subsystem. */
+			[key: string]: string;
+		};
+		subsystem: {
+			[key: string]: SubsystemEntrypoint;
 		};
 	};
-
-	/** Contains system info. */
-	private private!: ISystemProperty; /* tslint:disable-line variable-name */ // Override compiler, as this property is set from async function callback down the road
 
 	/** Contains subsystem data. */
 	private readonly subsystems: any;
@@ -419,7 +403,7 @@ export class System extends Loader {
 		behaviors,
 		onError
 	}: {
-		behaviors: Array<{ [key: string]: BehaviorInterface }> | null;
+		behaviors: Behaviors | null;
 		onError: ErrorCallback | null;
 		options: Options;
 	}) {
@@ -472,7 +456,6 @@ export class System extends Loader {
 								this.private.subsystem = new Object() as {
 									[key: string]: Subsystem;
 								};
-								this.private.behavior = new Behavior();
 								this.private.error = new Object() as {
 									[key: string]: SystemError;
 								};
@@ -483,12 +466,12 @@ export class System extends Loader {
 									},
 									filter: {
 										isDir: (filterContext: FilterContext): Promise<boolean> =>
-											Loader.isDir(this.private.subsystem[optionsSubsystem].get.rootDir, filterContext.item),
+											Loader.isDir(this.private.subsystem[this.private.role.options].get.rootDir, filterContext.item),
 										isFile: (filterContext: FilterContext): Promise<boolean> =>
-											Loader.isFile(Loader.join(this.private.subsystem[optionsSubsystem].get.rootDir, Loader.join(
-												filterContext.dir,
-												filterContext.itemName
-											) as string) as string) // Only two arguments make string always
+											Loader.isFile(Loader.join(
+												this.private.subsystem[this.private.role.options].get.rootDir,
+												Loader.join(filterContext.dir, filterContext.itemName) as string
+											) as string) // Only two arguments make string always
 									},
 									getFile: async (dir: string, file: string, cacheTtl: number, force: boolean): Promise<Buffer> => {
 										// Construct a path
@@ -508,9 +491,13 @@ export class System extends Loader {
 											(async (): Promise<Buffer> => {
 												/* eslint-disable-line func-style */ // Can't have arrow style function declaration
 												try {
-													return await Loader.getFile(this.private.subsystem[optionsSubsystem].get.rootDir, dir, file);
+													return await Loader.getFile(
+														this.private.subsystem[this.private.role.options].get.rootDir,
+														dir,
+														file
+													);
 												} catch (error) {
-													// TODO: this.fire("fileprivate_error");
+													// TODO: this.private.subsystem[this.private.role.behavior].call.fire("fileprivate_error");
 													throw this.private.error.file_system_error;
 												}
 											})();
@@ -599,7 +586,7 @@ export class System extends Loader {
 										return pGetFile();
 									},
 									getYaml: (dir: string, file: string): Promise<string> =>
-										loadYaml(this.private.subsystem[optionsSubsystem].get.rootDir, dir, file),
+										loadYaml(this.private.subsystem[this.private.role.options].get.rootDir, dir, file),
 									async join(rootDir: string, target: string | Array<string>): Promise<string | Array<string>> {
 										/* eslint-disable-line require-await */ // We want file methods to produce same type output
 										return Loader.join(rootDir, target);
@@ -607,7 +594,7 @@ export class System extends Loader {
 									list: async (dir: string, filter: Filter | null): Promise<Array<string>> => {
 										let filteredItems: Array<string>; // Return array
 										let itemNames: Array<string> = await Loader.list(
-											this.private.subsystem[optionsSubsystem].get.rootDir,
+											this.private.subsystem[this.private.role.options].get.rootDir,
 											dir
 										); // Wait for folder contets
 										let items: Array<string> = (await this.private.file.join(dir, itemNames)) as Array<string>; // The return will be always be an array
@@ -651,13 +638,25 @@ export class System extends Loader {
 											let filePath: string = Loader.join(dir, file) as string; // Only two arguments make string always
 
 											// Return
-											return Loader.join(this.private.subsystem[optionsSubsystem].get.rootDir, filePath) as string;
+											return Loader.join(
+												this.private.subsystem[this.private.role.options].get.rootDir,
+												filePath
+											) as string;
 										})(),
 									async toRelative(rootDir: string, target: string): Promise<string> {
 										/* eslint-disable-line require-await */ // We want file methods to produce same type output
 										return Loader.toRelative(rootDir, target) as string; // Only two arguments make string always
 									}
 								}; // <== file
+
+								// Initialize the roles
+								this.private.role = {};
+
+								// Initialize shared
+								this.shared = {
+									role: this.private.role,
+									subsystem: {}
+								};
 							})()
 					)
 					.then(async () => {
@@ -666,9 +665,6 @@ export class System extends Loader {
 						if (isProperLoaderObject(this, "subsystems", "object")) {
 							// Assign subsystems shortcut reference
 							let subsystems: LoaderProperty = this.subsystems as LoaderProperty;
-
-							// Declare array to populate with actual promises for await
-							let promises: Array<Promise<void>> = new Array();
 
 							// Declare an array of functions to be mapped
 							let imports: Imports = new Object() as Imports;
@@ -684,32 +680,58 @@ export class System extends Loader {
 											depends: isProperLoaderObject(subsystems[subsystem], "depends", "arrayOfString")
 												? ((subsystems[subsystem].depends as unknown) as Array<string>)
 												: new Array(),
-											fn: (): Promise<void> =>
+											// TODO: Remove the no-loop-func with a rework
+											fn: (): Promise<void> /* eslint-disable-line no-loop-func */ =>
 												import(`../subsystem/${(subsystemsProperty.type as unknown) as string}`).then(
 													(subsystemModule: { default: ISubsystem }): void => {
-														let systemArgs: any = new Object();
+														// Process roles
+														if (isProperLoaderObject(subsystemsProperty, "roles", "arrayOfString")) {
+															let roles: Array<string> = (subsystemsProperty.roles as unknown) as Array<string>;
+															roles.forEach((element: string): void => {
+																// Assigning subsystem name to a role identified by subsystem
+																this.private.role[element] = subsystem;
+															});
+														}
+
+														// Process args
+														let resultingArgs: {
+															[key: string]: any;
+														} = new Object();
 														if (isProperLoaderObject(subsystemsProperty, "args", "arrayOfString")) {
-															if (((subsystemsProperty.args as unknown) as Array<any>).includes("system_args")) {
+															// Define subsystem arguments
+															let subsystemArgsProperty: Array<string> = (subsystemsProperty.args as unknown) as Array<
+																string
+															>;
+															// Process the system args
+															if (subsystemArgsProperty.includes("system_args")) {
 																/* eslint-disable-next-line dot-notation */ /* tslint:disable-next-line no-string-literal */ // Parens are necessary
-																systemArgs["system_args"] = {
+																resultingArgs["system_args"] = {
 																	behaviors,
 																	options
 																};
+															}
+
+															// Process the roles
+															if (subsystemArgsProperty.includes("shared")) {
+																/* eslint-disable-next-line dot-notation */ /* tslint:disable-next-line no-string-literal */ // Potential future change to some form of the definitions of the strings
+																resultingArgs["shared"] = this.shared;
 															}
 														}
 
 														// Initialize subsystem entrypoints
 														this.public.subsystem[subsystem] = new SubsystemEntrypoint();
 														this.protected.subsystem[subsystem] = new SubsystemEntrypoint();
+														this.shared.subsystem[subsystem] = new SubsystemEntrypoint();
 
 														// Initialize subsystem
 														this.private.subsystem[
 															subsystem
 															/* eslint-disable-next-line new-cap */ // It is an argument
 														] = new subsystemModule.default({
-															args: systemArgs,
+															args: resultingArgs,
 															protectedEntrypoint: this.protected.subsystem[subsystem],
 															publicEntrypoint: this.public.subsystem[subsystem],
+															sharedEntrypoint: this.shared.subsystem[subsystem],
 															system: this,
 															vars: subsystemsProperty.vars
 														});
@@ -719,23 +741,15 @@ export class System extends Loader {
 									}
 								}
 							}
-							Object.keys(imports).forEach(function(current: string): void {
-								importRecursion({ current, imports, promises, stack: new Array() });
-							});
-
-							await Promise.all(promises);
-						}
-						if (
-							!(
-								Object.prototype.hasOwnProperty.call(this, "events") &&
-								Object.prototype.hasOwnProperty.call(this, "behaviors")
-							)
-						) {
-							// Make sure basic system carcass was initialized
-							throw new LoaderError("loader_fail", "Mandatory initialization files are missing.");
+							// Await for subsystem load
+							await Promise.all(
+								Object.keys(imports).map(function(current: string): Promise<void> {
+									return importRecursion({ current, imports, stack: new Array() });
+								})
+							);
 						}
 
-						// Initialize the events
+						// Initialize the errors
 						if (isProperLoaderObject(this, "errors", "object")) {
 							Object.keys(this.errors as object).forEach((err: string): void => {
 								// Will skip garbled errors
@@ -756,17 +770,18 @@ export class System extends Loader {
 								}
 							});
 						}
-						// Initialize the behaviors; If behaviors not provided as argument, it is OK; Not immediate, since the load.then() code will execute after the instance finish initializing.
-						if (behaviors) {
-							this.addBehaviors(behaviors).then(() =>
-								this.fire(events.systemLoad, "Behaviors initialized during system loading.")
-							);
-						} else {
-							this.fire(events.systemLoad, "System loading complete.");
-						}
 					})
+					.then(() =>
+						// Add the behaviors
+						this.private.subsystem[this.private.role.behavior].call.addBehaviors(behaviors)
+					)
+					.then(() =>
+						this.private.subsystem[this.private.role.behavior].call.fire(
+							events.systemLoad,
+							"Behaviors initialized during system loading."
+						)
+					)
 					.catch(function(error: Error | LoaderError): void {
-						console.log(error);
 						// Errors returned from load or staticInitializationPromise
 						processLoaderError(
 							error instanceof LoaderError
@@ -789,7 +804,7 @@ export class System extends Loader {
 	 * @example <caption>Usage</caption>
 	 * system.private.error("Not enough resources.");
 	 */
-	private static error(text: string): void {
+	public static error(text: string): void {
 		/* eslint-disable-next-line no-console */
 		console.error(`\x1b[31m[Error]\x1b[0m ${text}`);
 	}
@@ -800,110 +815,10 @@ export class System extends Loader {
 	 * @example <caption>Usage</caption>
 	 * system.private.log("Resources loaded.");
 	 */
-	private static log(text: string): void {
+	public static log(text: string): void {
 		/* eslint-disable-next-line no-console */
 		console.log(`\x1b[32m[OK]\x1b[0m ${text}`);
 	}
-
-	/** Test error logging. */
-	public testError(): void {
-		this.error("Test");
-	}
-
-	/** Test logging. */
-	public testLog(): void {
-		this.log("Test");
-	}
-
-	/**
-	 * Adds behaviors to the system, and fires post-addtion events.
-	 * Firstly, this function attempts to add the behaviors.
-	 * When the behavior addition has been processed, the function will attempt to fire post-addition events, depending on success/failure of behavior additions.
-	 * @instance
-	 * @param {module:system.private~behavior[]} behaviors
-	 * @fires module:system.private#events#behaviorAttach
-	 * @fires module:system.private#events#behaviorAttachFail
-	 * @fires module:system.private#events#behaviorAttachRequestFail
-	 * @example <caption>Usage</caption>
-	 * var options = {
-	 *   id: "lab_inventory",
-	 *   rootDir: "labs",
-	 *   relativeInitDir: "black_mesa",
-	 *   initFilename: "inventory.yml",
-	 *   logging: console
-	 * };
-	 * var behavior = {
-	 *   "check_inventory": () => {
-	 *     // Behavior functionality
-	 *     // ...
-	 *   }
-	 * }
-	 *
-	 * var labInventory = new System(options);
-	 * labInventory.addBehaviors([behavior]).then(function(){
-	 *   console.log("Behavior added.");
-	 * });
-	 */
-	private async addBehaviors(behaviors: Array<{ [key: string]: BehaviorInterface }>): Promise<void> {
-		if (Array.isArray(behaviors)) {
-			// Sanity check - is an array
-			if (behaviors.length > 0) {
-				// Sanity check - is not empty
-				// Loop - attachment
-				await Promise.all(
-					behaviors
-						.map((element: { [key: string]: BehaviorInterface }): {
-							behaviorAdded: Promise<string> | null;
-							key: string;
-						} | null => {
-							if (typeof element === "object") {
-								let properties: Array<string> = Object.getOwnPropertyNames(element);
-								if (properties.length === 1) {
-									let [key]: Array<string> = properties;
-									let value: BehaviorInterface = element[key];
-									if (typeof key === "string") {
-										if (key.length > 0 && typeof value === "function") {
-											return {
-												behaviorAdded: this.private.behavior.addBehavior(key, () => value(this)),
-												key
-											};
-										}
-										return {
-											behaviorAdded: null,
-											key
-										};
-									}
-								}
-							}
-							return null;
-						})
-						.map(
-							(element: { behaviorAdded: Promise<string> | null; key: string } | null): Promise<string | void> => {
-								// Loop - post-attachment event fire
-								if (element === null) {
-									this.fire(events.behaviorAttachFail, "Behavior could not be added.");
-									return Promise.resolve();
-								}
-								if (element.behaviorAdded) {
-									this.fire(events.behaviorAttach, element.key);
-									return element.behaviorAdded;
-								}
-
-								// Behavior not added
-								this.fire(events.behaviorAttachRequestFail, "Event not described.");
-								return Promise.resolve();
-							}
-						)
-				);
-
-				// Terminate if successfully processed arrays
-				return;
-			}
-		}
-
-		// Behaviors not an array || empty array
-		this.fire(events.behaviorAttachRequestFail, "Incorrect request.");
-	} // <== addBehaviors
 
 	/**
 	 * Adds an error to the System dynamically
@@ -928,159 +843,14 @@ export class System extends Loader {
 	private addError(code: string, message: string): void {
 		if (Object.prototype.hasOwnProperty.call(this.private.error, code)) {
 			// Fire an error event that error already exists
-			this.fire(events.errorExists, "Error to be added already exists.");
+			this.private.subsystem[this.private.role.behavior].call.fire(
+				events.errorExists,
+				"Error to be added already exists."
+			);
 		} else {
 			this.private.error[code] = new SystemError(code, message);
 		}
 	}
-
-	/**
-	 * Emit an event as a behavior.
-	 * @instance
-	 * @param {string} event Behavior name.
-	 * @example <caption>Usage</caption>
-	 * // From the lab inventory system context
-	 * {
-	 *   // ...
-	 *
-	 *   this.behave("system_load_aux");
-	 *
-	 *   // ...
-	 * }
-	 */
-	private behave(event: string): void {
-		try {
-			this.log(`Behavior - ${this.behaviors[event].text}`);
-		} catch (error) {
-			this.log(`Behavior - Undocumented behavior - ${event}`);
-		}
-		this.private.behavior.behave(event);
-	}
-
-	/**
-	 * Log an error  message from the System context
-	 * @instance
-	 * @param {string} text - Message
-	 * @fires module:system.private~type_error
-	 * @example <caption>Usage</caption>
-	 * var options = {
-	 *   id: "lab_inventory",
-	 *   rootDir: "labs",
-	 *   relativeInitDir: "black_mesa",
-	 *   initFilename: "inventory.yml",
-	 *   logging: console
-	 * };
-	 * var text = "Testing Lab Inventory error log.";
-	 *
-	 * var labInventory = new System(options);
-	 * labInventory.error(text);
-	 */
-	private error(text: string): void {
-		if (this.private.subsystem[optionsSubsystem].get.logging === "console") {
-			System.error(`${this.private.subsystem[optionsSubsystem].get.id}: ${text}`);
-		}
-	} // <== error
-
-	/**
-	 * Fires a system event
-	 * @instance
-	 * @param {string} name - Event name, as specified in {@link module:system.private#events}.
-	 * @param {string=} message - [Optional] Message is not strictly required, but preferred. If not specified, will assume value of the name
-	 * @throws {external:Error} Will throw `error_hell`. The inability to process error - if {@link module:system.private#events#event:eventFail} event fails.
-	 * @fires module:system.private#events#eventFail
-	 * @example <caption>Usage</caption>
-	 * var options = {
-	 *   id: "lab_inventory",
-	 *   rootDir: "labs",
-	 *   relativeInitDir: "black_mesa",
-	 *   initFilename: "inventory.yml",
-	 *   logging: "console"
-	 * };
-	 *
-	 * var labInventory = new System(options);
-	 * labInventory.fire("system_load_aux", "Auxiliary system loaded.");
-	 */
-	public fire(name: string, message: string): void {
-		const eventAbsent: string = "event_absent";
-		const errorHell: string = "error_hell";
-
-		let msg: string = message;
-
-		try {
-			let event: { behavior?: boolean | undefined; error?: string | undefined; log?: string | undefined };
-
-			// Verify event exists
-			if (!Object.prototype.hasOwnProperty.call(this.events, name)) {
-				// throw new system error
-				throw new SystemError(eventAbsent, "Could not fire an event that is not described.");
-			}
-
-			// Locate event
-			event = this.events[name];
-
-			// Assign the message, as it is technically optional
-			if (!message) {
-				msg = name;
-			}
-
-			// Log
-			if (event.log) {
-				this.log(`${event.log} - ${msg}`);
-			}
-
-			// Error
-			if (event.error) {
-				this.error(`${name} - ${msg}`);
-			}
-
-			// Behavior
-			if (event.behavior) {
-				this.behave(name);
-			}
-			// Callback
-		} catch (error) {
-			let noFail: boolean = true;
-			if (name === events.eventFail) {
-				noFail = false;
-			}
-			if (name === eventAbsent) {
-				if (SystemError.isSystemError(error)) {
-					if (error.code === eventAbsent) {
-						noFail = false;
-					}
-				}
-			}
-			if (noFail) {
-				this.fire(events.eventFail, "Event has failed");
-			} else {
-				throw errorHell;
-			}
-		}
-	} // <== fire
-
-	/**
-	 * Log message from the System context
-	 * @instance
-	 * @param {string} text - Message
-	 * @fires module:system.private~type_error
-	 * @example <caption>Usage</caption>
-	 * var options = {
-	 *   id: "lab_inventory",
-	 *   rootDir: "labs",
-	 *   relativeInitDir: "black_mesa",
-	 *   initFilename: "inventory.yml",
-	 *   loggomg: console
-	 * };
-	 * var text = "Lab Inventory working.";
-	 *
-	 * var labInventory = new System(options);
-	 * labInventory.log(text);
-	 */
-	private log(text: string): void {
-		if (this.private.subsystem[optionsSubsystem].get.logging === "console") {
-			System.log(`${this.private.subsystem[optionsSubsystem].get.id}: ${text}`);
-		}
-	} // <== log
 
 	/**
 	 * Adds a behavior bound to "this".
@@ -1102,8 +872,8 @@ export class System extends Loader {
 	 * });
 	 */
 	private on(event: string, callback: (system: System) => void): void {
-		let behavior: { [key: string]: BehaviorInterface } = new Object() as { [key: string]: BehaviorInterface };
+		let behavior: BehaviorInterface = new Object() as BehaviorInterface;
 		behavior[event] = (): void => callback(this);
-		this.addBehaviors([behavior]);
+		this.private.subsystem[this.private.role.behavior].call.addBehaviors([behavior]);
 	}
 }

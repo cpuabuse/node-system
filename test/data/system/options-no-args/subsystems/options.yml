@@ -1,0 +1,7 @@
+type: system.info.options
+vars:
+  homepage: https://github.com/cpuabuse/node-system
+args:
+depends:
+roles:
+  - options

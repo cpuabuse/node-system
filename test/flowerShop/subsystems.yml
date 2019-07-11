@@ -1,9 +1,0 @@
-options:
-  folder: subsystems
-  path: relative
-local-fs:
-  folder: subsystems
-  path: relative
-behavior:
-  folder: subsystems
-  path: relative

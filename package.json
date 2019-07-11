@@ -1,55 +1,61 @@
 {
-  "name": "cpuabuse-system",
-  "version": "0.5.0",
-  "description": "System module",
-  "main": "src/system.js",
-  "types": "src/system.d.ts",
-  "license": "UNLICENSED",
-  "scripts": {
-    "codecov": "echo Deploying coverage... && codecov",
-    "coverage": "echo Running coverage... && nyc --reporter=lcovonly --reporter=text-summary --reporter=text --extension=.ts npm run ts-mocha",
-    "build": "echo Building JS files... && tsc",
-    "docs": "echo Building documentation... && typedoc --ignoreCompilerErrors",
-    "mocha": "echo Running tests... && mocha",
-    "nojekyll": "echo Touching .nojekyll file... && nodetouch docs/.nojekyll",
-    "prets-mocha": "echo Clearing cache... && tsc",
-    "ts-mocha": "echo Running native TypeScript tests... && mocha --require ts-node/register test/test.ts",
-    "prepare": "npm run build",
-    "test": "npm run ts-mocha && npm run mocha"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/cpuabuse/node-system.git"
-  },
-  "dependencies": {
-    "js-yaml": "^3.13.1"
-  },
-  "devDependencies": {
-    "@types/js-yaml": "^3.12.1",
-    "@types/mocha": "^5.2.7",
-    "@types/node": "^12.0.8",
-    "@typescript-eslint/eslint-plugin": "^1.10.2",
-    "@typescript-eslint/parser": "^1.10.2",
-    "codecov": "^3.5.0",
-    "eslint": "^5.16.0",
-    "eslint-config-airbnb": "^17.1.0",
-    "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-config-prettier": "^4.3.0",
-    "eslint-plugin-import": "^2.17.3",
-    "eslint-plugin-jsx-a11y": "^6.2.1",
-    "eslint-plugin-prettier": "^3.1.0",
-    "eslint-plugin-react": "^7.13.0",
-    "mocha": "^6.1.4",
-    "nyc": "^14.1.1",
-    "pre-commit": "^1.2.2",
-    "prettier": "^1.18.2",
-    "touch": "^3.1.0",
-    "ts-node": "^8.3.0",
-    "tslint": "^5.17.0",
-    "typedoc": "^0.14.2",
-    "typescript": "^3.5.2"
-  },
-  "pre-commit": [
-    "test"
-  ]
+	"name": "cpuabuse-system",
+	"version": "0.6.0",
+	"description": "System module",
+	"main": "src/system.js",
+	"types": "src/system.d.ts",
+	"license": "UNLICENSED",
+	"scripts": {
+		"codecov": "echo Deploying coverage... && codecov",
+		"coverage": "echo Running coverage... && nyc --reporter=lcovonly --reporter=text-summary --reporter=text --extension=.ts npm run ts-mocha",
+		"codacy": "echo Deploying Codacy coverage... && cat ./coverage/lcov.info | cross-var codacy-coverage -t $CODACY_PROJECT_TOKEN",
+		"build": "echo Building JS files... && tsc",
+		"docs": "echo Building documentation... && typedoc --ignoreCompilerErrors",
+		"mocha": "echo Running tests... && mocha",
+		"nojekyll": "echo Touching .nojekyll file... && nodetouch docs/.nojekyll",
+		"prets-mocha": "echo Clearing cache... && tsc",
+		"ts-mocha": "echo Running native TypeScript tests... && mocha --require ts-node/register test/test.ts",
+		"prepare": "npm run build",
+		"test": "npm run ts-mocha && npm run mocha"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/cpuabuse/node-system.git"
+	},
+	"engines": {
+		"node": ">= 10.0.0"
+	},
+	"dependencies": {
+		"js-yaml": "^3.13.1"
+	},
+	"devDependencies": {
+		"@types/js-yaml": "^3.12.1",
+		"@types/mocha": "^5.2.7",
+		"@types/node": "^12.6.2",
+		"@typescript-eslint/eslint-plugin": "^1.11.0",
+		"@typescript-eslint/parser": "^1.11.0",
+		"codacy-coverage": "^3.4.0",
+		"codecov": "^3.5.0",
+		"cross-var": "^1.1.0",
+		"eslint": "^5.16.0",
+		"eslint-config-airbnb": "^17.1.0",
+		"eslint-config-airbnb-base": "^13.1.0",
+		"eslint-config-prettier": "^4.3.0",
+		"eslint-plugin-import": "^2.18.0",
+		"eslint-plugin-jsx-a11y": "^6.2.1",
+		"eslint-plugin-prettier": "^3.1.0",
+		"eslint-plugin-react": "^7.14.2",
+		"mocha": "^6.1.4",
+		"nyc": "^14.1.1",
+		"pre-commit": "^1.2.2",
+		"prettier": "^1.18.2",
+		"touch": "^3.1.0",
+		"ts-node": "^8.3.0",
+		"tslint": "^5.18.0",
+		"typedoc": "^0.14.2",
+		"typescript": "^3.5.2"
+	},
+	"pre-commit": [
+		"test"
+	]
 }

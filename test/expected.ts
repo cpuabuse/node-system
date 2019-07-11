@@ -7,20 +7,18 @@
  * Contains constants for comparing against in testing.
  */
 
-export const flowerShopInit: string = `events:
-data:
+export const flowerShopInit: string = `data:
   file: flowers
   path: relative
   folder: data
   extend: false
-behaviors:
 errors:
 branch:
   extend: true
 subsystems:
-  extend: true`;
+  extend: true
+`;
 export const flowerShopYamlInit: any = {
-	behaviors: null,
 	branch: {
 		extend: true
 	},
@@ -31,20 +29,16 @@ export const flowerShopYamlInit: any = {
 		path: "relative"
 	},
 	errors: null,
-	events: null,
 	subsystems: {
 		extend: true
 	}
 };
-export const exampleInit: string = `behaviors:
-errors:
-events:
+export const exampleInit: string = `errors:
 subsystems:
-  extend: true`;
+  extend: true
+`;
 export const exampleYamlInit: any = {
-	behaviors: null,
 	errors: null,
-	events: null,
 	subsystems: {
 		extend: true
 	}
