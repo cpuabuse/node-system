@@ -1,7 +1,7 @@
 [![Travis (.com)](https://img.shields.io/travis/com/cpuabuse/node-system.svg?style=for-the-badge)](https://travis-ci.com/cpuabuse/node-system)
 [![npm](https://img.shields.io/npm/v/cpuabuse-system.svg?style=for-the-badge)](https://www.npmjs.com/package/cpuabuse-system)
 [![Codecov](https://img.shields.io/codecov/c/github/cpuabuse/node-system.svg?style=for-the-badge)](https://codecov.io/gh/cpuabuse/node-system)
-[![Codacy grade](https://img.shields.io/codefactor/grade/github/cpuabuse/node-system.svg?style=for-the-badge)](https://www.codefactor.io/repository/github/cpuabuse/node-system)
+[![Codacy grade](https://img.shields.io/codefactor/grade/github/cpuabuse/node-system.svg?style=for-the-badge)](https://app.codacy.com/project/cpuabuse/node-system/dashboard)
 [![Libraries.io dependency status for latest release](https://img.shields.io/librariesio/release/npm/cpuabuse-system.svg?style=for-the-badge)](https://libraries.io/npm/cpuabuse-system)
 [![Documentation](https://img.shields.io/badge/documentation-gh--pages-success.svg?style=for-the-badge)](https://cpuabuse.github.io/node-system/)
 [![Chat](https://img.shields.io/badge/chat-slack-success.svg?style=for-the-badge)](https://join.slack.com/t/cpuabuse/shared_invite/enQtNjYzMjQ4NjY1MTUzLTZjMTY1M2NiYmZkNzBjMzI0YTQ4OGVjZDA1ODJkNjFiNDU1NDQwYjViMjBjODA1Y2Y4ZjNiYmUzODA2YWI3NDM)
