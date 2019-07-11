@@ -82,6 +82,7 @@
 								<li class="tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported"><a href="../interfaces/_src_subsystem_system_behavior_.behaviorindex.html" class="tsd-kind-icon">Behavior<wbr>Index</a></li>
 								<li class="tsd-kind-interface tsd-parent-kind-external-module"><a href="../interfaces/_src_subsystem_system_behavior_.behaviorinterface.html" class="tsd-kind-icon">Behavior<wbr>Interface</a></li>
 								<li class="tsd-kind-interface tsd-parent-kind-external-module"><a href="../interfaces/_src_subsystem_system_behavior_.behaviorinterfacecallback.html" class="tsd-kind-icon">Behavior<wbr>Interface<wbr>Callback</a></li>
+								<li class="tsd-kind-interface tsd-parent-kind-external-module"><a href="../interfaces/_src_subsystem_system_behavior_.behaviors.html" class="tsd-kind-icon">Behaviors</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
@@ -94,7 +95,9 @@
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported"><a href="_src_subsystem_system_behavior_.html#addbehavior" class="tsd-kind-icon">add<wbr>Behavior</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported"><a href="_src_subsystem_system_behavior_.html#addbehaviors" class="tsd-kind-icon">add<wbr>Behaviors</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported"><a href="_src_subsystem_system_behavior_.html#behave" class="tsd-kind-icon">behave</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported"><a href="_src_subsystem_system_behavior_.html#fire" class="tsd-kind-icon">fire</a></li>
 							</ul>
 						</section>
 					</div>
@@ -108,12 +111,12 @@
 					<div class="tsd-signature tsd-kind-icon">behavior<wbr>Creation<wbr>Error<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;behavior_creation_error&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/cpuabuse/node-system/blob/70f68d9/src/subsystem/system.behavior.ts#L21">src/subsystem/system.behavior.ts:21</a></li>
+							<li>Defined in <a href="https://github.com/cpuabuse/node-system/blob/9121791/src/subsystem/system.behavior.ts#L24">src/subsystem/system.behavior.ts:24</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>Behavior creation error, returned by <a href="../classes/_src_behavior_.behavior.html#addbehavior">Behavior.addBehavior</a>.</p>
+							<p>Behavior creation error, returned by [[Behavior.addBehavior]].</p>
 						</div>
 					</div>
 				</section>
@@ -130,7 +133,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/cpuabuse/node-system/blob/70f68d9/src/subsystem/system.behavior.ts#L69">src/subsystem/system.behavior.ts:69</a></li>
+									<li>Defined in <a href="https://github.com/cpuabuse/node-system/blob/9121791/src/subsystem/system.behavior.ts#L78">src/subsystem/system.behavior.ts:78</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -170,6 +173,75 @@ behavior.addBehavior(<span class="hljs-string">"hello_behavior"</span>, <span cl
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+					<a name="addbehaviors" class="tsd-anchor"></a>
+					<h3>add<wbr>Behaviors</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">add<wbr>Behaviors<span class="tsd-signature-symbol">(</span>this<span class="tsd-signature-symbol">: </span><a href="../classes/_src_subsystem_system_behavior_.behavior.html" class="tsd-signature-type">Behavior</a>, behaviors<span class="tsd-signature-symbol">: </span><a href="../interfaces/_src_subsystem_system_behavior_.behaviors.html" class="tsd-signature-type">Behaviors</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/cpuabuse/node-system/blob/9121791/src/subsystem/system.behavior.ts#L147">src/subsystem/system.behavior.ts:147</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Adds behaviors to the system, and fires post-addtion events.
+										Firstly, this function attempts to add the behaviors.
+									When the behavior addition has been processed, the function will attempt to fire post-addition events, depending on success/failure of behavior additions.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>instance</dt>
+									<dd></dd>
+									<dt>fires</dt>
+									<dd><p>module:system.private#events#behaviorAttach</p>
+									</dd>
+									<dt>fires</dt>
+									<dd><p>module:system.private#events#behaviorAttachFail</p>
+									</dd>
+									<dt>fires</dt>
+									<dd><p>module:system.private#events#behaviorAttachRequestFail
+										<strong>Usage</strong></p>
+										<pre><code class="language-typescript"><span class="hljs-keyword">var</span> options = {
+  id: <span class="hljs-string">"lab_inventory"</span>,
+  rootDir: <span class="hljs-string">"labs"</span>,
+  relativeInitDir: <span class="hljs-string">"black_mesa"</span>,
+  initFilename: <span class="hljs-string">"inventory.yml"</span>,
+  logging: <span class="hljs-built_in">console</span>
+};
+<span class="hljs-keyword">var</span> behavior = {
+  <span class="hljs-string">"check_inventory"</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-comment">// Behavior functionality</span>
+    <span class="hljs-comment">// ...</span>
+  }
+}
+
+<span class="hljs-keyword">var</span> labInventory = <span class="hljs-keyword">new</span> System(options);
+labInventory.addBehaviors([behavior]).then(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
+  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Behavior added."</span>);
+});</code></pre>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>this: <a href="../classes/_src_subsystem_system_behavior_.behavior.html" class="tsd-signature-type">Behavior</a></h5>
+								</li>
+								<li>
+									<h5>behaviors: <a href="../interfaces/_src_subsystem_system_behavior_.behaviors.html" class="tsd-signature-type">Behaviors</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Behaviors
+										// TODO: Events</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
 					<a name="behave" class="tsd-anchor"></a>
 					<h3>behave</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
@@ -179,7 +251,7 @@ behavior.addBehavior(<span class="hljs-string">"hello_behavior"</span>, <span cl
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/cpuabuse/node-system/blob/70f68d9/src/subsystem/system.behavior.ts#L125">src/subsystem/system.behavior.ts:125</a></li>
+									<li>Defined in <a href="https://github.com/cpuabuse/node-system/blob/9121791/src/subsystem/system.behavior.ts#L228">src/subsystem/system.behavior.ts:228</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -215,6 +287,59 @@ behavior.behave(<span class="hljs-string">"hello_behavior"</span>);
 						</li>
 					</ul>
 				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+					<a name="fire" class="tsd-anchor"></a>
+					<h3>fire</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">fire<span class="tsd-signature-symbol">(</span>this<span class="tsd-signature-symbol">: </span><a href="../classes/_src_subsystem_system_behavior_.behavior.html" class="tsd-signature-type">Behavior</a>, name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, message<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/cpuabuse/node-system/blob/9121791/src/subsystem/system.behavior.ts#L268">src/subsystem/system.behavior.ts:268</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Fires a system event</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>this: <a href="../classes/_src_subsystem_system_behavior_.behavior.html" class="tsd-signature-type">Behavior</a></h5>
+								</li>
+								<li>
+									<h5>name: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Event name, as specified in {@link module:system.private#events}.</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> message: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Message is not strictly required, but preferred. If not specified, will assume value of the name
+											// TODO: @event module:system.private#events#eventFail
+										// TODO: <strong>Throws</strong> {external:Error} Will throw <code>error_hell</code>. The inability to process error - if {@link module:system.private#events#event:eventFail} event fails.</p>
+										<p><strong>Usage</strong></p>
+										<pre><code class="language-typescript"><span class="hljs-keyword">var</span> options = {
+  id: <span class="hljs-string">"lab_inventory"</span>,
+  rootDir: <span class="hljs-string">"labs"</span>,
+  relativeInitDir: <span class="hljs-string">"black_mesa"</span>,
+  initFilename: <span class="hljs-string">"inventory.yml"</span>,
+  logging: <span class="hljs-string">"console"</span>
+};
+
+<span class="hljs-keyword">var</span> labInventory = <span class="hljs-keyword">new</span> System(options);
+labInventory.fire(<span class="hljs-string">"system_load_aux"</span>, <span class="hljs-string">"Auxiliary system loaded."</span>);</code></pre>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
 			</section>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
@@ -223,77 +348,8 @@ behavior.behave(<span class="hljs-string">"hello_behavior"</span>);
 					<li class="globals  ">
 						<a href="../globals.html"><em>Globals</em></a>
 					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_src_behavior_.html">"src/behavior"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_src_error_.html">"src/error"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_src_errors_.html">"src/errors"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_src_events_.html">"src/events"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_src_loader_.html">"src/loader"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_src_loadererror_.html">"src/loader<wbr>Error"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_src_meta_callback_.html">"src/meta/callback"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_src_meta_externals_.html">"src/meta/externals"</a>
-					</li>
 					<li class="current tsd-kind-external-module">
 						<a href="_src_subsystem_system_behavior_.html">"src/subsystem/system.behavior"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_src_subsystem_system_file_system_.html">"src/subsystem/system.file-<wbr>system"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_src_subsystem_system_info_.html">"src/subsystem/system.info"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_src_subsystem_system_info_options_.html">"src/subsystem/system.info.options"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_src_system_file_.html">"src/system-<wbr>file"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_src_system_atomic_.html">"src/system/atomic"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_src_system_subsystem_.html">"src/system/subsystem"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_src_system_system_.html">"src/system/system"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_test_expected_.html">"test/expected"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_test_subsystem_system_info_options_.html">"test/subsystem/system.info.options"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_test_system_system_.html">"test/system/system"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_test_test_.html">"test/test"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_test_test_atomic_.html">"test/test-<wbr>atomic"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_test_test_errors_.html">"test/test-<wbr>errors"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_test_test_loader_.html">"test/test-<wbr>loader"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_test_test_vars_.html">"test/test-<wbr>vars"</a>
 					</li>
 				</ul>
 			</nav>
@@ -311,6 +367,9 @@ behavior.behave(<span class="hljs-string">"hello_behavior"</span>);
 					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
 						<a href="../interfaces/_src_subsystem_system_behavior_.behaviorinterfacecallback.html" class="tsd-kind-icon">Behavior<wbr>Interface<wbr>Callback</a>
 					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
+						<a href="../interfaces/_src_subsystem_system_behavior_.behaviors.html" class="tsd-kind-icon">Behaviors</a>
+					</li>
 					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
 						<a href="_src_subsystem_system_behavior_.html#behaviorcreationerror" class="tsd-kind-icon">behavior<wbr>Creation<wbr>Error</a>
 					</li>
@@ -318,7 +377,13 @@ behavior.behave(<span class="hljs-string">"hello_behavior"</span>);
 						<a href="_src_subsystem_system_behavior_.html#addbehavior" class="tsd-kind-icon">add<wbr>Behavior</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="_src_subsystem_system_behavior_.html#addbehaviors" class="tsd-kind-icon">add<wbr>Behaviors</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
 						<a href="_src_subsystem_system_behavior_.html#behave" class="tsd-kind-icon">behave</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="_src_subsystem_system_behavior_.html#fire" class="tsd-kind-icon">fire</a>
 					</li>
 				</ul>
 			</nav>

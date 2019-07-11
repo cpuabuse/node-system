@@ -64,13 +64,13 @@
 	<div class="row">
 		<div class="col-8 col-content">
 			<div class="tsd-panel tsd-typography">
-				<p><a href="https://travis-ci.com/cpuabuse/node-system"><img src="https://img.shields.io/travis/com/cpuabuse/node-system.svg" alt="travis"></a>
-					<a href="https://www.npmjs.com/package/cpuabuse-system"><img src="https://img.shields.io/npm/v/cpuabuse-system.svg" alt="npm"></a>
-					<a href="https://codecov.io/gh/cpuabuse/node-system"><img src="https://img.shields.io/codecov/c/github/cpuabuse/node-system.svg" alt="coverage"></a>
-					<a href="https://www.codefactor.io/repository/github/cpuabuse/node-system"><img src="https://www.codefactor.io/repository/github/cpuabuse/node-system/badge" alt="CodeFactor"></a>
-					<a href="https://libraries.io/npm/cpuabuse-system"><img src="https://img.shields.io/librariesio/release/npm/cpuabuse-system.svg" alt="dependecies"></a>
-					<a href="https://cpuabuse.github.io/node-system/"><img src="https://img.shields.io/badge/documentation-gh--pages-success.svg" alt="documentation"></a>
-				<a href="https://join.slack.com/t/cpuabuse/shared_invite/enQtNjYzMjQ4NjY1MTUzLTZjMTY1M2NiYmZkNzBjMzI0YTQ4OGVjZDA1ODJkNjFiNDU1NDQwYjViMjBjODA1Y2Y4ZjNiYmUzODA2YWI3NDM"><img src="https://img.shields.io/badge/chat-slack-success.svg" alt="chat"></a></p>
+				<p><img src="https://img.shields.io/travis/com/cpuabuse/node-system.svg?style=for-the-badge" alt="Travis (.com)">
+					<img src="https://img.shields.io/npm/v/cpuabuse-system.svg?style=for-the-badge" alt="npm">
+					<img src="https://img.shields.io/codecov/c/github/cpuabuse/node-system.svg?style=for-the-badge" alt="Codecov">
+					<img src="https://img.shields.io/codacy/grade/20c4959c1cd24053825f9f629a863945.svg?style=for-the-badge" alt="Codacy grade">
+					<img src="https://img.shields.io/librariesio/release/npm/cpuabuse-system.svg?style=for-the-badge" alt="Libraries.io dependency status for latest release">
+					<a href="https://cpuabuse.github.io/node-system/"><img src="https://img.shields.io/badge/documentation-gh--pages-success.svg?style=for-the-badge" alt="Documentation"></a>
+				<a href="https://join.slack.com/t/cpuabuse/shared_invite/enQtNjYzMjQ4NjY1MTUzLTZjMTY1M2NiYmZkNzBjMzI0YTQ4OGVjZDA1ODJkNjFiNDU1NDQwYjViMjBjODA1Y2Y4ZjNiYmUzODA2YWI3NDM"><img src="https://img.shields.io/badge/chat-slack-success.svg?style=for-the-badge" alt="Chat"></a></p>
 				<h1 id="about">About</h1>
 				<h2 id="related-projects">Related projects</h2>
 				<ul>
@@ -81,32 +81,65 @@
 				</ul>
 				<h2 id="description">Description</h2>
 				<p>The system handles initialization of data structures using information from yaml files. System is split into multiple extendable modular subsystems, responsible for respective functionality such as file system, error handling, internal system logic, etc.</p>
-				<h2 id="installation">Installation</h2>
-				<h2 id="api">API</h2>
+				<h2 id="setup">Setup</h2>
+				<h3 id="requirements">Requirements</h3>
+				<ul>
+					<li>Node.js version 10 and higher</li>
+				</ul>
+				<h3 id="dependencies">Dependencies</h3>
+				<ul>
+					<li><a href="https://github.com/nodeca/js-yaml">js-yaml</a></li>
+				</ul>
+				<h3 id="installation">Installation</h3>
+				<pre><code>npm <span class="hljs-keyword">install</span> cpuabuse-<span class="hljs-keyword">system</span> <span class="hljs-comment">--save</span></code></pre><h2 id="api">API</h2>
 				<h3 id="typescript">TypeScript</h3>
 				<pre><code class="language-typescript"><span class="hljs-comment">// Import</span>
-<span class="hljs-keyword">import</span> {Behaviors, ErrorCallback, Options, System} <span class="hljs-keyword">from</span> <span class="hljs-string">"cpuabuse-system"</span>;
+<span class="hljs-keyword">import</span> { Behaviors, ErrorCallback, Options, System } <span class="hljs-keyword">from</span> <span class="hljs-string">"cpuabuse-system"</span>;
 
 <span class="hljs-comment">// Init options</span>
 <span class="hljs-keyword">let</span> options: Options = {
-  id: <span class="hljs-string">"my_system"</span>,
-  initFilename: <span class="hljs-string">"init"</span>,
-  logging: <span class="hljs-string">"off"</span>,
-  relativeInitDir: <span class="hljs-string">"my_system"</span>,
-  rootDir: <span class="hljs-string">"root"</span>
+    id: <span class="hljs-string">"my_system"</span>,
+    initFilename: <span class="hljs-string">"init"</span>,
+    logging: <span class="hljs-string">"off"</span>,
+    relativeInitDir: <span class="hljs-string">"my_system"</span>,
+    rootDir: <span class="hljs-string">"root"</span>
 };
 
 <span class="hljs-comment">// Init behaviors</span>
 <span class="hljs-keyword">let</span> behaviors: Behaviors = [
-  {
-    system_load() {
-      <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"done"</span>);
+    {
+        system_load() {
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"done"</span>);
+        }
     }
-  }
-]
+];
 
 <span class="hljs-comment">// Create a system</span>
-<span class="hljs-keyword">let</span> mySystem: System = <span class="hljs-keyword">new</span> System({options, behaviors, onError});</code></pre>
+<span class="hljs-keyword">let</span> mySystem: System = <span class="hljs-keyword">new</span> System({ options, behaviors, onError });</code></pre>
+				<h3 id="node-js">Node.js</h3>
+				<pre><code class="language-javascript"><span class="hljs-comment">// Import</span>
+<span class="hljs-keyword">const</span> system = <span class="hljs-built_in">require</span>(<span class="hljs-string">"cpuabuse-system"</span>);
+
+<span class="hljs-comment">// Init options</span>
+<span class="hljs-keyword">let</span> options = {
+    <span class="hljs-attr">id</span>: <span class="hljs-string">"my_system"</span>,
+    <span class="hljs-attr">initFilename</span>: <span class="hljs-string">"init"</span>,
+    <span class="hljs-attr">logging</span>: <span class="hljs-string">"off"</span>,
+    <span class="hljs-attr">relativeInitDir</span>: <span class="hljs-string">"my_system"</span>,
+    <span class="hljs-attr">rootDir</span>: <span class="hljs-string">"root"</span>
+};
+
+<span class="hljs-comment">// Init behaviors</span>
+<span class="hljs-keyword">let</span> behaviors = [
+    {
+        system_load() {
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"done"</span>);
+        }
+    }
+];
+
+<span class="hljs-comment">// Create a system</span>
+<span class="hljs-keyword">let</span> mySystem = <span class="hljs-keyword">new</span> system.System({ options, behaviors, onError });</code></pre>
 			</div>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
@@ -114,9 +147,6 @@
 				<ul>
 					<li class="globals  ">
 						<a href="globals.html"><em>Globals</em></a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_src_behavior_.html">"src/behavior"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="modules/_src_error_.html">"src/error"</a>
@@ -137,10 +167,10 @@
 						<a href="modules/_src_meta_callback_.html">"src/meta/callback"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_src_meta_externals_.html">"src/meta/externals"</a>
+						<a href="modules/_src_subsystem_system_behavior_.html">"src/subsystem/system.behavior"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_src_subsystem_system_behavior_.html">"src/subsystem/system.behavior"</a>
+						<a href="modules/_src_subsystem_system_event_.html">"src/subsystem/system.event"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="modules/_src_subsystem_system_file_system_.html">"src/subsystem/system.file-<wbr>system"</a>
@@ -152,10 +182,19 @@
 						<a href="modules/_src_subsystem_system_info_options_.html">"src/subsystem/system.info.options"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_subsystem_system_log_.html">"src/subsystem/system.log"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
 						<a href="modules/_src_system_file_.html">"src/system-<wbr>file"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="modules/_src_system_atomic_.html">"src/system/atomic"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_system_error_list_.html">"src/system/error-<wbr>list"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_system_event_list_.html">"src/system/event-<wbr>list"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="modules/_src_system_subsystem_.html">"src/system/subsystem"</a>
@@ -165,9 +204,6 @@
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="modules/_test_expected_.html">"test/expected"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_test_subsystem_system_info_options_.html">"test/subsystem/system.info.options"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="modules/_test_system_system_.html">"test/system/system"</a>
@@ -186,6 +222,12 @@
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="modules/_test_test_vars_.html">"test/test-<wbr>vars"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_test_unit_subsystem_system_info_options_.html">"test/unit/subsystem/system.info.options"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_test_unit_system_constructor_.html">"test/unit/system/constructor"</a>
 					</li>
 				</ul>
 			</nav>

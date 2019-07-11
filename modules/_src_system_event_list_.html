@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>SubsystemArgs | cpuabuse-system</title>
+	<title>&quot;src/system/event-list&quot; | cpuabuse-system</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,13 +56,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="../modules/_src_system_subsystem_.html">&quot;src/system/subsystem&quot;</a>
-				</li>
-				<li>
-					<a href="_src_system_subsystem_.subsystemargs.html">SubsystemArgs</a>
+					<a href="_src_system_event_list_.html">&quot;src/system/event-list&quot;</a>
 				</li>
 			</ul>
-			<h1>Interface SubsystemArgs</h1>
+			<h1>External module &quot;src/system/event-list&quot;</h1>
 		</div>
 	</div>
 </header>
@@ -72,93 +69,133 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Subsystem class arguments.</p>
+						<p>Contains list of events used in system.</p>
 					</div>
 				</div>
-			</section>
-			<section class="tsd-panel tsd-hierarchy">
-				<h3>Hierarchy</h3>
-				<ul class="tsd-hierarchy">
-					<li>
-						<span class="target">SubsystemArgs</span>
-					</li>
-				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>Properties</h3>
+							<h3>Variables</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_src_system_subsystem_.subsystemargs.html#protectedentrypoint" class="tsd-kind-icon">protected<wbr>Entrypoint</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_src_system_subsystem_.subsystemargs.html#publicentrypoint" class="tsd-kind-icon">public<wbr>Entrypoint</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_src_system_subsystem_.subsystemargs.html#sharedentrypoint" class="tsd-kind-icon">shared<wbr>Entrypoint</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_src_system_subsystem_.subsystemargs.html#system" class="tsd-kind-icon">system</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-external-module"><a href="_src_system_event_list_.html#behaviorattach" class="tsd-kind-icon">behavior<wbr>Attach</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-external-module"><a href="_src_system_event_list_.html#behaviorattachfail" class="tsd-kind-icon">behavior<wbr>Attach<wbr>Fail</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-external-module"><a href="_src_system_event_list_.html#behaviorattachrequestfail" class="tsd-kind-icon">behavior<wbr>Attach<wbr>Request<wbr>Fail</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-external-module"><a href="_src_system_event_list_.html#errorexists" class="tsd-kind-icon">error<wbr>Exists</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-external-module"><a href="_src_system_event_list_.html#eventfail" class="tsd-kind-icon">event<wbr>Fail</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-external-module"><a href="_src_system_event_list_.html#systemload" class="tsd-kind-icon">system<wbr>Load</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-external-module"><a href="_src_system_event_list_.html#typeerror" class="tsd-kind-icon">type<wbr>Error</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Properties</h2>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="protectedentrypoint" class="tsd-anchor"></a>
-					<h3>protected<wbr>Entrypoint</h3>
-					<div class="tsd-signature tsd-kind-icon">protected<wbr>Entrypoint<span class="tsd-signature-symbol">:</span> <a href="../classes/_src_system_subsystem_.subsystementrypoint.html" class="tsd-signature-type">SubsystemEntrypoint</a></div>
+				<h2>Variables</h2>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module">
+					<a name="behaviorattach" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> behavior<wbr>Attach</h3>
+					<div class="tsd-signature tsd-kind-icon">behavior<wbr>Attach<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;behavior_attach&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/cpuabuse/node-system/blob/9121791/src/system/subsystem.ts#L46">src/system/subsystem.ts:46</a></li>
+							<li>Defined in <a href="https://github.com/cpuabuse/node-system/blob/9121791/src/system/event-list.ts#L17">src/system/event-list.ts:17</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>Protected entrypoint reference.</p>
+							<p>Behavior has been attached.</p>
 						</div>
 					</div>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="publicentrypoint" class="tsd-anchor"></a>
-					<h3>public<wbr>Entrypoint</h3>
-					<div class="tsd-signature tsd-kind-icon">public<wbr>Entrypoint<span class="tsd-signature-symbol">:</span> <a href="../classes/_src_system_subsystem_.subsystementrypoint.html" class="tsd-signature-type">SubsystemEntrypoint</a></div>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module">
+					<a name="behaviorattachfail" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> behavior<wbr>Attach<wbr>Fail</h3>
+					<div class="tsd-signature tsd-kind-icon">behavior<wbr>Attach<wbr>Fail<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;behavior_attach_fail&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/cpuabuse/node-system/blob/9121791/src/system/subsystem.ts#L49">src/system/subsystem.ts:49</a></li>
+							<li>Defined in <a href="https://github.com/cpuabuse/node-system/blob/9121791/src/system/event-list.ts#L20">src/system/event-list.ts:20</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>Public entrypoint reference.</p>
+							<p>Behavior could not be attached.</p>
 						</div>
 					</div>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="sharedentrypoint" class="tsd-anchor"></a>
-					<h3>shared<wbr>Entrypoint</h3>
-					<div class="tsd-signature tsd-kind-icon">shared<wbr>Entrypoint<span class="tsd-signature-symbol">:</span> <a href="../classes/_src_system_subsystem_.subsystementrypoint.html" class="tsd-signature-type">SubsystemEntrypoint</a></div>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module">
+					<a name="behaviorattachrequestfail" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> behavior<wbr>Attach<wbr>Request<wbr>Fail</h3>
+					<div class="tsd-signature tsd-kind-icon">behavior<wbr>Attach<wbr>Request<wbr>Fail<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;behavior_attach_request_fail&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/cpuabuse/node-system/blob/9121791/src/system/subsystem.ts#L52">src/system/subsystem.ts:52</a></li>
+							<li>Defined in <a href="https://github.com/cpuabuse/node-system/blob/9121791/src/system/event-list.ts#L23">src/system/event-list.ts:23</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>Shared entrypoint reference.</p>
+							<p>Incorrect behavior attach request.</p>
 						</div>
 					</div>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="system" class="tsd-anchor"></a>
-					<h3>system</h3>
-					<div class="tsd-signature tsd-kind-icon">system<span class="tsd-signature-symbol">:</span> <a href="../classes/_src_system_system_.system.html" class="tsd-signature-type">System</a></div>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module">
+					<a name="errorexists" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> error<wbr>Exists</h3>
+					<div class="tsd-signature tsd-kind-icon">error<wbr>Exists<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;error_exists&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/cpuabuse/node-system/blob/9121791/src/system/subsystem.ts#L55">src/system/subsystem.ts:55</a></li>
+							<li>Defined in <a href="https://github.com/cpuabuse/node-system/blob/9121791/src/system/event-list.ts#L11">src/system/event-list.ts:11</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>System context.</p>
+							<p>Error could not be added, because error with same code already exists.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module">
+					<a name="eventfail" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> event<wbr>Fail</h3>
+					<div class="tsd-signature tsd-kind-icon">event<wbr>Fail<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;event_fail&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/cpuabuse/node-system/blob/9121791/src/system/event-list.ts#L29">src/system/event-list.ts:29</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Failed to fire an event.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module">
+					<a name="systemload" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> system<wbr>Load</h3>
+					<div class="tsd-signature tsd-kind-icon">system<wbr>Load<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;system_load&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/cpuabuse/node-system/blob/9121791/src/system/event-list.ts#L14">src/system/event-list.ts:14</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>System load event. Fires at the end of system load, so it is safe to execute code in the then() directive of behavior associated.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module">
+					<a name="typeerror" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> type<wbr>Error</h3>
+					<div class="tsd-signature tsd-kind-icon">type<wbr>Error<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;type_error&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/cpuabuse/node-system/blob/9121791/src/system/event-list.ts#L26">src/system/event-list.ts:26</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Type error has been encountered.</p>
 						</div>
 					</div>
 				</section>
@@ -171,59 +208,32 @@
 						<a href="../globals.html"><em>Globals</em></a>
 					</li>
 					<li class="current tsd-kind-external-module">
-						<a href="../modules/_src_system_subsystem_.html">"src/system/subsystem"</a>
+						<a href="_src_system_event_list_.html">"src/system/event-<wbr>list"</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-enum tsd-parent-kind-external-module">
-						<a href="../enums/_src_system_subsystem_.access.html" class="tsd-kind-icon">Access</a>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
+						<a href="_src_system_event_list_.html#behaviorattach" class="tsd-kind-icon">behavior<wbr>Attach</a>
 					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-external-module">
-						<a href="../classes/_src_system_subsystem_.subsystem.html" class="tsd-kind-icon">Subsystem</a>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
+						<a href="_src_system_event_list_.html#behaviorattachfail" class="tsd-kind-icon">behavior<wbr>Attach<wbr>Fail</a>
 					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-external-module">
-						<a href="../classes/_src_system_subsystem_.subsystementrypoint.html" class="tsd-kind-icon">Subsystem<wbr>Entrypoint</a>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
+						<a href="_src_system_event_list_.html#behaviorattachrequestfail" class="tsd-kind-icon">behavior<wbr>Attach<wbr>Request<wbr>Fail</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="_src_system_subsystem_.data.html" class="tsd-kind-icon">Data</a>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
+						<a href="_src_system_event_list_.html#errorexists" class="tsd-kind-icon">error<wbr>Exists</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="_src_system_subsystem_.isubsystem.html" class="tsd-kind-icon">ISubsystem</a>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
+						<a href="_src_system_event_list_.html#eventfail" class="tsd-kind-icon">event<wbr>Fail</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="_src_system_subsystem_.method.html" class="tsd-kind-icon">Method</a>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
+						<a href="_src_system_event_list_.html#systemload" class="tsd-kind-icon">system<wbr>Load</a>
 					</li>
-				</ul>
-				<ul class="current">
-					<li class="current tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="_src_system_subsystem_.subsystemargs.html" class="tsd-kind-icon">Subsystem<wbr>Args</a>
-						<ul>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_src_system_subsystem_.subsystemargs.html#protectedentrypoint" class="tsd-kind-icon">protected<wbr>Entrypoint</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_src_system_subsystem_.subsystemargs.html#publicentrypoint" class="tsd-kind-icon">public<wbr>Entrypoint</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_src_system_subsystem_.subsystemargs.html#sharedentrypoint" class="tsd-kind-icon">shared<wbr>Entrypoint</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_src_system_subsystem_.subsystemargs.html#system" class="tsd-kind-icon">system</a>
-							</li>
-						</ul>
-					</li>
-				</ul>
-				<ul class="after-current">
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="_src_system_subsystem_.subsystemdata.html" class="tsd-kind-icon">Subsystem<wbr>Data</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="_src_system_subsystem_.subsystemextensionargs.html" class="tsd-kind-icon">Subsystem<wbr>Extension<wbr>Args</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="_src_system_subsystem_.subsystemmethod.html" class="tsd-kind-icon">Subsystem<wbr>Method</a>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
+						<a href="_src_system_event_list_.html#typeerror" class="tsd-kind-icon">type<wbr>Error</a>
 					</li>
 				</ul>
 			</nav>
