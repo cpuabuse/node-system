@@ -1,41 +1,42 @@
 language: node_js
 node_js:
-- '12'
-- '11'
-- '10'
+  - "12"
+  - "11"
+  - "10"
 os:
-- linux
-- osx
-- windows
+  - linux
+  - osx
+  - windows
 jobs:
   include:
-  - stage: Deploy
-    name: npm next release
-    deploy:
-      email: cpuabuse@gmail.com
-      provider: npm
-      api_key:
-        secure: rlPkaYcQDoaCVVWikzA15stbnVyF7XWficH32YvHlWO85WYnJuHwqG4kQsPAIjiKV4DV7lp9knPJ7vYcpQDEnptYEIUCegRI92kvvyd5jthfaMYCDlEYBEmLmiaLG/IGxpqXohqZuieaWJ37dMAvpneNxJWf8S91Xvl6sMQCk/aMTAvdk5MUKGDYU0JbtNqhEN7nC7Ra7+3GHbj4gJsYdIrvFRAo5Yy+EiMMP6q26TUNyUFTs8maFsPpZx2RGcBgmqzO0E/c3PeBKkJZG9ju0YVRdRpEFTKH+veum0fQlXGmY+38PJmUi/6N0QfWJAhjVeTYvF+ZC9mckwQSZv0ovkcH8VwsOsGjzQbuiYeFQ4i3F76esp+2ehGMItjHOMtS+cL7iR8GIsf3SkwocKHAKzim2i+V6pirWaYY9ujc54ldbUyty+jaRsRICq5gd4t47Uk7b8+972oxIhXxoXL1UtkDzWadlz3husX3rYVM/Lf2AjXTaUbKxOmp/v6BBzBPTM0NXwlGMVUTTv4O67p5qeev9oLpdvb25ZUvbR4xk5knSsniA1dzNxBL3wiqczSPmaxzY+RjcyrtUDfPyqopsfD1nuoLcBo/oKxCLIfbxrIWE4fgzcFdY37dU5MH0OyljR8J6nEoAwhOC1madVjaKM8qHsfnOUr2dE854dp7op8=
-      on:
-        branch: dev
-      tag: next
-  - name: coverage
-    script:
-      - npm run coverage
-      - npm run codecov
-  - name: docs
-    script: |
-      npm run docs
-      npm run nojekyll
-    deploy:
-      provider: pages
-      local_dir: docs/
-      skip_cleanup: true
-      github_token:
-        secure: 4P2I/wayczxVSmDT+hKIizsufuztbgXnFCzFXU0ILd9373JqSYUYKgNL8XA5SshBlBI8rk1qfsN6aXVXJeY6K70dwm3u3no0oOhKyLjSZToi/vCpjTHQ5T9MDGm/HkeSHQbyn/EX5bd/ko348UuwpLj5FCXg8glyyIcji/nBjdTelLae7ftftUXA2fRmGWmR2WjerqPiIMW56EB5HES3sYDP9aEGWe8L2tmPjKycc+J0imKGtih13VOahDK5uRqLypFxQovBtcqRWDkDbB/jgwYER1DXb3CV3tVnLp6noKHENJ/WKgAjVEj7d+tW/t0D8+pwx+Y3hF6RHNVfaIC/11MWgfot9qDPgxHCHgbXT28lI46zchQyfURLZ0A6it1RAPTtIL0EsS5hy2YTkH7kN6jRC6Z5GR/non1zOn25+dhiPLiYS9auZviWMfnv++y8KqUO+Fi9Xye5tetHADqpqZxmf3ivPleZvcInsb/ECGulF4wVGg13tWAsz3b9PGesuzt5T+cXqP2c+phePzKSZjXDv8uELp3ioV6yZ6qSDqNoGDEwgKx3COTl5tXpGeHj6tJz8G2Bfs3OqgPvLoKreU5dyz7SKqRoLJUS/STIcMSufgZ6uYjZ/cUGgTgHtw2fjflsNDixq1wuNDue40m1w82ikAG0z28iVIlNPtYuWNE=
-      keep_history: true
-      on:
-        branch: master
+    - stage: Deploy
+      name: npm next release
+      deploy:
+        email: cpuabuse@gmail.com
+        provider: npm
+        api_key:
+          secure: rlPkaYcQDoaCVVWikzA15stbnVyF7XWficH32YvHlWO85WYnJuHwqG4kQsPAIjiKV4DV7lp9knPJ7vYcpQDEnptYEIUCegRI92kvvyd5jthfaMYCDlEYBEmLmiaLG/IGxpqXohqZuieaWJ37dMAvpneNxJWf8S91Xvl6sMQCk/aMTAvdk5MUKGDYU0JbtNqhEN7nC7Ra7+3GHbj4gJsYdIrvFRAo5Yy+EiMMP6q26TUNyUFTs8maFsPpZx2RGcBgmqzO0E/c3PeBKkJZG9ju0YVRdRpEFTKH+veum0fQlXGmY+38PJmUi/6N0QfWJAhjVeTYvF+ZC9mckwQSZv0ovkcH8VwsOsGjzQbuiYeFQ4i3F76esp+2ehGMItjHOMtS+cL7iR8GIsf3SkwocKHAKzim2i+V6pirWaYY9ujc54ldbUyty+jaRsRICq5gd4t47Uk7b8+972oxIhXxoXL1UtkDzWadlz3husX3rYVM/Lf2AjXTaUbKxOmp/v6BBzBPTM0NXwlGMVUTTv4O67p5qeev9oLpdvb25ZUvbR4xk5knSsniA1dzNxBL3wiqczSPmaxzY+RjcyrtUDfPyqopsfD1nuoLcBo/oKxCLIfbxrIWE4fgzcFdY37dU5MH0OyljR8J6nEoAwhOC1madVjaKM8qHsfnOUr2dE854dp7op8=
+        on:
+          branch: dev
+        tag: next
+    - name: coverage
+      script:
+        - npm run coverage
+        - npm run codecov
+        - npm run codacy
+    - name: docs
+      script: |
+        npm run docs
+        npm run nojekyll
+      deploy:
+        provider: pages
+        local_dir: docs/
+        skip_cleanup: true
+        github_token:
+          secure: 4P2I/wayczxVSmDT+hKIizsufuztbgXnFCzFXU0ILd9373JqSYUYKgNL8XA5SshBlBI8rk1qfsN6aXVXJeY6K70dwm3u3no0oOhKyLjSZToi/vCpjTHQ5T9MDGm/HkeSHQbyn/EX5bd/ko348UuwpLj5FCXg8glyyIcji/nBjdTelLae7ftftUXA2fRmGWmR2WjerqPiIMW56EB5HES3sYDP9aEGWe8L2tmPjKycc+J0imKGtih13VOahDK5uRqLypFxQovBtcqRWDkDbB/jgwYER1DXb3CV3tVnLp6noKHENJ/WKgAjVEj7d+tW/t0D8+pwx+Y3hF6RHNVfaIC/11MWgfot9qDPgxHCHgbXT28lI46zchQyfURLZ0A6it1RAPTtIL0EsS5hy2YTkH7kN6jRC6Z5GR/non1zOn25+dhiPLiYS9auZviWMfnv++y8KqUO+Fi9Xye5tetHADqpqZxmf3ivPleZvcInsb/ECGulF4wVGg13tWAsz3b9PGesuzt5T+cXqP2c+phePzKSZjXDv8uELp3ioV6yZ6qSDqNoGDEwgKx3COTl5tXpGeHj6tJz8G2Bfs3OqgPvLoKreU5dyz7SKqRoLJUS/STIcMSufgZ6uYjZ/cUGgTgHtw2fjflsNDixq1wuNDue40m1w82ikAG0z28iVIlNPtYuWNE=
+        keep_history: true
+        on:
+          branch: master
 notifications:
   slack:
     secure: 1AgdwupATTv0RN7DVNsFu83Dtx8fjHlFtxw9K4cQ8Zu/VASytbbbvFAy7AfBLFAfIVsFQcy5iPtYzMzV1EkBlyE4SwFz37ieWFZ02y6d2AshM3AOspV635zaMUgUmrtowW/X09O8nIRvqoXhwtWUuxBhGqoDOpQRyshQlHOlIz0PoQLyscRf9H2zjzQp9uV8t+L7LGddGmKVWS5mGqe/eG35pR6KrMgPDGEOePu93f2YwvkvT0cSmaFM1xQQyhZorbFPPoIojTcIyFfWpo+Xrfftflz26PkilR1/bvjm+C7rB90UeDx14wncxGqsEbC9LmvptjxvxMqEHUuAFwpKHqZq17cgDC6jN1NH+VqXFAA9BujWLnDlxFgdGS181RreFcfHOEcwtBucnjZ94Ke+8qj3k78QdD2g0waZxQ93g97dyaGUkOW1xxQiQWXENGBDAS5vIskCxlo772vyZzde9jW5BDA5fzkSULksZ/5Q1OHuOVRcbSzBwDrd1daaoqkzINBSwgQu01cwtnBYEGcAPZ+nntVbFTASMMfY+B21Wy+biwYXlEn/9cwbXF9EP52rsez2p/WgjjcX2Seln61oYhRAGfBqBrrDrGVngeCpPu2wKA8qDVXfNSi4BvUjDW4YNrhP1u/38MQjZK4hTGJ6jrdlYPghi6PTnUAJp2gFEww=
