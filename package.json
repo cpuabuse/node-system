@@ -22,6 +22,9 @@
 		"type": "git",
 		"url": "git+https://github.com/cpuabuse/node-system.git"
 	},
+	"engines": {
+		"node": ">= 10.0.0"
+	},
 	"dependencies": {
 		"js-yaml": "^3.13.1"
 	},
