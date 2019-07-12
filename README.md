@@ -3,6 +3,7 @@
 ![Codecov](https://img.shields.io/codecov/c/github/cpuabuse/node-system.svg?style=for-the-badge)
 ![Codacy grade](https://img.shields.io/codacy/grade/20c4959c1cd24053825f9f629a863945.svg?style=for-the-badge)
 ![Libraries.io dependency status for latest release](https://img.shields.io/librariesio/release/npm/cpuabuse-system.svg?style=for-the-badge)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/63ff087096f84dcabb59a1c6f5bb7451)](https://app.codacy.com/app/cpuabuse/node-system?utm_source=github.com&utm_medium=referral&utm_content=cpuabuse/node-system&utm_campaign=Badge_Grade_Dashboard)
 [![Documentation](https://img.shields.io/badge/documentation-gh--pages-success.svg?style=for-the-badge)](https://cpuabuse.github.io/node-system/)
 [![Chat](https://img.shields.io/badge/chat-slack-success.svg?style=for-the-badge)](https://join.slack.com/t/cpuabuse/shared_invite/enQtNjYzMjQ4NjY1MTUzLTZjMTY1M2NiYmZkNzBjMzI0YTQ4OGVjZDA1ODJkNjFiNDU1NDQwYjViMjBjODA1Y2Y4ZjNiYmUzODA2YWI3NDM)
 
