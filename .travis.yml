@@ -11,6 +11,7 @@ jobs:
   include:
     - stage: Deploy
       name: npm next release
+      before_deploy: npm install # Should run prepare as well
       deploy:
         email: cpuabuse@gmail.com
         provider: npm
@@ -25,9 +26,9 @@ jobs:
         - npm run codecov
         - npm run codacy
     - name: docs
-      script: |
-        npm run docs
-        npm run nojekyll
+      script:
+        - npm run docs
+        - npm run nojekyll
       deploy:
         provider: pages
         local_dir: docs/
