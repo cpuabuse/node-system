@@ -8,8 +8,6 @@
  * If error is thrown, node will exit with code 1, otherwise 0.
  */
 
-import { testAtomicLock } from "./test-atomic";
-import { testLoaderError, testSystemError } from "./test-errors";
 import { testLoader } from "./test-loader";
 import { unit } from "./unit/unit";
 import { integration } from "./integration/integration";
@@ -28,7 +26,4 @@ unit();
 integration();
 
 // Run tests
-testLoaderError();
-testSystemError();
 testLoader();
-testAtomicLock();

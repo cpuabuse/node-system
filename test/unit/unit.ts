@@ -9,10 +9,12 @@
 /* global describe:true */
 
 import { test as testSystem } from "./system/system";
+import { test as testLoader } from "./loader/loader";
 
 /** Execute unit tests. */
 export function unit(): void {
 	describe("unit", function(): void {
+		testLoader();
 		testSystem();
 	});
 }
