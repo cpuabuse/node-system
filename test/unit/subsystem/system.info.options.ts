@@ -11,7 +11,7 @@
 
 import { strictEqual } from "assert";
 import { System } from "../../../src/system/system"; /* eslint-disable-line no-unused-vars */
-import { SystemTest } from "../../system/system"; /* eslint-disable-line no-unused-vars */ // ESLint bug
+import { SystemTest } from "../../integration/system/system"; /* eslint-disable-line no-unused-vars */ // ESLint bug
 
 /** Tests `system.info.options` subsystem. */
 export function test(system: System, systemTest: SystemTest): void {
@@ -19,7 +19,10 @@ export function test(system: System, systemTest: SystemTest): void {
 		// System instance ID
 		describe("id", function(): void {
 			it(`should be ${systemTest.options.id}`, function(done: () => void): void {
-				strictEqual(system.public.subsystem.options.get.id, systemTest.options.id);
+				strictEqual(
+					system.public.subsystem.options.get.id,
+					systemTest.options.id
+				);
 				done();
 			});
 		});
