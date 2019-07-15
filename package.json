@@ -4,7 +4,7 @@
 	"description": "System module",
 	"main": "src/system.js",
 	"types": "src/system.d.ts",
-	"license": "UNLICENSED",
+	"license": "ISC",
 	"scripts": {
 		"codecov": "echo Deploying coverage... && codecov",
 		"coverage": "echo Running coverage... && nyc --reporter=lcovonly --reporter=text-summary --reporter=text --extension=.ts npm run ts-mocha",
