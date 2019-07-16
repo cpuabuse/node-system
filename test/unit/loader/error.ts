@@ -12,7 +12,7 @@
 /* global describe:true */
 /* global it:true */
 
-import { strictEqual } from "assert";
+import { deepStrictEqual } from "assert";
 import { LoaderError } from "../../../src/loaderError";
 
 /**
@@ -25,13 +25,13 @@ export function test(): void {
 		describe("constructor", function(): void {
 			it("should initialize with default values", function(): void {
 				let error: LoaderError = new LoaderError();
-				strictEqual(error.code, "default_code");
-				strictEqual(error.message, "default_message");
+				deepStrictEqual(error.code, "default_code");
+				deepStrictEqual(error.message, "default_message");
 
 				// Repeat with empty strings
 				error = new LoaderError("", "");
-				strictEqual(error.code, "default_code");
-				strictEqual(error.message, "default_message");
+				deepStrictEqual(error.code, "default_code");
+				deepStrictEqual(error.message, "default_message");
 			});
 		});
 	});

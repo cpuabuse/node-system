@@ -8,7 +8,6 @@
  * If error is thrown, node will exit with code 1, otherwise 0.
  */
 
-import { testLoader } from "./test-loader";
 import { unit } from "./unit/unit";
 import { integration } from "./integration/integration";
 
@@ -24,6 +23,3 @@ unit();
 
 // Call integration test
 integration();
-
-// Run tests
-testLoader();
