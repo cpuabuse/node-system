@@ -115,8 +115,6 @@ async function addBehavior(this: Behavior, name: string, callback: BehaviorInter
  * Adds behaviors to the system, and fires post-addtion events.
  * Firstly, this function attempts to add the behaviors.
  * When the behavior addition has been processed, the function will attempt to fire post-addition events, depending on success/failure of behavior additions.
- * @instance
- * @param behaviors Behaviors
  * // TODO: Events
  * @fires module:system.private#events#behaviorAttach
  * @fires module:system.private#events#behaviorAttachFail
@@ -148,7 +146,7 @@ async function addBehaviors(this: Behavior, behaviors: Behaviors): Promise<void>
 	if (Array.isArray(behaviors)) {
 		// Sanity check - is an array
 		if (behaviors.length > 0) {
-			// Sanity check - is not empty
+				// Sanity check - is not empty
 			// Loop - attachment
 			await Promise.all(
 				behaviors
