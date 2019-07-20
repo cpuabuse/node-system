@@ -9,7 +9,11 @@
 
 import { EventEmitter } from "events";
 import { AtomicLock } from "../system/atomic";
-import { behaviorAttachFail, behaviorAttachRequestFail, behaviorAttach } from "../system/event-list";
+import {
+	behaviorAttachFail,
+	behaviorAttachRequestFail,
+	behaviorAttach
+} from "../system/event-list";
 import { LoaderError } from "../loaderError";
 import {
 	Access,
@@ -75,7 +79,11 @@ export interface Behaviors {
  * @param callback Behavior callback function
  * @returns ID of the behavior; `behaviorCreationError` if creation failed
  */
-async function addBehavior(this: Behavior, name: string, callback: BehaviorInterfaceCallback): Promise<string> {
+async function addBehavior(
+	this: Behavior,
+	name: string,
+	callback: BehaviorInterfaceCallback
+): Promise<string> {
 	if (typeof name === "string") {
 		// Name must be string
 		if (typeof callback === "function") {
@@ -142,11 +150,14 @@ async function addBehavior(this: Behavior, name: string, callback: BehaviorInter
  * });
  * ```
  */
-async function addBehaviors(this: Behavior, behaviors: Behaviors): Promise<void> {
+async function addBehaviors(
+	this: Behavior,
+	behaviors: Behaviors
+): Promise<void> {
 	if (Array.isArray(behaviors)) {
 		// Sanity check - is an array
 		if (behaviors.length > 0) {
-				// Sanity check - is not empty
+			// Sanity check - is not empty
 			// Loop - attachment
 			await Promise.all(
 				behaviors
@@ -155,14 +166,18 @@ async function addBehaviors(this: Behavior, behaviors: Behaviors): Promise<void>
 						key: string;
 					} | null => {
 						if (typeof element === "object") {
-							let properties: Array<string> = Object.getOwnPropertyNames(element);
+							let properties: Array<string> = Object.getOwnPropertyNames(
+								element
+							);
 							if (properties.length === 1) {
 								let [key]: Array<string> = properties;
 								let value: BehaviorInterfaceCallback = element[key];
 								if (typeof key === "string") {
 									if (key.length > 0 && typeof value === "function") {
 										return {
-											behaviorAdded: this.private.call.addBehavior(key, () => value(this.system)),
+											behaviorAdded: this.private.call.addBehavior(key, () =>
+												value(this.system)
+											),
 											key
 										};
 									}
@@ -176,10 +191,18 @@ async function addBehaviors(this: Behavior, behaviors: Behaviors): Promise<void>
 						return null;
 					})
 					.map(
-						(element: { behaviorAdded: Promise<string> | null; key: string } | null): Promise<string | void> => {
+						(
+							element: {
+								behaviorAdded: Promise<string> | null;
+								key: string;
+							} | null
+						): Promise<string | void> => {
 							// Loop - post-attachment event fire
 							if (element === null) {
-								this.private.call.fire(behaviorAttachFail, "Behavior could not be added.");
+								this.private.call.fire(
+									behaviorAttachFail,
+									"Behavior could not be added."
+								);
 								return Promise.resolve();
 							}
 							if (element.behaviorAdded) {
@@ -188,7 +211,10 @@ async function addBehaviors(this: Behavior, behaviors: Behaviors): Promise<void>
 							}
 
 							// Behavior not added
-							this.private.call.fire(behaviorAttachRequestFail, "Event not described.");
+							this.private.call.fire(
+								behaviorAttachRequestFail,
+								"Event not described."
+							);
 							return Promise.resolve();
 						}
 					)
@@ -225,9 +251,13 @@ async function addBehaviors(this: Behavior, behaviors: Behaviors): Promise<void>
  */
 function behave(this: Behavior, name: string): void {
 	try {
-		this.subsystem[this.role.log].call.log(`Behavior - ${this.private.get.data[name].text}`);
+		this.subsystem[this.role.log].call.log(
+			`Behavior - ${this.private.get.data[name].text}`
+		);
 	} catch (error) {
-		this.subsystem[this.role.log].call.log(`Behavior - Undocumented behavior - ${name}`);
+		this.subsystem[this.role.log].call.log(
+			`Behavior - Undocumented behavior - ${name}`
+		);
 	}
 
 	if (typeof name === "string") {
@@ -275,9 +305,17 @@ function fire(this: Behavior, name: string, message?: string): void {
 		let event: { behavior?: boolean; error?: string; log?: string };
 
 		// Verify event exists
-		if (!Object.prototype.hasOwnProperty.call(this.system.public.subsystem[eventSubsystem].get.data, name)) {
+		if (
+			!Object.prototype.hasOwnProperty.call(
+				this.system.public.subsystem[eventSubsystem].get.data,
+				name
+			)
+		) {
 			// throw new system error
-			throw new SystemError(eventAbsent, "Could not fire an event that is not described.");
+			throw new SystemError(
+				eventAbsent,
+				"Could not fire an event that is not described."
+			);
 		}
 
 		// Locate event
@@ -351,7 +389,14 @@ export default class Behavior extends Subsystem {
 
 	/** Initializes system behavior. */
 	// @ts-ignore tsc does not see inevitability of super()
-	constructor({ system, args, protectedEntrypoint, publicEntrypoint, sharedEntrypoint, vars }: Args) {
+	constructor({
+		system,
+		args,
+		protectedEntrypoint,
+		publicEntrypoint,
+		sharedEntrypoint,
+		vars
+	}: Args) {
 		// Call superclass's constructor
 		super({ protectedEntrypoint, publicEntrypoint, sharedEntrypoint, system });
 
