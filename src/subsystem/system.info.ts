@@ -16,7 +16,13 @@ import {
 
 /** Generic subsystem for information. */
 export default class Info extends Subsystem {
-	constructor({ system, vars, protectedEntrypoint, publicEntrypoint, sharedEntrypoint }: SubsystemExtensionArgs) {
+	constructor({
+		system,
+		vars,
+		protectedEntrypoint,
+		publicEntrypoint,
+		sharedEntrypoint
+	}: SubsystemExtensionArgs) {
 		// Call superclass constructor
 		super({ protectedEntrypoint, publicEntrypoint, sharedEntrypoint, system });
 
@@ -24,7 +30,11 @@ export default class Info extends Subsystem {
 		let data: Array<Data> = new Array() as Array<Data>;
 
 		Object.keys(vars).forEach(function(name: string): void {
-			data.push({ access: Access.private | Access.protected | Access.shared, name, obj: vars[name] });
+			data.push({
+				access: Access.private | Access.protected | Access.shared,
+				name,
+				obj: vars[name]
+			});
 		});
 
 		// Assign data

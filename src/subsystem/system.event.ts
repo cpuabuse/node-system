@@ -7,12 +7,23 @@
  * Contains instructions for behaviours.
  */
 
-import { Access, SubsystemData as Data, Subsystem, SubsystemExtensionArgs as Args } from "../system/subsystem";
+import {
+	Access,
+	SubsystemData as Data /* eslint-disable-line no-unused-vars */, // ESLint bug
+	Subsystem,
+	SubsystemExtensionArgs as Args /* eslint-disable-line no-unused-vars */ // ESLint bug
+} from "../system/subsystem";
 
 /** This class handles events. */
 export default class Event extends Subsystem {
 	/** Constructs an instance of events. */
-	constructor({ system, protectedEntrypoint, publicEntrypoint, sharedEntrypoint, vars }: Args) {
+	constructor({
+		system,
+		protectedEntrypoint,
+		publicEntrypoint,
+		sharedEntrypoint,
+		vars
+	}: Args) {
 		super({ protectedEntrypoint, publicEntrypoint, sharedEntrypoint, system });
 
 		// TODO: Add checks for consistency of the events

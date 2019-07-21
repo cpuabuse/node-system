@@ -14,7 +14,13 @@ export default class FileSystem extends Subsystem {
 	/** Contains files & file meta-data. */
 	private files: any;
 
-	constructor({ protectedEntrypoint, publicEntrypoint, system, sharedEntrypoint, vars }: Args) {
+	constructor({
+		protectedEntrypoint,
+		publicEntrypoint,
+		system,
+		sharedEntrypoint,
+		vars
+	}: Args) {
 		super({ protectedEntrypoint, publicEntrypoint, sharedEntrypoint, system });
 		this.files = vars;
 	}

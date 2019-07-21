@@ -11,7 +11,7 @@ import {
 	Access,
 	Subsystem,
 	SubsystemExtensionArgs as Args /* eslint-disable-line no-unused-vars */, // ESLint bug
-	SubsystemEntrypoint
+	SubsystemEntrypoint /* eslint-disable-line no-unused-vars */ // ESLint type import detection bug
 } from "../system/subsystem";
 import { LoaderError } from "../loaderError";
 
@@ -36,7 +36,9 @@ import { LoaderError } from "../loaderError";
 function error(this: Log, text: string): void {
 	if (this.subsystem[this.role.options].get.logging === "console") {
 		/* eslint-disable-next-line no-console */
-		console.error(`\x1b[31m[Error]\x1b[0m ${this.subsystem[this.role.options].get.id}: ${text}`);
+		console.error(
+			`\x1b[31m[Error]\x1b[0m ${this.subsystem[this.role.options].get.id}: ${text}`
+		);
 	}
 } // <== error
 
@@ -61,7 +63,9 @@ function error(this: Log, text: string): void {
 function log(this: Log, text: string): void {
 	if (this.subsystem[this.role.options].get.logging === "console") {
 		/* eslint-disable-next-line no-console */
-		console.log(`\x1b[32m[OK]\x1b[0m ${this.subsystem[this.role.options].get.id}: ${text}`);
+		console.log(
+			`\x1b[32m[OK]\x1b[0m ${this.subsystem[this.role.options].get.id}: ${text}`
+		);
 	}
 } // <== log
 
@@ -78,7 +82,14 @@ export default class Log extends Subsystem {
 		[key: string]: SubsystemEntrypoint;
 	};
 
-	constructor({ args, system, protectedEntrypoint, publicEntrypoint, sharedEntrypoint, vars }: Args) {
+	constructor({
+		args,
+		system,
+		protectedEntrypoint,
+		publicEntrypoint,
+		sharedEntrypoint,
+		vars
+	}: Args) {
 		/** Call super class constructor. */
 		super({ protectedEntrypoint, publicEntrypoint, sharedEntrypoint, system });
 

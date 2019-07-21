@@ -7,7 +7,10 @@
  * Used for storing system options.
  */
 
-import { Access, SubsystemExtensionArgs } from "../system/subsystem"; /* eslint-disable-line no-unused-vars */ // ESLint type import detection bug
+import {
+	Access,
+	SubsystemExtensionArgs /* eslint-disable-line no-unused-vars */ // ESLint type import detection bug
+} from "../system/subsystem";
 import Info from "./system.info";
 import { LoaderError } from "../loaderError";
 import { Options as SystemOptions } from "../system/system"; /* eslint-disable-line no-unused-vars */ // ESLint type import detection bug
@@ -15,7 +18,9 @@ import { Options as SystemOptions } from "../system/system"; /* eslint-disable-l
 interface OptionsVars {
 	homepage: string;
 } /* eslint-disable-line no-extra-semi */ // ESLint inteface no-extra-semi bug
-export interface OptionsInterface extends SystemOptions, OptionsVars {} /* eslint-disable-line no-extra-semi */ // ESLint inteface no-extra-semi bug
+export interface OptionsInterface
+	extends SystemOptions,
+		OptionsVars {} /* eslint-disable-line no-extra-semi */ // ESLint inteface no-extra-semi bug
 
 /**
  * Checks options argument for missing incorrect property types
@@ -48,7 +53,11 @@ export function checkOptionsFailure(options: SystemOptions) {
 		}
 
 		// Checks strings
-		let stringOptions: ("id" | "rootDir" | "relativeInitDir" | "initFilename")[] = [
+		let stringOptions: (
+			| "id"
+			| "rootDir"
+			| "relativeInitDir"
+			| "initFilename")[] = [
 			"id",
 			"rootDir",
 			"relativeInitDir",
@@ -69,7 +78,14 @@ export function checkOptionsFailure(options: SystemOptions) {
 
 /** Stores system options. */
 export default class Options extends Info {
-	constructor({ args, system, publicEntrypoint, protectedEntrypoint, sharedEntrypoint, vars }: SubsystemExtensionArgs) {
+	constructor({
+		args,
+		system,
+		publicEntrypoint,
+		protectedEntrypoint,
+		sharedEntrypoint,
+		vars
+	}: SubsystemExtensionArgs) {
 		// Set options to be read
 		if (args.system_args !== undefined) {
 			// Assign system option args
@@ -107,6 +123,9 @@ export default class Options extends Info {
 		}
 
 		// Report an error
-		throw new LoaderError("system_options_failure", "The options provided to the system constructor are inconsistent.");
+		throw new LoaderError(
+			"system_options_failure",
+			"The options provided to the system constructor are inconsistent."
+		);
 	}
 }
