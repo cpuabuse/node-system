@@ -23,7 +23,7 @@ import {
 } from "../../../src/system/system";
 import * as systemError from "../../../src/error";
 import * as loaderError from "../../../src/loaderError" /* eslint-disable-line no-unused-vars */;
-import * as expected from "../../expected";
+import * as expected from "./expected";
 
 /** Non-existent file or directory. */
 const nonExistentFileOrDir: string = "Non-existent file or directory";

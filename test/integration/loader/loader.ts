@@ -12,10 +12,10 @@ File: test/integration/loader/loader.ts
 /* global describe:true */
 /* global it:true */
 /* global before:true */
-import * as assert from "assert";
-import * as path from "path";
+import { rejects, doesNotReject, strictEqual, deepStrictEqual } from "assert";
+import { sep } from "path";
 import { Loader } from "../../../src/loader";
-import { LoaderError } from "../../../src/loaderError";
+import { LoaderError } from "../../../src/loaderError"; /* eslint-disable-line no-unused-vars */
 
 /** Default string for absent file. */
 const nonExistentFileOrDir: string = "Non-existent file or directory";
@@ -106,7 +106,7 @@ export function test(): void {
 				],
 				name: "Stars",
 				rawFilename: "stars.yml",
-				rootDir: `test${path.sep}data${path.sep}loader`
+				rootDir: `test${sep}data${sep}loader`
 			},
 			// Flower Shop
 			{
@@ -147,7 +147,7 @@ export function test(): void {
 				],
 				name: "Flower Shop",
 				rawFilename: "init.yml",
-				rootDir: `test${path.sep}data${path.sep}system`
+				rootDir: `test${sep}data${sep}system`
 			},
 			// Example
 			{
@@ -156,7 +156,7 @@ export function test(): void {
 				filesAndFoldersAmount: 4,
 				name: "Example",
 				rawFilename: "init.yml",
-				rootDir: `test${path.sep}data${path.sep}system`
+				rootDir: `test${sep}data${sep}system`
 			},
 			// Cars
 			{
@@ -166,7 +166,7 @@ export function test(): void {
 				filesAndFoldersAmount: 1,
 				name: "Cars",
 				rawFilename: "init.yml",
-				rootDir: `test${path.sep}data${path.sep}loader`
+				rootDir: `test${sep}data${sep}loader`
 			}
 		];
 		loaders.forEach(function(element: Test): void {
@@ -185,7 +185,7 @@ export function test(): void {
 									"constructorError"
 								)
 							) {
-								constructorErrorOk = (assert.rejects(load, function(
+								constructorErrorOk = (rejects(load, function(
 									error: LoaderError | Error
 								): boolean {
 									return (
@@ -195,7 +195,7 @@ export function test(): void {
 									);
 								}) as unknown) as Promise<Error>; // @types declaration mismatch
 							} else {
-								constructorErrorOk = (assert.doesNotReject(
+								constructorErrorOk = (doesNotReject(
 									load
 								) as unknown) as Promise<Error>; // @types declaration mismatch
 							}
@@ -215,7 +215,7 @@ export function test(): void {
 						? `reject with "${element.constructorError}"`
 						: "not reject";
 					it(`should ${should}`, function(): Promise<void> {
-						return assert.doesNotReject(constructorErrorOk);
+						return doesNotReject(constructorErrorOk);
 					});
 				});
 
@@ -233,7 +233,7 @@ export function test(): void {
 						): void {
 							describe(`#${compare.child}.${compare.grandChild}`, function(): void {
 								it(`should be ${compare.value}`, function(done: () => void): void {
-									assert.strictEqual(
+									strictEqual(
 										// TODO: Ignore for now
 										// @ts-ignore
 										loaderTest[compare.child][compare.grandChild],
@@ -261,7 +261,7 @@ export function test(): void {
 						): void {
 							describe(`#${compare.child}.${compare.grandChild}.${compare.greatGrandChild}`, function(): void {
 								it(`should be ${compare.value}`, function(done: () => void): void {
-									assert.strictEqual(
+									strictEqual(
 										// TODO: Ignore for now
 										// @ts-ignore
 										loaderTest[compare.child][compare.grandChild][
@@ -287,12 +287,12 @@ export function test(): void {
 						Loader.list(element.rootDir, element.dir).then(function(
 							result: Array<string>
 						): void {
-							assert.strictEqual(result.length, element.filesAndFoldersAmount);
+							strictEqual(result.length, element.filesAndFoldersAmount);
 							done();
 						});
 					});
 					it("should reject with args", function(): void {
-						assert.rejects(Loader.list(element.rootDir, "Some text."));
+						rejects(Loader.list(element.rootDir, "Some text."));
 					});
 				});
 
@@ -303,15 +303,15 @@ export function test(): void {
 				 * - Array as argument
 				 */
 				describe(".toRelative()", function(): void {
-					let absolutePath: string = element.rootDir + path.sep + element.dir; // Absolute path from root
+					let absolutePath: string = element.rootDir + sep + element.dir; // Absolute path from root
 					it(`should be equal to "${element.dir}" with args ("${element.rootDir}", "${absolutePath}")`, function(): void {
-						assert.strictEqual(
+						strictEqual(
 							Loader.toRelative(element.rootDir, absolutePath),
 							element.dir
 						);
 					});
 					it("should work with array", function(): void {
-						assert.deepEqual(
+						deepStrictEqual(
 							Loader.toRelative(element.rootDir, [absolutePath, absolutePath]),
 							[element.dir, element.dir]
 						);
@@ -327,33 +327,29 @@ export function test(): void {
 				 */
 				describe(`.isFile("${element.rootDir}", "${element.dir}", "${element.rawFilename}")`, function(): void {
 					let isFile: Promise<boolean> = Loader.isFile(
-						element.rootDir +
-							path.sep +
-							element.dir +
-							path.sep +
-							element.rawFilename
+						element.rootDir + sep + element.dir + sep + element.rawFilename
 					);
-					it(`should be a file with args ("${element.rootDir}${path.sep}${element.dir}${path.sep}${element.rawFilename}")`, function(done: () => void): void {
+					it(`should be a file with args ("${element.rootDir}${sep}${element.dir}${sep}${element.rawFilename}")`, function(done: () => void): void {
 						isFile.then(function(result: boolean): void {
-							assert.strictEqual(result, true);
+							strictEqual(result, true);
 							done();
 						});
 					});
-					it(`should not be a directory with args ("${element.rootDir}${path.sep}${element.dir}")`, function(done: () => void): void {
-						Loader.isFile(element.rootDir + path.sep + element.dir).then(
+					it(`should not be a directory with args ("${element.rootDir}${sep}${element.dir}")`, function(done: () => void): void {
+						Loader.isFile(element.rootDir + sep + element.dir).then(function(
+							result: boolean
+						): void {
+							strictEqual(result, false);
+							done();
+						});
+					});
+					it(`should not be a directory with args ("${element.rootDir}${sep}${nonExistentFileOrDir}")`, function(done: () => void): void {
+						Loader.isFile(element.rootDir + sep + nonExistentFileOrDir).then(
 							function(result: boolean): void {
-								assert.strictEqual(result, false);
+								strictEqual(result, false);
 								done();
 							}
 						);
-					});
-					it(`should not be a directory with args ("${element.rootDir}${path.sep}${nonExistentFileOrDir}")`, function(done: () => void): void {
-						Loader.isFile(
-							element.rootDir + path.sep + nonExistentFileOrDir
-						).then(function(result: boolean): void {
-							assert.strictEqual(result, false);
-							done();
-						});
 					});
 				});
 
@@ -369,17 +365,17 @@ export function test(): void {
 						Loader.isDir(element.rootDir, element.dir).then(function(
 							result: boolean
 						): void {
-							assert.strictEqual(result, true);
+							strictEqual(result, true);
 							done();
 						});
 					});
 
-					it(`should not be a directory with args ("${element.rootDir}", "${element.dir}${path.sep}${element.rawFilename}")`, function(done: () => void): void {
+					it(`should not be a directory with args ("${element.rootDir}", "${element.dir}${sep}${element.rawFilename}")`, function(done: () => void): void {
 						Loader.isDir(element.rootDir, Loader.join(
 							element.dir,
 							element.rawFilename
 						) as string).then(function(result: boolean): void {
-							assert.strictEqual(result, false);
+							strictEqual(result, false);
 							done();
 						});
 					});
@@ -388,7 +384,7 @@ export function test(): void {
 						Loader.isDir(element.rootDir, nonExistentFileOrDir).then(function(
 							result: boolean
 						): void {
-							assert.strictEqual(result, false);
+							strictEqual(result, false);
 							done();
 						});
 					});

@@ -10,8 +10,8 @@
 /* global it:true */
 
 import { strictEqual } from "assert";
-import { System } from "../../../src/system/system"; /* eslint-disable-line no-unused-vars */
-import { SystemTest } from "../../integration/system/system"; /* eslint-disable-line no-unused-vars */ // ESLint bug
+import { System } from "../../../../src/system/system"; /* eslint-disable-line no-unused-vars */
+import { SystemTest } from "../../../integration/system/system"; /* eslint-disable-line no-unused-vars */ // ESLint bug
 
 /** Tests `system.info.options` subsystem. */
 export function test(system: System, systemTest: SystemTest): void {
