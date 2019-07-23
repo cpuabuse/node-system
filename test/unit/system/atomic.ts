@@ -20,13 +20,13 @@
 /* global it:true */
 
 import { strictEqual } from "assert";
-import { AtomicLock } from "../src/system/system";
+import { AtomicLock } from "../../../src/system/system";
 
 /** Time to wait. */
 const waitTime: number = 200;
 
 /** Tests of AtomicLock class. */
-export function testAtomicLock(): void {
+export function test(): void {
 	describe("AtomicLock", function(): void {
 		// Assing variables
 		let atomicLock: AtomicLock = new AtomicLock();

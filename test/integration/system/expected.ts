@@ -18,7 +18,7 @@ branch:
 subsystems:
   extend: true
 `;
-export const flowerShopYamlInit: any = {
+export const flowerShopYamlInit: object = {
 	branch: {
 		extend: true
 	},
@@ -37,7 +37,7 @@ export const exampleInit: string = `errors:
 subsystems:
   extend: true
 `;
-export const exampleYamlInit: any = {
+export const exampleYamlInit: object = {
 	errors: null,
 	subsystems: {
 		extend: true
