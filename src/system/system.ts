@@ -794,12 +794,10 @@ export class System extends Loader {
 																> = (subsystemsProperty.roles as unknown) as Array<
 																	string
 																>;
-																roles.forEach(
-																	(element: string): void => {
-																		// Assigning subsystem name to a role identified by subsystem
-																		this.private.role[element] = subsystem;
-																	}
-																);
+																roles.forEach((element: string): void => {
+																	// Assigning subsystem name to a role identified by subsystem
+																	this.private.role[element] = subsystem;
+																});
 															}
 
 															// Process args

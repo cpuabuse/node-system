@@ -9,7 +9,10 @@
 
 import { AtomicLock } from "./atomic";
 import { Behaviors } from "../subsystem/system.behavior"; /* eslint-disable-line no-unused-vars */ // ESLint type import detection bug
-import { System, Options } from "./system"; /* eslint-disable-line no-unused-vars */ // ESLint type import detection bug
+import {
+	System /* eslint-disable-line no-unused-vars */, // ESLint type import detection bug
+	Options /* eslint-disable-line no-unused-vars */ // ESLint type import detection bug
+} from "./system";
 
 /** Method access flags. */
 export enum Access /* eslint-disable-line no-unused-vars */ { // ESLint detection bug
@@ -142,7 +145,12 @@ export class Subsystem extends SubsystemEntrypoint {
 	private method: Method = new Object() as Method;
 
 	/** Constructs subsystem. */
-	constructor({ system, protectedEntrypoint, publicEntrypoint, sharedEntrypoint }: SubsystemArgs) {
+	constructor({
+		system,
+		protectedEntrypoint,
+		publicEntrypoint,
+		sharedEntrypoint
+	}: SubsystemArgs) {
 		// Call superclass constructor
 		super();
 
@@ -162,7 +170,9 @@ export class Subsystem extends SubsystemEntrypoint {
 	/** Adds subsystem data to the subsystem. */
 	protected addData(data: Array<SubsystemData>): void {
 		data.forEach((subsystemData: SubsystemData): void => {
-			let addSubsystemData: (access: "public" | "protected" | "private" | "shared") => void = (
+			let addSubsystemData: (
+				access: "public" | "protected" | "private" | "shared"
+			) => void = (
 				access: "public" | "protected" | "private" | "shared"
 			): void => {
 				if ((subsystemData.access & Access[access]) === Access[access]) {
@@ -191,7 +201,9 @@ export class Subsystem extends SubsystemEntrypoint {
 	protected addMethods(methods: Array<SubsystemMethod>): void {
 		// Bind methods
 		methods.forEach((method: SubsystemMethod): void => {
-			let addMethod: (access: "public" | "protected" | "private" | "shared") => void = (
+			let addMethod: (
+				access: "public" | "protected" | "private" | "shared"
+			) => void = (
 				access: "public" | "protected" | "private" | "shared"
 			): void => {
 				if ((method.access & Access[access]) === Access[access]) {
