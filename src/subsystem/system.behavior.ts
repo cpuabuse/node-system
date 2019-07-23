@@ -235,14 +235,11 @@ async function addBehaviors(
  * **Usage**
  *
  * ```typescript
- * // Create a new instance of Behavior
- * var behavior = new Behavior();
+ * // From within the system context - Add a behavior
+ * this.protected.subsystem.behavior.call.addBehavior("hello_behavior", () => console.log("Hello World"));
  *
- * // Add a behavior
- * behavior.addBehavior("hello_behavior", () => console.log("Hello World"));
- *
- * // Call a behavior
- * behavior.behave("hello_behavior");
+ * // From within the system context - Behave
+ * this.protected.subsystem.behavior.call.behave("hello_behavior");
  *
  * // Output:
  * // "Hello World"
@@ -281,7 +278,8 @@ function behave(this: Behavior, name: string): void {
  * **Usage**
  *
  * ```typescript
- * var options = {
+ * // Set options
+ * let options: Options = {
  *   id: "lab_inventory",
  *   rootDir: "labs",
  *   relativeInitDir: "black_mesa",
@@ -289,8 +287,11 @@ function behave(this: Behavior, name: string): void {
  *   logging: "console"
  * };
  *
- * var labInventory = new System(options);
- * labInventory.fire("system_load_aux", "Auxiliary system loaded.");
+ * // Create system
+ * let labInventory: System = new System({options});
+ *
+ * // Call fire
+ * labInventory.public.subsystem.behavior.call.fire("system_load_aux", "Auxiliary system loaded.");
  * ```
  */
 function fire(this: Behavior, name: string, message?: string): void {
