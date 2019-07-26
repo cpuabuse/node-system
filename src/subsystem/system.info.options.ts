@@ -20,7 +20,7 @@ interface OptionsVars {
 	homepage: string;
 } /* eslint-disable-line no-extra-semi */ // ESLint inteface no-extra-semi bug
 
-/** Variables of option subsystem, as stored.*/
+/** Variables of option subsystem, as stored. */
 export interface OptionsInterface
 	extends SystemOptions,
 		OptionsVars {} /* eslint-disable-line no-extra-semi */ // ESLint inteface no-extra-semi bug
