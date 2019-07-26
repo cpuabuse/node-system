@@ -15,9 +15,12 @@ import Info from "./system.info";
 import { LoaderError } from "../loaderError";
 import { Options as SystemOptions } from "../system/system"; /* eslint-disable-line no-unused-vars */ // ESLint type import detection bug
 
+/** Variables of Options subsystem, received from initialization file. */
 interface OptionsVars {
 	homepage: string;
 } /* eslint-disable-line no-extra-semi */ // ESLint inteface no-extra-semi bug
+
+/** Variables of option subsystem, as stored.*/
 export interface OptionsInterface
 	extends SystemOptions,
 		OptionsVars {} /* eslint-disable-line no-extra-semi */ // ESLint inteface no-extra-semi bug

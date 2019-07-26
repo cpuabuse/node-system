@@ -69,11 +69,8 @@ export interface Behaviors {
  * **Usage**
  *
  * ```typescript
- * // Create a new instance of Behavior
- * var behavior = new Behavior();
- *
- * // Add a behavior
- * behavior.addBehavior("hello_behavior", () => console.log("Hello World"));
+ * // From the context of class extending the system
+ * this.protected.subsystem.behavior.call.addBehavior("hello_behavior", () => console.log("Hello World"));
  * ```
  * @param name Name of the bahavior
  * @param callback Behavior callback function
@@ -130,22 +127,26 @@ async function addBehavior(
  * **Usage**
  *
  * ```typescript
- * var options = {
+ * // Set options
+ * let options: Options = {
  *   id: "lab_inventory",
  *   rootDir: "labs",
  *   relativeInitDir: "black_mesa",
  *   initFilename: "inventory.yml",
  *   logging: console
  * };
- * var behavior = {
+ * let behavior: Behavior = {
  *   "check_inventory": () => {
  *     // Behavior functionality
  *     // ...
  *   }
  * }
  *
- * var labInventory = new System(options);
- * labInventory.addBehaviors([behavior]).then(function(){
+ * // Create system
+ * let labInventory: System = new System({options});
+ *
+ * // Call addBehaviors
+ * labInventory.public.susbsystem.Behavior.call.addBehaviors([behavior]).then(function(){
  *   console.log("Behavior added.");
  * });
  * ```
