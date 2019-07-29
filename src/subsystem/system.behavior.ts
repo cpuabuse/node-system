@@ -72,7 +72,7 @@ export interface Behaviors {
  * // From the context of class extending the system
  * this.protected.subsystem.behavior.call.addBehavior("hello_behavior", () => console.log("Hello World"));
  * ```
- * @param name Name of the bahavior
+ * @param name Name of the behavior
  * @param callback Behavior callback function
  * @returns ID of the behavior; `behaviorCreationError` if creation failed
  */
@@ -249,11 +249,11 @@ async function addBehaviors(
  */
 function behave(this: Behavior, name: string): void {
 	try {
-		this.subsystem[this.role.log].call.log(
+		this.sharedSubsystem[this.role.log].call.log(
 			`Behavior - ${this.private.get.data[name].text}`
 		);
 	} catch (error) {
-		this.subsystem[this.role.log].call.log(
+		this.sharedSubsystem[this.role.log].call.log(
 			`Behavior - Undocumented behavior - ${name}`
 		);
 	}
@@ -328,12 +328,12 @@ function fire(this: Behavior, name: string, message?: string): void {
 
 		// Log
 		if (event.log) {
-			this.subsystem[this.role.log].call.log(`${event.log} - ${msg}`);
+			this.sharedSubsystem[this.role.log].call.log(`${event.log} - ${msg}`);
 		}
 
 		// Error
 		if (event.error) {
-			this.subsystem[this.role.log].call.error(`${name} - ${msg}`);
+			this.sharedSubsystem[this.role.log].call.error(`${name} - ${msg}`);
 		}
 
 		// Behavior
@@ -385,7 +385,7 @@ export default class Behavior extends Subsystem {
 	};
 
 	/** Contains the shared subsystem entrypoint. */
-	protected subsystem: {
+	protected sharedSubsystem: {
 		[key: string]: SubsystemEntrypoint;
 	};
 
@@ -408,7 +408,7 @@ export default class Behavior extends Subsystem {
 			this.role = args.shared.role;
 
 			// Assign shared subsystems
-			this.subsystem = args.shared.subsystem;
+			this.sharedSubsystem = args.shared.subsystem;
 
 			// Add the methods
 			this.addMethods([
