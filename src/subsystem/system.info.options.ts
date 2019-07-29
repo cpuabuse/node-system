@@ -27,10 +27,12 @@ export interface OptionsInterface
 
 /**
  * Checks options argument for missing incorrect property types
- * @param {module:system~System~SystemArgs} options System options argument
  * @returns {boolean} Returns true if the arguments is corrupt; false if OK
- * @example <caption>Usage</caption>
- * var options = {
+ * **Usage**
+ *
+ * ```typescript
+ * // Set options
+ * let options: Options = {
  *   id: "stars",
  *   rootDir: "test",
  *   relativeInitDir: "stars",
@@ -41,13 +43,15 @@ export interface OptionsInterface
  * if (System.checkOptionsFailure(options)){
  *   throw new Error ("Options inconsistent.");
  * }
+ * ```
+ * @param {module:system~System~SystemArgs} options System options argument
  */
-export function checkOptionsFailure(options: SystemOptions) {
-	let failed = false;
+export function checkOptionsFailure(options: SystemOptions): boolean {
+	let failed: boolean = false;
 
 	if (options) {
 		// Checks boolean
-		if (!options.hasOwnProperty("logging")) {
+		if (!Object.prototype.hasOwnProperty.call(options, "logging")) {
 			failed = true;
 		} else if (typeof options.logging !== "string") {
 			failed = true;
@@ -66,8 +70,10 @@ export function checkOptionsFailure(options: SystemOptions) {
 			"relativeInitDir",
 			"initFilename"
 		];
-		stringOptions.forEach(function(element) {
-			if (!options.hasOwnProperty(element)) {
+		stringOptions.forEach(function(
+			element: "id" | "rootDir" | "relativeInitDir" | "initFilename"
+		): void {
+			if (!Object.prototype.hasOwnProperty.call(options, element)) {
 				failed = true;
 			} else if (typeof options[element] !== "string") {
 				failed = true;

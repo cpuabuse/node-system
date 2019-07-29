@@ -17,21 +17,20 @@ import { LoaderError } from "../loaderError";
 
 /**
  * Log an error  message from the System context
- * @instance
- * @param {string} text - Message
- * @fires module:system.private~type_error
- * @example <caption>Usage</caption>
- * var options = {
- *   id: "lab_inventory",
- *   rootDir: "labs",
- *   relativeInitDir: "black_mesa",
- *   initFilename: "inventory.yml",
- *   logging: console
- * };
- * var text = "Testing Lab Inventory error log.";
+ * @fires module:system.private~type_error // TODO: Document fire
+ * **Usage**
  *
- * var labInventory = new System(options);
- * labInventory.error(text);
+ * ```typescript
+ * // Text to print
+ * let text = "Testing error log.";
+ *
+ * // From within the context of subsystem
+ * args.shared.subsystem.log.call.error(text);
+ *
+ * // Error log output:
+ * // Testing error log.
+ * ```
+ * @param text - Message
  */
 function error(this: Log, text: string): void {
 	if (this.subsystem[this.role.options].get.logging === "console") {
@@ -44,21 +43,19 @@ function error(this: Log, text: string): void {
 
 /**
  * Log message from the System context
- * @instance
- * @param {string} text - Message
- * @fires module:system.private~type_error
- * @example <caption>Usage</caption>
- * var options = {
- *   id: "lab_inventory",
- *   rootDir: "labs",
- *   relativeInitDir: "black_mesa",
- *   initFilename: "inventory.yml",
- *   loggomg: console
- * };
- * var text = "Lab Inventory working.";
+ * @fires module:system.private~type_error // TODO: Document fire
+ * **Usage**
  *
- * var labInventory = new System(options);
- * labInventory.log(text);
+ * ```typescript
+ * let text = "Lab Inventory working.";
+ *
+ * // From within the context of subsystem
+ * args.shared.subsystem.log.call.log(text);
+ *
+ * // Log output:
+ * // Lab Inventory working.
+ * ```
+ * @param text - Message
  */
 function log(this: Log, text: string): void {
 	if (this.subsystem[this.role.options].get.logging === "console") {
@@ -95,7 +92,6 @@ export default class Log extends Subsystem {
 
 		// Only if we received the args we continue
 		if (args.shared !== undefined) {
-			// Assigning shared to instance
 			this.role = args.shared.role;
 
 			// Assign shared subsystems
