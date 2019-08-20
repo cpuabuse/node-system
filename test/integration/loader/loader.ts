@@ -316,6 +316,18 @@ export function test(): void {
 							[element.dir, element.dir]
 						);
 					});
+					it("should work with two arrays", function(): void {
+						deepStrictEqual(
+							Loader.toRelative(
+								[element.rootDir, element.rootDir, element.rootDir],
+								[absolutePath, absolutePath]
+							),
+							[element.dir, element.dir, element.dir]
+						);
+					});
+					it("should work with two empty arrays", function(): void {
+						deepStrictEqual(Loader.toRelative([], []), [""]);
+					});
 				});
 
 				/**
