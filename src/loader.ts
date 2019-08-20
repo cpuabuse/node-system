@@ -37,21 +37,92 @@ export class Loader {
 	 * @param target File/folder name|names.
 	 * @returns Relative path|paths.
 	 */
-	public static toRelative(dir: string, target: string | Array<string>): string | Array<string> {
-		if (Array.isArray(target)) {
-			let results: Array<string> = new Array() as Array<string>; // Prepare the return array
+	public static toRelative(
+		dir: string | Array<string>,
+		target: string | Array<string>
+	): string | Array<string> {
+		// Determine if dir is an Array
+		let dirIsArray: boolean = Array.isArray(dir);
 
-			// Populate return array
-			target.forEach(function(targetMember: string): void {
-				results.push(path.relative(dir, targetMember));
-			});
+		// Determine maximum dir length
+		let dirLength: number = dirIsArray ? dir.length : 1;
 
-			// Return an array
-			return results;
+		// Determine if target is an Array
+		let targetIsArray: boolean = Array.isArray(target);
+
+		// Determine maximum target length
+		let targetLength: number = targetIsArray ? target.length : 1;
+
+		// Determine maximum length
+		let maxLength: number = dirLength > targetLength ? dirLength : targetLength;
+
+		// Special case, when both are strings
+		if (!dirIsArray && !targetIsArray) {
+			return path.relative(dir as string, target as string);
 		}
 
-		// Return a string if not an array
-		return path.relative(dir, target);
+		// Special case, when args provided were exclusively empty arrays
+		if (maxLength === 0) {
+			return [""];
+		}
+
+		// Create target array - an array holding intermediate data
+		let targetArray: Array<{ dir: string; target: string }> = new Array();
+
+		// Populate target Array
+		for (let i: number = 0; i < maxLength; i++) {
+			// Prepare data
+			let dirForTargetArray, targetForTargetArray: string;
+
+			// Assign the dir counter part for the target array
+			if (dirIsArray) {
+				// If array is empty
+				if (dirLength === 0) {
+					dirForTargetArray = "";
+				} else {
+					// Assign dir[i] if dir array is long enough
+					dirForTargetArray = i < dirLength ? dir[i] : dir[dirLength - 1];
+				}
+			} else {
+				// If it is a string, assign a string
+				dirForTargetArray = dir as string;
+			}
+
+			// Assign the target counter part for the target array
+			if (targetIsArray) {
+				// If array is empty
+				if (targetLength === 0) {
+					targetForTargetArray = "";
+				} else {
+					// Assign target[i] if target array is long enough
+					targetForTargetArray =
+						i < targetLength ? target[i] : target[targetLength - 1];
+				}
+			} else {
+				// If it is a string, assign a string
+				targetForTargetArray = target as string;
+			}
+
+			// Copy values into target Array
+			targetArray.push({
+				dir: dirForTargetArray,
+				target: targetForTargetArray
+			});
+		}
+
+		// Create a new final Array for the result
+		let resultArray: Array<string> = new Array();
+
+		// Populate return array
+		targetArray.forEach(function(targetMember: {
+			dir: string;
+			target: string;
+		}): void {
+			resultArray.push(path.relative(targetMember.dir, targetMember.target));
+		});
+
+		// Return
+		return resultArray;
 	}
 
 	/**
@@ -74,14 +145,23 @@ export class Loader {
 		var standardConstructor = () => {
 			// Initialization recursion; The error handling of the callback will happen asynchronously
 			// @ts-ignore
-			callback(initRecursion(rootDir as string, arg_relativeInitDir as string, arg_initFilename, this, true));
+			callback(
+				initRecursion(
+					rootDir as string,
+					arg_relativeInitDir as string,
+					arg_initFilename as string,
+					this,
+					true
+				)
+			);
 		};
 
 		// Determine which constructor to use.
 		let previousIsNull: boolean | null = null;
 		for (let a = 0; a < arguments.length; a++) {
 			if (a === 0) {
-				previousIsNull = arguments[a] === null; /* eslint-disable-line prefer-rest-params */
+				previousIsNull =
+					arguments[a] === null; /* eslint-disable-line prefer-rest-params */
 			} else if (previousIsNull !== (arguments[a] === null)) {
 				/* eslint-disable-line prefer-rest-params */
 				throw new LoaderError(
@@ -130,7 +210,11 @@ export class Loader {
 	 * @param file Full file name.
 	 * @returns File contents.
 	 */
-	static getFile(rootDir: string, relativeDir: string, file: string): Promise<Buffer> {
+	static getFile(
+		rootDir: string,
+		relativeDir: string,
+		file: string
+	): Promise<Buffer> {
 		return new Promise(function(resolve, reject) {
 			fs.readFile(path.join(rootDir, relativeDir, file), function(err, data) {
 				if (err) {
@@ -157,11 +241,13 @@ export class Loader {
 	 * @param pathArrays File/folder name|names.
 	 * @returns Absolute path|paths.
 	 */
-	static join(...pathArrays: Array<string | Array<string>>): string | Array<string> {
+	static join(
+		...pathArrays: Array<string | Array<string>>
+	): string | Array<string> {
 		// Determine maximum pathArray length & construct metadata
-		var maxLength: number = 0;
-		var arraysMeta: Array<{ isArray: boolean; length: number }> = new Array();
-		pathArrays.forEach(function(pathArray) {
+		let maxLength: number = 0;
+		let arraysMeta: Array<{ isArray: boolean; length: number }> = new Array();
+		pathArrays.forEach(function(pathArray: any): void {
 			let isArray: boolean = Array.isArray(pathArray);
 			let length: number = isArray ? pathArray.length : 1;
 
@@ -179,43 +265,46 @@ export class Loader {
 
 		// Special case, when args provided were exclusively empty arrays
 		if (maxLength === 0) {
-			return "";
+			return [""];
 		}
 
 		// Loop
-		let filter: Array<{ isArray: boolean; length: number }> = arraysMeta.filter(function(array) {
-			return array.isArray;
-		});
+		let filter: Array<{ isArray: boolean; length: number }> = arraysMeta.filter(
+			function(array) {
+				return array.isArray;
+			}
+		);
 		if (filter.length === 0) {
 			// Return a string if no arrays
 			return path.join(...(<Array<string>>pathArrays)); // Casting due to inability of compiler to detect that there are no other types possible
-		} else {
-			// In case of arrays present
-			var results: Array<string> = new Array(); // Prepare the return array
-			for (let i = 0; i < maxLength; i++) {
-				let joinData: Array<string> = new Array();
-				pathArrays.forEach(function(pathArray, index) {
-					let toPush: string | null = null;
-					let { length }: { isArray: boolean; length: number } = arraysMeta[index];
-					if (arraysMeta[index].isArray) {
-						if (length < i + 1) {
-							if (length > 0) {
-								toPush = pathArray[length];
-							}
-						} else {
-							toPush = pathArray[i];
+		}
+		// In case of arrays present
+		let results: Array<string> = new Array(); // Prepare the return array
+		for (let i: number = 0; i < maxLength; i++) {
+			let joinData: Array<string> = new Array();
+			pathArrays.forEach(function(pathArray, index) {
+				let toPush: string | null = null;
+				let { length }: { isArray: boolean; length: number } = arraysMeta[
+					index
+				];
+				if (arraysMeta[index].isArray) {
+					if (length < i + 1) {
+						if (length > 0) {
+							toPush = pathArray[length];
 						}
 					} else {
-						toPush = <string>pathArray; // Casting due to inability of compiler to detect that there are no other types possible
+						toPush = pathArray[i];
 					}
-					if (toPush !== null) {
-						joinData.push(toPush);
-					}
-				});
-				results.push(path.join(...joinData));
-			}
-			return results;
+				} else {
+					toPush = <string>pathArray; // Casting due to inability of compiler to detect that there are no other types possible
+				}
+				if (toPush !== null) {
+					joinData.push(toPush);
+				}
+			});
+			results.push(path.join(...joinData));
 		}
+		return results;
 	}
 
 	/**
@@ -454,7 +543,9 @@ async function initRecursion(
 				if (init[key] !== null) {
 					// Custom properties
 					// Check if property is set or assume default
-					let checkDefaultStringDirective: (property: string) => boolean = function(property) {
+					let checkDefaultStringDirective: (
+						property: string
+					) => boolean = function(property) {
 						if (init[key].hasOwnProperty(property)) {
 							if (typeof init[key][property] === "string") {
 								if (init[key][property] != "") {
@@ -465,7 +556,9 @@ async function initRecursion(
 						return false;
 					};
 
-					let checkDefaultBooleanDirective: (property: string) => boolean = function(property) {
+					let checkDefaultBooleanDirective: (
+						property: string
+					) => boolean = function(property) {
 						if (init[key].hasOwnProperty(property)) {
 							if (typeof init[key][property] === "boolean") {
 								return true;
@@ -549,7 +642,11 @@ async function initSettings(
  * @param filename Filename, with or without extension.
  * @returns Javascript object.
  */
-export async function loadYaml(rootDir: string, relativeDir: string, filename: string) {
+export async function loadYaml(
+	rootDir: string,
+	relativeDir: string,
+	filename: string
+) {
 	var fileExtension: string = ".yml"; // Making a variable for interpreted language like this would not even save any memory, but it feels right
 
 	// Add file extension if absent
